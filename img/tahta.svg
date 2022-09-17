@@ -1,0 +1,42 @@
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 480 480">
+  <title>Dama Tahtası</title>
+  <g>
+    <rect width="480" height="480" fill="lemonchiffon" />
+    <rect width="430" height="430"
+      stroke="black" stroke-opacity="33%" stroke-width="5"
+      fill="black" x="25" y="25"/>
+    <g fill="wheat"></g>
+    <g fill="black" stroke="white" stroke-width="2" stroke-dasharray="2"></g>
+    <g fill="white" stroke="black" stroke-width="1" stroke-dasharray="1"></g>
+    <g fill="gray" font-family="sans-serif"></g>
+
+    <path d="M 27,43 27,27 43,27 M 59,27 75,27 75,43 M 75,59 75,75 59,75 M 43,75 27,75 27,59"
+      stroke-width="3" stroke="blue" fill="none" visibility="hidden">
+      <animate attributeName="stroke-opacity" from="0" to="1" dur="350ms" begin="indefinite" />
+    </path>
+    <animateTransform attributeName="transform" type="rotate" dur="330ms" fill="freeze"
+                      begin="indefinite" additive="sum" />
+    <animateTransform attributeName="transform" type="translate" dur="300ms" fill="freeze"
+                      begin="indefinite" additive="sum" />
+    <animateTransform attributeName="transform" type="scale" dur="300ms" fill="freeze"
+                      begin="indefinite" additive="sum" />
+    <line x1="25" y1="23" x2="455" y2="23" id="siyah" visibility="hidden"
+          stroke="lime" stroke-width="5" stroke-linecap="round" />
+    <line x1="25" y1="457" x2="455" y2="457" id="beyaz" visibility="hidden"
+          stroke="lime" stroke-width="5" stroke-linecap="round" />
+  </g>
+
+  <defs>
+    <radialGradient id="beyazdama">
+      <stop offset="30%" stop-color="white" />
+      <stop offset="45%" stop-color="black" />
+      <stop offset="60%" stop-color="white" />
+    </radialGradient>
+    <radialGradient id="siyahdama">
+      <stop offset="20%" stop-color="black" />
+      <stop offset="45%" stop-color="white" />
+      <stop offset="70%" stop-color="black" />
+    </radialGradient>
+  </defs>
+</svg>

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./css/style.css">
+    <title>Dama</title>
+</head>
+<body>
+  <main>
+    <div class="çerçeve">
+      <button type="button">
+        <svg class="ikon" fill="currentColor" id="çevir">
+          <use xlink:href="./img/icons.svg#arrow-counterclockwise"/>
+        </svg>
+      </button>
+      <button type="button">
+        <svg class="ikon" fill="currentColor" id="çgör">
+          <use xlink:href="./img/icons.svg#arrows-angle-expand"/>
+        </svg>
+      </button>
+    </div>    
+    <div>
+      <object data="./img/tahta.svg" type="image/svg+xml"></object>
+    </div>
+  </main>  
+
+  <script type="module">
+    import * as Dama from './js/dama.js';
+
+    onload = () => {
+      const th = document.querySelector('object').contentDocument;
+      Dama.tahta_çiz(th);
+      document.querySelector('#çevir').addEventListener('click', Dama.tahta_çevir(th));
+      const çerçe = Dama.çerçeve_gör(th);
+      document.querySelector('#çgör').addEventListener('click', (e) => {
+        if (çerçe())
+          e.target.children[0].attributes[0].value = './img/icons.svg#arrows-angle-expand';
+        else
+          e.target.children[0].attributes[0].value = './img/icons.svg#arrows-angle-contract';
+      });      
+      Dama.oynat(th);
+    };    
+  </script>
+</body>
+</html>
