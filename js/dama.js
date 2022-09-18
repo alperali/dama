@@ -105,16 +105,18 @@ function oynat(th) {
   th.querySelectorAll('g')[1].addEventListener('click', kare_seç);
   th.querySelectorAll('g')[2].addEventListener('click', siyah_oynat);
   th.querySelectorAll('g')[3].addEventListener('click', beyaz_oynat);
-  let from, seçili = false;
+  let from, seçim_sabit=false, seçili=false;
 
   function siyah_oynat(e) {
     if (!sıra_siyahta) return;
+    if (seçim_sabit)   return;
     sıra_beyazda = false;  // oyun başında gerekli sadece
     marker_set(from=e.target);
   }
 
   function beyaz_oynat(e) {
-    if (!sıra_beyazda)  return;
+    if (!sıra_beyazda) return;
+    if (seçim_sabit)   return;
     sıra_siyahta = false;  // oyun başında gerekli sadece
     marker_set(from=e.target);
   }
@@ -145,10 +147,12 @@ function oynat(th) {
           from.setAttribute('stroke-width', '2');
           from.setAttribute('fill', 'url(#beyazdama)');
         }
-        if (taş_aldı && !dama_oldu && daha_alır_mı(1))  // yeni dama olmuş taş almaya devam edemez
+        if (taş_aldı && !dama_oldu && daha_alır_mı(1)) {
           marker_set(from);
+          seçim_sabit = true;
+        }
         else {
-          sıra_beyazda = seçili = false;
+          sıra_beyazda = seçili = seçim_sabit = false;
           sıra_siyahta = true;
           marker.setAttribute('visibility','hidden');
           th.querySelector('line#siyah').setAttribute('visibility', 'visible');
@@ -169,10 +173,12 @@ function oynat(th) {
           from.setAttribute('stroke', 'dimgray');
           from.setAttribute('fill', 'url(#siyahdama)');
         }
-        if (taş_aldı && !dama_oldu && daha_alır_mı(-1))  // yeni dama olmuş taş almaya devam edemez
+        if (taş_aldı && !dama_oldu && daha_alır_mı(-1)) {
           marker_set(from);
+          seçim_sabit = true;
+        }
         else {
-          sıra_siyahta = seçili = false;
+          sıra_siyahta = seçili = seçim_sabit = false;
           sıra_beyazda = true;
           marker.setAttribute('visibility','hidden');
           th.querySelector('line#siyah').setAttribute('visibility', 'hidden');
