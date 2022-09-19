@@ -13,7 +13,7 @@
 
     <path d="M 27,43 27,27 43,27 M 59,27 75,27 75,43 M 75,59 75,75 59,75 M 43,75 27,75 27,59"
       stroke-width="3" stroke="blue" fill="none" visibility="hidden">
-      <animate attributeName="stroke-opacity" from="0" to="1" dur="350ms" begin="indefinite" />
+      <animate attributeName="stroke-opacity" from="0" to="1" dur="250ms" begin="indefinite" />
     </path>
     <animateTransform attributeName="transform" type="rotate" dur="330ms" fill="freeze"
                       begin="indefinite" additive="sum" />

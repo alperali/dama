@@ -253,24 +253,125 @@ function oynat(th) {
           return [false,];  // bu devinim mümkün değil.
       }
 
-      function yatay_devinim() {
-        from.children[0].setAttribute('attributeName', 'cx');
-        from.children[0].setAttribute('from', `${from.cx.baseVal.value}`);
-        from.children[0].setAttribute('to', `${(to_x-x)*54 + from.cx.baseVal.value}`);
-        from.dataset.x = to_x;
-        from.setAttribute('cx', `${(to_x-x)*54 + from.cx.baseVal.value}`);
-        from.children[0].beginElement();
-      }
-      function düşey_devinim() {
-        from.children[0].setAttribute('attributeName', 'cy');
-        from.children[0].setAttribute('from', `${from.cy.baseVal.value}`);
-        from.children[0].setAttribute('to', `${(y-to_y)*54 + from.cy.baseVal.value}`);
-        from.dataset.y = to_y;
-        from.setAttribute('cy', `${(y-to_y)*54 + from.cy.baseVal.value}`);
-        from.children[0].beginElement();
-      }
-
+    /* dama taş */
+    if (y == to_y && arası_boş_mu_yatay(x, to_x, y)) {
+      yatay_devinim();
+      return [true,false];
     }
+    else if (x == to_x && arası_boş_mu_düşey(y, to_y, x)) {
+      düşey_devinim();
+      return [true,false];
+    }
+    else { /* taş alma hamlesi */
+      let av = {};
+      av.renk = (yön == 1 ? 'siyah' : 'beyaz');
+      av.x = x; av.y = y;
+      if (y == to_y && arası_tek_av_mı_yatay(x, to_x, av)) {
+        th.querySelector(`g g rect[data-x="${av.x}"][data-y="${y}"]`).dataset.taş = 'yok';
+        th.querySelector(`g g circle[data-x="${av.x}"][data-y="${y}"]`).remove();
+        yatay_devinim();
+        return [true,true];
+      }
+      else if (x == to_x && arası_tek_av_mı_düşey(y, to_y, av)) {
+        th.querySelector(`g g rect[data-x="${x}"][data-y="${av.y}"]`).dataset.taş = 'yok';
+        th.querySelector(`g g circle[data-x="${x}"][data-y="${av.y}"]`).remove();
+        düşey_devinim();
+        return [true,true];
+      }
+      else
+        return [false,];  // bu devinim mümkün değil.
+    }
+
+    function arası_boş_mu_yatay(x, to_x, y) {
+      if (Math.abs(x - to_x) == 1)  return true;
+      let baş, son;
+      if (to_x > x) {
+        baş = x+1; son = to_x;
+      }
+      else {
+        baş = to_x+1; son = x;
+      }
+      for (let i=baş; i < son; ++i)
+        if (th.querySelector(`g g rect[data-x="${i}"][data-y="${y}"]`).dataset.taş !== 'yok')
+          return false;
+
+      return true;
+    }
+
+    function arası_boş_mu_düşey(y, to_y, x) {
+      if (Math.abs(y - to_y) == 1)  return true;
+      let baş, son;
+      if (to_y > y) {
+        baş = y+1; son = to_y;
+      }
+      else {
+        baş = to_y+1; son = y;
+      }
+      for (let i=baş; i < son; ++i)
+        if (th.querySelector(`g g rect[data-x="${x}"][data-y="${i}"]`).dataset.taş !== 'yok')
+          return false;
+
+      return true;
+    }
+
+    function arası_tek_av_mı_yatay(x, to_x, av) {
+      let baş, son, say=0, t;
+      if (to_x > x) {
+        baş = x+1; son = to_x;
+      }
+      else {
+        baş = to_x+1; son = x;
+      }
+      for (let i=baş; i<son; ++i) {
+        t = th.querySelector(`g g rect[data-x="${i}"][data-y="${av.y}"]`);
+        if (t.dataset.taş == av.renk) { av.x=i; ++say; }
+        else if (t.dataset.taş == 'yok') continue;
+        else return false;  /* arada kendiyle aynı renk taş var */
+      }
+      
+      if (say > 1)  return false;
+      
+      return true;
+    }
+
+    function arası_tek_av_mı_düşey(y, to_y, av) {
+      let baş, son, say=0, t;
+      if (to_y > y) {
+        baş = y+1; son = to_y;
+      }
+      else {
+        baş = to_y+1; son = y;
+      }
+      for (let i=baş; i<son; ++i) {
+        t = th.querySelector(`g g rect[data-x="${av.x}"][data-y="${i}"]`);
+        if (t.dataset.taş == av.renk) { av.y=i; ++say; }
+        else if (t.dataset.taş == 'yok') continue;
+        else return false;  /* arada kendiyle aynı renk taş var */
+      }
+      
+      if (say > 1)  return false;
+      
+      return true;
+    }
+
+    function yatay_devinim() {
+      from.children[0].setAttribute('attributeName', 'cx');
+      from.children[0].setAttribute('from', `${from.cx.baseVal.value}`);
+      from.children[0].setAttribute('to', `${(to_x-x)*54 + from.cx.baseVal.value}`);
+      from.dataset.x = to_x;
+      from.setAttribute('cx', `${(to_x-x)*54 + from.cx.baseVal.value}`);
+      from.children[0].beginElement();
+    }
+    function düşey_devinim() {
+      from.children[0].setAttribute('attributeName', 'cy');
+      from.children[0].setAttribute('from', `${from.cy.baseVal.value}`);
+      from.children[0].setAttribute('to', `${(y-to_y)*54 + from.cy.baseVal.value}`);
+      from.dataset.y = to_y;
+      from.setAttribute('cy', `${(y-to_y)*54 + from.cy.baseVal.value}`);
+      from.children[0].beginElement();
+    }
+
+  } /* taş_devindir */
 
 } /* oynat */
 
