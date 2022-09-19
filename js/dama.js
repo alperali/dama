@@ -139,15 +139,7 @@ function oynat(th) {
       if (devindi) {
         e.target.dataset.taş = 'beyaz';
         seçilen_taşın_karesi.dataset.taş = 'yok';
-        let dama_oldu = false;
-        if (from.dataset.dama == '0' && from.dataset.y == '8') {
-          dama_oldu = true;
-          from.dataset.dama = '1';
-          from.setAttribute('stroke-dasharray','none');
-          from.setAttribute('stroke-width', '2');
-          from.setAttribute('fill', 'url(#beyazdama)');
-        }
-        if (taş_aldı && !dama_oldu && daha_alır_mı(1)) {
+        if (taş_aldı && daha_alır_mı(1)) {
           marker_set(from);
           seçim_sabit = true;
         }
@@ -157,23 +149,21 @@ function oynat(th) {
           marker.setAttribute('visibility','hidden');
           th.querySelector('line#siyah').setAttribute('visibility', 'visible');
           th.querySelector('line#beyaz').setAttribute('visibility', 'hidden');
+          if (from.dataset.dama == '0' && from.dataset.y == '8') {
+            from.dataset.dama = '1';
+            from.setAttribute('stroke-dasharray','none');
+            from.setAttribute('stroke-width', '2');
+            from.setAttribute('fill', 'url(#beyazdama)');
+          }
         }
       }
-    } 
+    }
     else {  /* sıra siyahta */
       const [devindi, taş_aldı] = siyah_devin(+e.target.dataset.x, +e.target.dataset.y);
       if (devindi) {
         e.target.dataset.taş = 'siyah';
         seçilen_taşın_karesi.dataset.taş = 'yok';
-        let dama_oldu = false;
-        if (from.dataset.dama == '0' && from.dataset.y == '1') {
-          dama_oldu = true;
-          from.dataset.dama = '1';
-          from.setAttribute('stroke-dasharray','none');
-          from.setAttribute('stroke', 'dimgray');
-          from.setAttribute('fill', 'url(#siyahdama)');
-        }
-        if (taş_aldı && !dama_oldu && daha_alır_mı(-1)) {
+        if (taş_aldı && daha_alır_mı(-1)) {
           marker_set(from);
           seçim_sabit = true;
         }
@@ -183,6 +173,13 @@ function oynat(th) {
           marker.setAttribute('visibility','hidden');
           th.querySelector('line#siyah').setAttribute('visibility', 'hidden');
           th.querySelector('line#beyaz').setAttribute('visibility', 'visible');
+          if (from.dataset.dama == '0' && from.dataset.y == '1') {
+            dama_oldu = true;
+            from.dataset.dama = '1';
+            from.setAttribute('stroke-dasharray','none');
+            from.setAttribute('stroke', 'dimgray');
+            from.setAttribute('fill', 'url(#siyahdama)');
+          }
         }
       }
     }
