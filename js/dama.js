@@ -174,7 +174,6 @@ function oynat(th) {
           th.querySelector('line#siyah').setAttribute('visibility', 'hidden');
           th.querySelector('line#beyaz').setAttribute('visibility', 'visible');
           if (from.dataset.dama == '0' && from.dataset.y == '1') {
-            dama_oldu = true;
             from.dataset.dama = '1';
             from.setAttribute('stroke-dasharray','none');
             from.setAttribute('stroke', 'dimgray');
