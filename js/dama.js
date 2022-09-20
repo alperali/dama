@@ -185,6 +185,8 @@ function oynat(th) {
 
     function daha_alır_mı(yön) {
       const renk = (yön == 1 ? 'siyah' : 'beyaz');
+      if (from.dataset.dama == '1')
+        return daha_alır_mı_dama(renk);
       if (
         (th.querySelector(`g g rect[data-x="${+from.dataset.x-2}"][data-y="${+from.dataset.y}"]`)?.dataset.taş == 'yok' &&
          th.querySelector(`g g rect[data-x="${+from.dataset.x-1}"][data-y="${+from.dataset.y}"]`).dataset.taş == renk)  ||
@@ -197,7 +199,23 @@ function oynat(th) {
       else
         return false;
     }
-  }
+
+    function daha_alır_mı_dama(renk) {
+      let t, x=[-1,0,1,0], y=[0,1,0,-1];
+      for (let d=0; d<4; ++d)
+        for (let i=1, buldu=false; t=th.querySelector(`g g rect[data-x="${+from.dataset.x + x[d]*i}"][data-y="${+from.dataset.y + y[d]*i}"]`); ++i)
+          if (t.dataset.taş == renk)
+            if (buldu) break; /* yanyana iki rakip taş */
+            else buldu = true;
+          else if (t.dataset.taş == 'yok')
+            if (buldu) return true;
+            else continue;
+          else break; /* kendiyle aynı renk taş */
+
+      return false;
+    }
+
+  } /* kare_seç */
   
   function beyaz_devin(to_x, to_y) {
     return taş_devindir(from, to_x, to_y, 1);
