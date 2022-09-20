@@ -1,4 +1,5 @@
 const celm = (th,e) => th.createElementNS('http://www.w3.org/2000/svg', e);
+const Yön = {B: 0, K: 1, D: 2, G: 3};
 
 export 
 function tahta_çiz(th) {
@@ -135,11 +136,11 @@ function oynat(th) {
     
     let seçilen_taşın_karesi = th.querySelector(`g g rect[data-x="${from.dataset.x}"][data-y="${from.dataset.y}"]`);
     if (sıra_beyazda) {
-      const [devindi, taş_aldı] = beyaz_devin(+e.target.dataset.x, +e.target.dataset.y);
+      const [devindi, taş_aldı, dama_yön] = beyaz_devin(+e.target.dataset.x, +e.target.dataset.y);
       if (devindi) {
         e.target.dataset.taş = 'beyaz';
         seçilen_taşın_karesi.dataset.taş = 'yok';
-        if (taş_aldı && daha_alır_mı(1)) {
+        if (taş_aldı && daha_alır_mı(1, dama_yön)) {
           marker_set(from);
           seçim_sabit = true;
         }
@@ -159,11 +160,11 @@ function oynat(th) {
       }
     }
     else {  /* sıra siyahta */
-      const [devindi, taş_aldı] = siyah_devin(+e.target.dataset.x, +e.target.dataset.y);
+      const [devindi, taş_aldı, dama_yön] = siyah_devin(+e.target.dataset.x, +e.target.dataset.y);
       if (devindi) {
         e.target.dataset.taş = 'siyah';
         seçilen_taşın_karesi.dataset.taş = 'yok';
-        if (taş_aldı && daha_alır_mı(-1)) {
+        if (taş_aldı && daha_alır_mı(-1, dama_yön)) {
           marker_set(from);
           seçim_sabit = true;
         }
@@ -183,10 +184,10 @@ function oynat(th) {
       }
     }
 
-    function daha_alır_mı(yön) {
+    function daha_alır_mı(yön, dama_yön) {
       const renk = (yön == 1 ? 'siyah' : 'beyaz');
       if (from.dataset.dama == '1')
-        return daha_alır_mı_dama(renk);
+        return daha_alır_mı_dama(renk, dama_yön);
       if (
         (th.querySelector(`g g rect[data-x="${+from.dataset.x-2}"][data-y="${+from.dataset.y}"]`)?.dataset.taş == 'yok' &&
          th.querySelector(`g g rect[data-x="${+from.dataset.x-1}"][data-y="${+from.dataset.y}"]`).dataset.taş == renk)  ||
@@ -200,15 +201,17 @@ function oynat(th) {
         return false;
     }
 
-    function daha_alır_mı_dama(renk) {
-      let t, x=[-1,0,1,0], y=[0,1,0,-1];
-      for (let d=0; d<4; ++d)
+    function daha_alır_mı_dama(renk, dama_yön) {
+      // dama_yön: damanın, son taşı alırken hangi yönde atılım yaptığı. Bu yönün
+      //           tam tersinde taş almaya devam edemez.
+      let t, x=[-1,0,1,0], y=[0,1,0,-1], ters_yön=[Yön.D, Yön.G, Yön.B, Yön.K];
+      for (let d=Yön.B; d<=Yön.G; ++d)
         for (let i=1, buldu=false; t=th.querySelector(`g g rect[data-x="${+from.dataset.x + x[d]*i}"][data-y="${+from.dataset.y + y[d]*i}"]`); ++i)
           if (t.dataset.taş == renk)
-            if (buldu) break; /* yanyana iki rakip taş */
+            if (buldu) break; /* yanyana iki yağı taş */
             else buldu = true;
           else if (t.dataset.taş == 'yok')
-            if (buldu) return true;
+            if (buldu && ters_yön[dama_yön] != d) return true;
             else continue;
           else break; /* kendiyle aynı renk taş */
 
@@ -226,19 +229,20 @@ function oynat(th) {
   }
 
   function taş_devindir(from, to_x, to_y, yön) {
-    // devinirse [true, false]
-    // rakip taşı alarak devinirse [true, true]
-    // devinemezse [false,] 
+    // devinirse [true, false,]
+    // yağı taşı alarak devinirse [true, true,]
+    // dama taş, yağı taşı alarak devinirse [true, true, Yön]
+    // devinemezse [false,,]
     // döndürür.
     let x=+from.dataset.x, y=+from.dataset.y, dama=+from.dataset.dama;
     if (!dama) // yoz taş
       if (y == to_y && (to_x == x-1 || to_x == x+1)) {
         yatay_devinim();
-        return [true,false];
+        return [true,false,];
       }
       else if (x == to_x && to_y == y+yön) {
         düşey_devinim();
-        return [true,false];
+        return [true,false,];
       }
       else  {   /* taş alma hamlesi */
         let renk = (yön == 1 ? 'siyah' : 'beyaz'), av;
@@ -247,34 +251,34 @@ function oynat(th) {
             av.dataset.taş = 'yok';
             th.querySelector(`g g circle[data-x="${x-1}"][data-y="${y}"]`).remove();
             yatay_devinim();
-            return [true,true];
+            return [true,true,];
         }
         else if (y == to_y && to_x == x+2 &&
             (av=th.querySelector(`g g rect[data-x="${x+1}"][data-y="${y}"]`)).dataset.taş === renk) {
             av.dataset.taş = 'yok';
             th.querySelector(`g g circle[data-x="${x+1}"][data-y="${y}"]`).remove();
             yatay_devinim();
-            return [true,true];
+            return [true,true,];
         }
         else if (x == to_x && to_y == y+(2*yön) && 
             (av=th.querySelector(`g g rect[data-x="${x}"][data-y="${y+yön}"]`)).dataset.taş === renk) {
             av.dataset.taş = 'yok';
             th.querySelector(`g g circle[data-x="${x}"][data-y="${y+yön}"]`).remove();
             düşey_devinim();
-            return [true,true];
+            return [true,true,];
         }
         else
-          return [false,];  // bu devinim mümkün değil.
+          return [false,,];  // bu devinim mümkün değil.
       }
 
     /* dama taş */
     if (y == to_y && arası_boş_mu_yatay(x, to_x, y)) {
       yatay_devinim();
-      return [true,false];
+      return [true,false,];
     }
     else if (x == to_x && arası_boş_mu_düşey(y, to_y, x)) {
       düşey_devinim();
-      return [true,false];
+      return [true,false,];
     }
     else { /* taş alma hamlesi */
       let av = {};
@@ -284,16 +288,16 @@ function oynat(th) {
         th.querySelector(`g g rect[data-x="${av.x}"][data-y="${y}"]`).dataset.taş = 'yok';
         th.querySelector(`g g circle[data-x="${av.x}"][data-y="${y}"]`).remove();
         yatay_devinim();
-        return [true,true];
+        return [true,true,(av.x < x ? Yön.B : Yön.D)];
       }
       else if (x == to_x && arası_tek_av_mı_düşey(y, to_y, av)) {
         th.querySelector(`g g rect[data-x="${x}"][data-y="${av.y}"]`).dataset.taş = 'yok';
         th.querySelector(`g g circle[data-x="${x}"][data-y="${av.y}"]`).remove();
         düşey_devinim();
-        return [true,true];
+        return [true,true,(av.y > y ? Yön.K : Yön.G)];
       }
       else
-        return [false,];  // bu devinim mümkün değil.
+        return [false,,];  // bu devinim mümkün değil.
     }
 
     function arası_boş_mu_yatay(x, to_x, y) {
