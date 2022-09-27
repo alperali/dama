@@ -9,7 +9,7 @@ function tahta_çiz(th) {
     let tt, x_off = 54, x1 = 47, x2 = 57,
             y_off = 54, y1 = 436, y2 = 426;
 
-    for (let c of "abcdefgh") {
+    for (let c of 'abcdefgh') {
       tt = celm(th, 'text');
       tt.x.baseVal.appendItem(th.documentElement.createSVGLength());
       tt.x.baseVal[0].value = x1;
@@ -30,7 +30,7 @@ function tahta_çiz(th) {
       x2 += x_off;
     }
 
-    for (let c of "12345678") {
+    for (let c of '12345678') {
       tt = celm(th, 'text');
       tt.x.baseVal.appendItem(th.documentElement.createSVGLength());
       tt.x.baseVal[0].value = 8;
@@ -61,7 +61,7 @@ function tahta_çiz(th) {
       dd.height.baseVal.value = 52;
       dd.dataset.x = x_say+1;
       dd.dataset.y = 8-y_say;
-      dd.dataset.taş = "yok";
+      dd.dataset.taş = 'yok';
       th.querySelectorAll('g')[1].appendChild(dd);
     }
   for (let y=105, y_say=0, yery='76'; y_say<2; y+=54, ++y_say)
@@ -72,7 +72,7 @@ function tahta_çiz(th) {
       cc.r.baseVal.value = 21;
       cc.dataset.x = x_say+1;
       cc.dataset.y = yery[y_say];
-      th.querySelector(`g g rect[data-x="${cc.dataset.x}"][data-y="${cc.dataset.y}"`).dataset.taş ="siyah";
+      th.querySelector(`g g rect[data-x="${cc.dataset.x}"][data-y="${cc.dataset.y}"`).dataset.taş ='siyah';
       cc.dataset.dama = 0;
       const at = celm(th, 'animate');
       at.setAttribute('dur', '250ms');
@@ -81,7 +81,7 @@ function tahta_çiz(th) {
       cc.appendChild(at);
       th.querySelectorAll('g')[2].appendChild(cc);
     }
-  for (let y=321, y_say=0, yery="32"; y_say<2; y+=54, ++y_say)
+  for (let y=321, y_say=0, yery='32'; y_say<2; y+=54, ++y_say)
     for (let x=51, x_say=0; x_say<8; x+=54, ++x_say){
       const cc = celm(th, 'circle'); /* beyazlar */
       cc.cx.baseVal.value = x;
@@ -89,7 +89,7 @@ function tahta_çiz(th) {
       cc.r.baseVal.value = 21;
       cc.dataset.x = x_say+1;
       cc.dataset.y = yery[y_say];
-      th.querySelector(`g g rect[data-x="${cc.dataset.x}"][data-y="${cc.dataset.y}"`).dataset.taş ="beyaz";
+      th.querySelector(`g g rect[data-x="${cc.dataset.x}"][data-y="${cc.dataset.y}"`).dataset.taş ='beyaz';
       cc.dataset.dama = 0;
       const at = celm(th, 'animate');
       at.setAttribute('dur', '250ms');
@@ -107,7 +107,7 @@ function oynat(th) {
   th.querySelectorAll('g')[1].addEventListener('click', kare_seç);
   th.querySelectorAll('g')[2].addEventListener('click', siyah_seç);
   th.querySelectorAll('g')[3].addEventListener('click', beyaz_seç);
-  let from, seçim_sabit=false, taş_seçili=false, al=[];
+  let from, seçim_sabit=false, taş_seçili=false, al=false;
 
   function siyah_seç(e) {
     if (!sıra_siyahta) return;
@@ -142,8 +142,8 @@ function oynat(th) {
       if (devindi) {
         e.target.dataset.taş = 'beyaz';
         seçilen_taşın_karesi.dataset.taş = 'yok';
-        al.length = 0;
-        if (taş_aldı && daha_alır_mı(Yön.Beyaz, dama_yön, al)) {
+        // al.length = 0;
+        if (taş_aldı && (al=daha_alır_mı(Yön.Beyaz, dama_yön))) {
           marker_set(from);
           seçim_sabit = true;
         }
@@ -167,8 +167,8 @@ function oynat(th) {
       if (devindi) {
         e.target.dataset.taş = 'siyah';
         seçilen_taşın_karesi.dataset.taş = 'yok';
-        al.length = 0;
-        if (taş_aldı && daha_alır_mı(Yön.Siyah, dama_yön, al)) {
+        // al.length = 0;
+        if (taş_aldı && (al=daha_alır_mı(Yön.Siyah, dama_yön))) {
           marker_set(from);
           seçim_sabit = true;
         }
@@ -188,22 +188,23 @@ function oynat(th) {
       }
     }
 
-    function daha_alır_mı(yön, dama_yön, alabilir) {
+    function daha_alır_mı(yön, dama_yön) {
       if (from.dataset.dama == '1')
-        return daha_alır_mı_dama(yön, dama_yön, alabilir);
-      if (th.querySelector(`g g rect[data-x="${+from.dataset.x-2}"][data-y="${+from.dataset.y}"]`)?.dataset.taş == 'yok' &&
-          th.querySelector(`g g rect[data-x="${+from.dataset.x-1}"][data-y="${+from.dataset.y}"]`).dataset.taş == Yağı[yön])
-            alabilir.push(Yön.B);
-      if (th.querySelector(`g g rect[data-x="${+from.dataset.x+2}"][data-y="${+from.dataset.y}"]`)?.dataset.taş == 'yok' &&
-          th.querySelector(`g g rect[data-x="${+from.dataset.x+1}"][data-y="${+from.dataset.y}"]`).dataset.taş == Yağı[yön])
-            alabilir.push(Yön.D);
-      if (th.querySelector(`g g rect[data-x="${+from.dataset.x}"][data-y="${+from.dataset.y+(2*yön)}"]`)?.dataset.taş == 'yok' &&
-          th.querySelector(`g g rect[data-x="${+from.dataset.x}"][data-y="${+from.dataset.y+yön}"]`).dataset.taş == Yağı[yön])
-            alabilir.push(yön == Yön.Beyaz ? Yön.K : Yön.G);
-      return alabilir.length == 0 ? false : true;
+        return daha_alır_mı_dama(yön, dama_yön);
+      if (
+        (th.querySelector(`g g rect[data-x="${+from.dataset.x-2}"][data-y="${+from.dataset.y}"]`)?.dataset.taş == 'yok' &&
+         th.querySelector(`g g rect[data-x="${+from.dataset.x-1}"][data-y="${+from.dataset.y}"]`).dataset.taş == Yağı[yön]) ||
+        (th.querySelector(`g g rect[data-x="${+from.dataset.x+2}"][data-y="${+from.dataset.y}"]`)?.dataset.taş == 'yok' &&
+         th.querySelector(`g g rect[data-x="${+from.dataset.x+1}"][data-y="${+from.dataset.y}"]`).dataset.taş == Yağı[yön]) ||
+        (th.querySelector(`g g rect[data-x="${+from.dataset.x}"][data-y="${+from.dataset.y+(2*yön)}"]`)?.dataset.taş == 'yok' &&
+         th.querySelector(`g g rect[data-x="${+from.dataset.x}"][data-y="${+from.dataset.y+yön}"]`).dataset.taş == Yağı[yön])
+      )
+        return true;
+      else
+        return false;
     }
 
-    function daha_alır_mı_dama(yön, dama_yön, alabilir) {
+    function daha_alır_mı_dama(yön, dama_yön) {
       // dama_yön: damanın, son taşı alırken hangi yönde atılım yaptığı. Bu yönün
       //           tam tersinde taş almaya devam edemez.
       let t, x=[-1,0,1,0], y=[0,1,0,-1], ters_yön=[Yön.D, Yön.G, Yön.B, Yön.K];
@@ -213,11 +214,11 @@ function oynat(th) {
             if (buldu) break; /* yanyana iki yağı taş */
             else buldu = true;
           else if (t.dataset.taş == 'yok')
-            if (buldu && ters_yön[dama_yön] != d) { alabilir.push(d); break; } // return true;
+            if (buldu && ters_yön[dama_yön] != d)  return true;
             else continue;
           else break; /* kendiyle aynı renk taş */
 
-      return alabilir.length == 0 ? false : true;
+      return false;
     }
 
   } /* kare_seç */
@@ -230,15 +231,15 @@ function oynat(th) {
     // döndürür.
     let x=+from.dataset.x, y=+from.dataset.y, dama=+from.dataset.dama;
     if (!dama) // yoz taş
-      if (y == to.y && (to.x == x-1 || to.x == x+1) && al.length == 0) {
+      if (y == to.y && (to.x == x-1 || to.x == x+1) && !al) {
         yatay_devinim();
         return [true,false,];
       }
-      else if (x == to.x && to.y == y+yön && al.length == 0) {
+      else if (x == to.x && to.y == y+yön && !al) {
         düşey_devinim();
         return [true,false,];
       }
-      else  {   /* taş alma hamlesi */
+      else  {   /* taş alma atılımı */
         let av;
         if (y == to.y && to.x == x-2 &&
             (av=th.querySelector(`g g rect[data-x="${x-1}"][data-y="${y}"]`)).dataset.taş === Yağı[yön]) {
@@ -262,20 +263,20 @@ function oynat(th) {
             return [true,true,];
         }
         else
-          return [false,,];  // bu devinim mümkün değil.
+          return [false,,];  // bu devinim olası değil.
       }
 
     /* dama taş */
     let yağı = { renk: Yağı[yön], x, y }; 
-    if (y == to.y && arası_kaç_yağı_yatay(x, to.x, yağı) == 0 && al.length == 0) {
+    if (y == to.y && arası_kaç_yağı_yatay(x, to.x, yağı) == 0 && !al) {
       yatay_devinim();
       return [true,false,];
     }
-    else if (x == to.x && arası_kaç_yağı_düşey(y, to.y, yağı) == 0 && al.length == 0) {
+    else if (x == to.x && arası_kaç_yağı_düşey(y, to.y, yağı) == 0 && !al) {
       düşey_devinim();
       return [true,false,];
     }
-    else { /* taş alma hamlesi */
+    else { /* taş alma atılımı */
       if (y == to.y && arası_kaç_yağı_yatay(x, to.x, yağı) == 1) {
         th.querySelector(`g g rect[data-x="${yağı.x}"][data-y="${y}"]`).dataset.taş = 'yok';
         th.querySelector(`g g circle[data-x="${yağı.x}"][data-y="${y}"]`).remove();
@@ -289,7 +290,7 @@ function oynat(th) {
         return [true,true,(yağı.y > y ? Yön.K : Yön.G)];
       }
       else
-        return [false,,];  // bu devinim mümkün değil.
+        return [false,,];  // bu devinim olası değil.
     }
 
     function arası_kaç_yağı_yatay(x, to_x, av) {
