@@ -213,7 +213,7 @@ function oynat(th) {
             if (buldu) break; /* yanyana iki yağı taş */
             else buldu = true;
           else if (t.dataset.taş == 'yok')
-            if (buldu && ters_yön[dama_yön] != d) alabilir.push[d]; // return true;
+            if (buldu && ters_yön[dama_yön] != d) { alabilir.push(d); break; } // return true;
             else continue;
           else break; /* kendiyle aynı renk taş */
 
@@ -266,67 +266,33 @@ function oynat(th) {
       }
 
     /* dama taş */
-    if (y == to.y && arası_boş_mu_yatay(x, to.x, y)) {
+    let yağı = { renk: Yağı[yön], x, y }; 
+    if (y == to.y && arası_kaç_yağı_yatay(x, to.x, yağı) == 0 && al.length == 0) {
       yatay_devinim();
       return [true,false,];
     }
-    else if (x == to.x && arası_boş_mu_düşey(y, to.y, x)) {
+    else if (x == to.x && arası_kaç_yağı_düşey(y, to.y, yağı) == 0 && al.length == 0) {
       düşey_devinim();
       return [true,false,];
     }
     else { /* taş alma hamlesi */
-      let av = {};
-      av.renk = Yağı[yön];
-      av.x = x; av.y = y;
-      if (y == to.y && arası_tek_av_mı_yatay(x, to.x, av)) {
-        th.querySelector(`g g rect[data-x="${av.x}"][data-y="${y}"]`).dataset.taş = 'yok';
-        th.querySelector(`g g circle[data-x="${av.x}"][data-y="${y}"]`).remove();
+      if (y == to.y && arası_kaç_yağı_yatay(x, to.x, yağı) == 1) {
+        th.querySelector(`g g rect[data-x="${yağı.x}"][data-y="${y}"]`).dataset.taş = 'yok';
+        th.querySelector(`g g circle[data-x="${yağı.x}"][data-y="${y}"]`).remove();
         yatay_devinim();
-        return [true,true,(av.x < x ? Yön.B : Yön.D)];
+        return [true,true,(yağı.x < x ? Yön.B : Yön.D)];
       }
-      else if (x == to.x && arası_tek_av_mı_düşey(y, to.y, av)) {
-        th.querySelector(`g g rect[data-x="${x}"][data-y="${av.y}"]`).dataset.taş = 'yok';
-        th.querySelector(`g g circle[data-x="${x}"][data-y="${av.y}"]`).remove();
+      else if (x == to.x && arası_kaç_yağı_düşey(y, to.y, yağı) == 1) {
+        th.querySelector(`g g rect[data-x="${x}"][data-y="${yağı.y}"]`).dataset.taş = 'yok';
+        th.querySelector(`g g circle[data-x="${x}"][data-y="${yağı.y}"]`).remove();
         düşey_devinim();
-        return [true,true,(av.y > y ? Yön.K : Yön.G)];
+        return [true,true,(yağı.y > y ? Yön.K : Yön.G)];
       }
       else
         return [false,,];  // bu devinim mümkün değil.
     }
 
-    function arası_boş_mu_yatay(x, to_x, y) {
-      if (Math.abs(x - to_x) == 1)  return true;
-      let baş, son;
-      if (to_x > x) {
-        baş = x+1; son = to_x;
-      }
-      else {
-        baş = to_x+1; son = x;
-      }
-      for (let i=baş; i < son; ++i)
-        if (th.querySelector(`g g rect[data-x="${i}"][data-y="${y}"]`).dataset.taş !== 'yok')
-          return false;
-
-      return true;
-    }
-
-    function arası_boş_mu_düşey(y, to_y, x) {
-      if (Math.abs(y - to_y) == 1)  return true;
-      let baş, son;
-      if (to_y > y) {
-        baş = y+1; son = to_y;
-      }
-      else {
-        baş = to_y+1; son = y;
-      }
-      for (let i=baş; i < son; ++i)
-        if (th.querySelector(`g g rect[data-x="${x}"][data-y="${i}"]`).dataset.taş !== 'yok')
-          return false;
-
-      return true;
-    }
-
-    function arası_tek_av_mı_yatay(x, to_x, av) {
+    function arası_kaç_yağı_yatay(x, to_x, av) {
       let baş, son, say=0, t;
       if (to_x > x) {
         baş = x+1; son = to_x;
@@ -338,13 +304,13 @@ function oynat(th) {
         t = th.querySelector(`g g rect[data-x="${i}"][data-y="${av.y}"]`);
         if (t.dataset.taş == av.renk) { av.x=i; ++say; }
         else if (t.dataset.taş == 'yok') continue;
-        else return false;  /* arada kendiyle aynı renk taş var */
+        else return -1;  /* arada kendiyle aynı renk taş var */
       }
-      
-      return (say == 1) ? true : false;
+
+      return say;
     }
 
-    function arası_tek_av_mı_düşey(y, to_y, av) {
+    function arası_kaç_yağı_düşey(y, to_y, av) {
       let baş, son, say=0, t;
       if (to_y > y) {
         baş = y+1; son = to_y;
@@ -356,10 +322,10 @@ function oynat(th) {
         t = th.querySelector(`g g rect[data-x="${av.x}"][data-y="${i}"]`);
         if (t.dataset.taş == av.renk) { av.y=i; ++say; }
         else if (t.dataset.taş == 'yok') continue;
-        else return false;  /* arada kendiyle aynı renk taş var */
+        else return -1;  /* arada kendiyle aynı renk taş var */
       }
-      
-      return (say == 1) ? true : false;
+
+      return say;
     }
 
     function yatay_devinim() {
