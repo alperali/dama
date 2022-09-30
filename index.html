@@ -19,6 +19,11 @@
           <use xlink:href="./img/icons.svg#arrows-angle-expand"/>
         </svg>
       </button>
+      <button type="button">
+        <svg class="ikon" fill="currentColor" id="yeni">
+          <use xlink:href="./img/icons.svg#grid"/>
+        </svg>
+      </button>
     </div>    
     <div>
       <object data="./img/tahta.svg" type="image/svg+xml"></object>
@@ -30,14 +35,27 @@
 
     onload = () => {
       const th = document.querySelector('object').contentDocument;
-      Dama.tahta_çiz(th);
+      document.querySelector('#yeni').addEventListener('click', Dama.oyna(th));
       document.querySelector('#çevir').addEventListener('click', Dama.tahta_çevir(th));
-      const çerçe = Dama.çerçeve_gör(th);
-      document.querySelector('#çgör').addEventListener('click', (e) => {
-        e.target.children[0].attributes[0].value = çerçe() ? './img/icons.svg#arrows-angle-expand'
-                                                           : './img/icons.svg#arrows-angle-contract';
-      });
-      Dama.oynat(th);
+      document.querySelector('#çgör').addEventListener('click', Dama.çerçeve_gör(th));
+      document.querySelector('#çgör').addEventListener('click', (() => {
+        const ikon = ['./img/icons.svg#arrows-angle-expand', './img/icons.svg#arrows-angle-contract'];
+        let şimdi=0, önceki=1;
+        return function(e) {
+          [şimdi,önceki] = [önceki,şimdi];
+          e.target.children[0].attributes[0].value = ikon[şimdi];
+        }
+      })());
+      
+
+      // Dama.tahta_çiz(th);
+      // document.querySelector('#çevir').addEventListener('click', Dama.tahta_çevir(th));
+      // const çerçe = Dama.çerçeve_gör(th);
+      // document.querySelector('#çgör').addEventListener('click', (e) => {
+      //   e.target.children[0].attributes[0].value = çerçe() ? './img/icons.svg#arrows-angle-expand'
+      //                                                      : './img/icons.svg#arrows-angle-contract';
+      // });
+      // Dama.oynat(th);
     };    
   </script>
 </body>
