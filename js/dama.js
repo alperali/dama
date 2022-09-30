@@ -85,9 +85,6 @@ function oyna(th) {
           if (from.dataset.dama == '0' && from.dataset.y == '8') {
             from.dataset.dama = '1';
             dama_çiz(from, 'beyaz');
-            // from.setAttribute('stroke-dasharray','none');
-            // from.setAttribute('stroke-width', '2');
-            // from.setAttribute('fill', 'url(#beyazdama)');
           }
           oyun_kaydet(th, 'siyahta');
         }
@@ -111,9 +108,6 @@ function oyna(th) {
           if (from.dataset.dama == '0' && from.dataset.y == '1') {
             from.dataset.dama = '1';
             dama_çiz(from, 'siyah');
-            // from.setAttribute('stroke-dasharray','none');
-            // from.setAttribute('stroke', 'dimgray');
-            // from.setAttribute('fill', 'url(#siyahdama)');
           }
           oyun_kaydet(th, 'beyazda');
         }
