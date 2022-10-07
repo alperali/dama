@@ -14,7 +14,7 @@ body {
   line-height: 1.5;
 }
 
-main{
+main {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -35,9 +35,9 @@ div button svg {
 button {
   margin: 1ex;
   display: block;
- }
+}
 
- @media screen and (orientation: portrait) {
+@media screen and (orientation: portrait) {
   main {
     height: 100vh;
     flex-direction: column;
@@ -55,8 +55,8 @@ button {
 .ikon {
   display: inline-block;
   text-transform: none;
-  line-height: 1;
-  vertical-align: -.125em;
+  /* line-height: 1;
+  vertical-align: -.125em; */
 }
 
 .çerçeve { border: 1px solid black; }
