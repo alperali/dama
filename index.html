@@ -9,22 +9,36 @@
 <body>
   <main>
     <div class="çerçeve">
+      <button type="button" class="skor-btn-siyah" id="siyahskor" disabled>
+        <svg class="ikon skor-svg" viewBox="0 0 20 20">
+          <rect x="0.5" y="0.5" width="19" height="19" rx="2"
+                fill="black" stroke="dimgray" stroke-width="1" />
+          <text x="6" y="14.5" font-family="sans-serif" fill="white"></text>
+        </svg>
+      </button>
       <button type="button">
         <svg class="ikon" fill="currentColor" id="çevir">
-          <use xlink:href="./img/icons.svg#arrow-counterclockwise"/>
+          <use href="./img/icons.svg#arrow-counterclockwise"/>
         </svg>
       </button>
       <button type="button">
         <svg class="ikon" fill="currentColor" id="çgör">
-          <use xlink:href="./img/icons.svg#arrows-angle-expand"/>
+          <use href="./img/icons.svg#arrows-angle-expand"/>
         </svg>
       </button>
       <button type="button">
         <svg class="ikon" fill="currentColor" id="yeni">
-          <use xlink:href="./img/icons.svg#grid"/>
+          <use href="./img/icons.svg#grid"/>
         </svg>
       </button>
-    </div>    
+      <button type="button" class="skor-btn-beyaz" id="beyazskor" disabled>
+        <svg class="ikon skor-svg" viewBox="0 0 20 20">
+          <rect x="0.5" y="0.5" width="19" height="19" rx="2"
+                fill="white" stroke="black" stroke-width="1" />
+          <text x="6" y="14.5" font-family="sans-serif" fill="black"></text>
+        </svg>
+      </button>
+    </div>
     <div>
       <object data="./img/tahta.svg" type="image/svg+xml"></object>
     </div>
@@ -34,8 +48,17 @@
     import * as Dama from './js/dama.js';
 
     onload = () => {
+      const beyaz_sayaç = new EventTarget();
+      const siyah_sayaç = new EventTarget();
+      const evnt = 'taş-aldı';
+      beyaz_sayaç.addEventListener(evnt, e => {
+        document.querySelector('#beyazskor svg text').textContent = e.detail;
+      });
+      siyah_sayaç.addEventListener(evnt, e => {
+        document.querySelector('#siyahskor svg text').textContent = e.detail;
+      });
       const th = document.querySelector('object').contentDocument;
-      document.querySelector('#yeni').addEventListener('click', Dama.oyna(th));
+      document.querySelector('#yeni').addEventListener('click', Dama.oyna(th, beyaz_sayaç, siyah_sayaç, evnt));
       document.querySelector('#çevir').addEventListener('click', Dama.tahta_çevir(th));
       document.querySelector('#çgör').addEventListener('click', Dama.çerçeve_gör(th));
       document.querySelector('#çgör').addEventListener('click', (() => {

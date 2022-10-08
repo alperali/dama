@@ -75,12 +75,14 @@ function oyun_yükle(th) {
       ["1","3","0"],["2","3","0"],["3","3","0"],["4","3","0"],["5","3","0"],["6","3","0"],["7","3","0"],["8","3","0"],
       ["1","2","0"],["2","2","0"],["3","2","0"],["4","2","0"],["5","2","0"],["6","2","0"],["7","2","0"],["8","2","0"]
     ],
-    "sıra": "N/A"
+    "sıra": "N/A",
+    "beyaz_sayaç": "0",
+    "siyah_sayaç": "0"
   }
   let durum = JSON.parse(localStorage.getItem('damalper')) ?? ilk;
   taşları_diz(durum['siyah'], 'siyah', th.querySelectorAll('g')[2]);
   taşları_diz(durum['beyaz'], 'beyaz', th.querySelectorAll('g')[3]);
-  return durum['sıra'];
+  return [durum['sıra'], +durum['beyaz_sayaç'], +durum['siyah_sayaç']];
 
   function taşları_diz(taşlar, renk, g) {
     const x_off = 54, y_off = 54, baş_x = 51, baş_y = 51;
@@ -120,17 +122,21 @@ function dama_çiz(c, renk) {
 }
 
 export
-function oyun_kaydet(th, s) {
+function oyun_kaydet(th, s, beyaz_sayaç, siyah_sayaç) {
   let durum = {
     "siyah": [ ],
     "beyaz": [ ],
-    "sıra": ""
-  }
+    "sıra": "",
+    "beyaz_sayaç": "",
+    "siyah_sayaç": ""
+  };
   for (let t of th.querySelectorAll('g')[2].querySelectorAll('circle'))
     durum['siyah'].push([t.dataset.x, t.dataset.y, t.dataset.dama]);
   for (let t of th.querySelectorAll('g')[3].querySelectorAll('circle'))
     durum['beyaz'].push([t.dataset.x, t.dataset.y, t.dataset.dama]);
   durum['sıra'] = s;
+  durum['beyaz_sayaç'] = beyaz_sayaç.toString();
+  durum['siyah_sayaç'] = siyah_sayaç.toString();
   localStorage.setItem('damalper', JSON.stringify(durum));
 }
 

@@ -37,6 +37,21 @@ button {
   display: block;
 }
 
+.skor-svg {
+  width: calc(2.4vmin + var(--buton-en));
+  height: calc(1.6vmin + var(--buton-en));
+}
+.skor-btn-siyah {
+  padding: 0;
+  border: 0;
+  margin-bottom: 6vmin;
+}
+.skor-btn-beyaz {
+  padding: 0;
+  border: 0;
+  margin-top: 6vmin;
+}
+
 @media screen and (orientation: portrait) {
   main {
     height: 100vh;
@@ -50,13 +65,21 @@ button {
     width: min(100vmin, calc(100vh - calc(2 * var(--buton-en))));
     height: auto;
   }
+  .skor-btn-siyah {
+    margin-bottom: 1ex;
+    margin-right: 1em;
+  }
+  .skor-btn-beyaz {
+    margin-top: 1ex;
+    margin-left: 1em;
+  }
 }
 
 .ikon {
-  display: inline-block;
+  display: block;
   text-transform: none;
-  /* line-height: 1;
-  vertical-align: -.125em; */
+  line-height: 1;
+  /* vertical-align: -.125em; */
 }
 
 .çerçeve { border: 1px solid black; }

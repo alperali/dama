@@ -5,16 +5,18 @@ export { tahta_çevir, çerçeve_gör } from './gorsel.js';
 import { oyun_yükle, tahta_çiz, oyun_kaydet, dama_çiz } from './gorsel.js';
 
 export
-function oyna(th) {
+function oyna(th, byz_sayaç, syh_sayaç, evnt) {
   let marker = th.querySelector('path');
   th.querySelectorAll('g')[1].addEventListener('click', kare_seç);
   th.querySelectorAll('g')[2].addEventListener('click', siyah_seç);
   th.querySelectorAll('g')[3].addEventListener('click', beyaz_seç);
   let from, sıra, seçim_sabit=false, taş_seçili=false, al=false;
+  const sayaçlar = {[Yön.Beyaz]: {sayaç: byz_sayaç, say: 0},
+                    [Yön.Siyah]: {sayaç: syh_sayaç, say: 0}};
 
   tahta_çiz(th);
 
-  sıra = oyun_yükle(th);
+  [sıra, sayaçlar[Yön.Beyaz].say, sayaçlar[Yön.Siyah].say] = oyun_yükle(th);
 
   if (sıra == 'beyazda')
     th.querySelector('line#beyaz').setAttribute('visibility', 'visible');
@@ -22,6 +24,13 @@ function oyna(th) {
     th.querySelector('line#siyah').setAttribute('visibility', 'visible');
 
   // sıra == 'N/A' ise ikisi de hidden kalsın
+
+  if (sayaçlar[Yön.Beyaz].say)
+    sayaçlar[Yön.Beyaz].sayaç.dispatchEvent(new CustomEvent(evnt, {detail: sayaçlar[Yön.Beyaz].say}));
+  if (sayaçlar[Yön.Siyah].say)
+    sayaçlar[Yön.Siyah].sayaç.dispatchEvent(new CustomEvent(evnt, {detail: sayaçlar[Yön.Siyah].say}));
+
+  // sayaçlar 0 ise tabelalar boş kalsın
 
   return function yeni_oyun() {
     localStorage.removeItem('damalper');
@@ -34,6 +43,9 @@ function oyna(th) {
     th.querySelectorAll('g')[3].replaceChildren();
     for (let r of th.querySelectorAll('g g rect'))
       r.dataset.taş = 'yok';
+    sayaçlar[Yön.Beyaz].say = sayaçlar[Yön.Siyah].say = 0;
+    sayaçlar[Yön.Beyaz].sayaç.dispatchEvent(new CustomEvent(evnt, {detail: ""}));
+    sayaçlar[Yön.Siyah].sayaç.dispatchEvent(new CustomEvent(evnt, {detail: ""}));
     oyun_yükle(th);
   };
 
@@ -76,22 +88,26 @@ function oyna(th) {
       if (!devindi)  return;
       e.target.dataset.taş = renk;
       seçilen_taşın_karesi.dataset.taş = 'yok';
-      if (taş_aldı && (al=daha_alır_mı(yön, dama_yön))) {
-        marker_set(from);
-        seçim_sabit = true;
-      }
-      else {
-        taş_seçili = seçim_sabit = false;
-        sıra = (yön == Yön.Beyaz ? 'siyahta' : 'beyazda');
-        marker.setAttribute('visibility','hidden');
-        th.querySelector(`line#${Yağı[yön]}`).setAttribute('visibility', 'visible');
-        th.querySelector(`line#${renk}`).setAttribute('visibility', 'hidden');
-        if (from.dataset.dama == '0' && from.dataset.y == dama_satırı) {
-          from.dataset.dama = '1';
-          dama_çiz(from, renk);
+      if (taş_aldı) {
+        ++sayaçlar[yön].say;
+        sayaçlar[yön].sayaç.dispatchEvent(new CustomEvent(evnt, {detail: sayaçlar[yön].say}));
+        if (al=daha_alır_mı(yön, dama_yön)) {
+          marker_set(from);
+          seçim_sabit = true;
+          return;
         }
-        oyun_kaydet(th, sıra);
       }
+
+      taş_seçili = seçim_sabit = false;
+      sıra = (yön == Yön.Beyaz ? 'siyahta' : 'beyazda');
+      marker.setAttribute('visibility','hidden');
+      th.querySelector(`line#${Yağı[yön]}`).setAttribute('visibility', 'visible');
+      th.querySelector(`line#${renk}`).setAttribute('visibility', 'hidden');
+      if (from.dataset.dama == '0' && from.dataset.y == dama_satırı) {
+        from.dataset.dama = '1';
+        dama_çiz(from, renk);
+      }
+      oyun_kaydet(th, sıra, sayaçlar[Yön.Beyaz].say, sayaçlar[Yön.Siyah].say);
     }
 
     function daha_alır_mı(yön, dama_yön) {
