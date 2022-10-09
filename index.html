@@ -51,10 +51,19 @@
       const beyaz_sayaç = new EventTarget();
       const siyah_sayaç = new EventTarget();
       const evnt = 'taş-aldı';
+      let beyaz_onlu=false, siyah_onlu=false;
       beyaz_sayaç.addEventListener(evnt, e => {
+        if (!beyaz_onlu && +e.detail > 9) {
+          document.querySelector('#beyazskor svg text').x.baseVal[0].value = '1.75';
+          beyaz_onlu = true;
+        }
         document.querySelector('#beyazskor svg text').textContent = e.detail;
       });
       siyah_sayaç.addEventListener(evnt, e => {
+        if (!siyah_onlu && +e.detail > 9) {
+          document.querySelector('#siyahskor svg text').x.baseVal[0].value = '1.75';
+          siyah_onlu = true;
+        }
         document.querySelector('#siyahskor svg text').textContent = e.detail;
       });
       const th = document.querySelector('object').contentDocument;

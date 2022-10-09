@@ -38,8 +38,8 @@ button {
 }
 
 .skor-svg {
-  width: calc(2.4vmin + var(--buton-en));
-  height: calc(1.6vmin + var(--buton-en));
+  width: calc(2vmin + var(--buton-en));
+  height: calc(1.25vmin + var(--buton-en));
 }
 .skor-btn-siyah {
   padding: 0;
@@ -78,8 +78,6 @@ button {
 .ikon {
   display: block;
   text-transform: none;
-  line-height: 1;
-  /* vertical-align: -.125em; */
 }
 
 .çerçeve { border: 1px solid black; }
