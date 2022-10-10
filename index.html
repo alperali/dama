@@ -16,18 +16,18 @@
           <text x="6" y="14.5" font-family="sans-serif" fill="white"></text>
         </svg>
       </button>
-      <button type="button">
-        <svg class="ikon" fill="currentColor" id="çevir">
+      <button type="button" id="çevir">
+        <svg class="ikon" fill="currentColor">
           <use href="./img/icons.svg#arrow-counterclockwise"/>
         </svg>
       </button>
-      <button type="button">
-        <svg class="ikon" fill="currentColor" id="çgör">
+      <button type="button" id="çgör">
+        <svg class="ikon" fill="currentColor">
           <use href="./img/icons.svg#arrows-angle-expand"/>
         </svg>
       </button>
-      <button type="button">
-        <svg class="ikon" fill="currentColor" id="yeni">
+      <button type="button" id="yeni">
+        <svg class="ikon" fill="currentColor">
           <use href="./img/icons.svg#grid"/>
         </svg>
       </button>
@@ -69,6 +69,17 @@
       const th = document.querySelector('object').contentDocument;
       document.querySelector('#yeni').addEventListener('click', Dama.oyna(th, beyaz_sayaç, siyah_sayaç, evnt));
       document.querySelector('#çevir').addEventListener('click', Dama.tahta_çevir(th));
+      document.querySelector('#çevir').addEventListener('click', (() => {
+        const frm = document.querySelector('div.çerçeve');
+        const levha = ['#beyazskor', '#siyahskor'];
+        let alttaki=0, üstteki=1;
+        return function() {
+          frm.appendChild(frm.replaceChild(document.querySelector(`${levha[alttaki]}`),
+                                           document.querySelector(`${levha[üstteki]}`))
+                         );
+          [üstteki,alttaki] = [alttaki,üstteki];
+        }
+      })());
       document.querySelector('#çgör').addEventListener('click', Dama.çerçeve_gör(th));
       document.querySelector('#çgör').addEventListener('click', (() => {
         const ikon = ['./img/icons.svg#arrows-angle-expand', './img/icons.svg#arrows-angle-contract'];

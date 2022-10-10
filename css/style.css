@@ -33,23 +33,26 @@ div button svg {
 }
 
 button {
-  margin: 1ex;
+  margin: 1.75vmin 0.75vmin;
   display: block;
+  padding-left: 0.5vmin;
+  padding-right: 0.5vmin;
 }
 
 .skor-svg {
-  width: calc(2vmin + var(--buton-en));
+  width: calc(1.75vmin + var(--buton-en));
   height: calc(1.25vmin + var(--buton-en));
 }
-.skor-btn-siyah {
+.skor-btn-siyah, .skor-btn-beyaz {
   padding: 0;
   border: 0;
-  margin-bottom: 6vmin;
 }
-.skor-btn-beyaz {
-  padding: 0;
-  border: 0;
+
+#çevir {
   margin-top: 6vmin;
+}
+#yeni {
+  margin-bottom: 6vmin;
 }
 
 @media screen and (orientation: portrait) {
@@ -65,13 +68,13 @@ button {
     width: min(100vmin, calc(100vh - calc(2 * var(--buton-en))));
     height: auto;
   }
-  .skor-btn-siyah {
-    margin-bottom: 1ex;
-    margin-right: 1em;
+  #çevir {
+    margin-top: 1.75vmin;
+    margin-left: 4vmin;
   }
-  .skor-btn-beyaz {
-    margin-top: 1ex;
-    margin-left: 1em;
+  #yeni {
+    margin-bottom: 1.75vmin;
+    margin-right: 4vmin;
   }
 }
 
