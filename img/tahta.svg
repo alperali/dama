@@ -39,4 +39,13 @@
       <stop offset="70%" stop-color="black" />
     </radialGradient>
   </defs>
+  <path d="M 27,43 27,27 43,27 M 59,27 75,27 75,43 M 75,59 75,75 59,75 M 43,75 27,75 27,59"
+      stroke-width="2.5" stroke="aqua" fill="none" visibility="hidden" id="alan1">
+  </path>
+  <path d="M 27,43 27,27 43,27 M 59,27 75,27 75,43 M 75,59 75,75 59,75 M 43,75 27,75 27,59"
+      stroke-width="2.5" stroke="aqua" fill="none" visibility="hidden" id="alan2">
+  </path>
+  <path d="M 27,43 27,27 43,27 M 59,27 75,27 75,43 M 75,59 75,75 59,75 M 43,75 27,75 27,59"
+      stroke-width="2.5" stroke="aqua" fill="none" visibility="hidden" id="alan3">
+  </path>
 </svg>
