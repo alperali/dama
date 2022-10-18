@@ -1,0 +1,21 @@
+{
+  "short_name": "Dama",
+  "name": "Türk Dama Oyunu",
+  "icons": [
+    {
+      "src": "./img/ikon-apple.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "./img/ikon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./",
+  "id": "./",
+  "background_color": "lemonchiffon",
+  "theme_color": "wheat",
+  "display": "standalone"
+}

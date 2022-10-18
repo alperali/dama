@@ -3,35 +3,42 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="application-name" content="Dama Oyunu">
+    <meta name="description" content="Türk Dama Oyunu">
+    <meta name="theme-color" content="wheat">
+    <link rel="icon" href="./img/favicon.ico">
+    <link rel="icon" type="image/png" sizes="192x192" href="./img/favicon-192.png">
+    <link rel="apple-touch-icon" href="./img/ikon-apple.png">
     <link rel="stylesheet" href="./css/style.css">
+    <link rel="manifest" href="./manifest.json">
     <title>Dama</title>
 </head>
 <body>
   <main>
     <div class="çerçeve">
-      <button type="button" class="skor-btn-siyah" id="siyahskor" disabled>
+      <button type="button" class="skor-btn-siyah" aria-label="Siyah skor" id="siyahskor" disabled>
         <svg class="ikon skor-svg" viewBox="0 0 20 20">
           <rect x="0.5" y="0.5" width="19" height="19" rx="2"
                 fill="black" stroke="dimgray" stroke-width="1" />
           <text x="6" y="14.5" font-family="sans-serif" fill="white"></text>
         </svg>
       </button>
-      <button type="button" id="çevir">
+      <button type="button" aria-label="Tahta çevir" id="çevir">
         <svg class="ikon" fill="currentColor">
           <use href="./img/icons.svg#arrow-counterclockwise"/>
         </svg>
       </button>
-      <button type="button" id="çgör">
+      <button type="button" aria-label="Çerçeve kaldır-göster" id="çgör">
         <svg class="ikon" fill="currentColor">
           <use href="./img/icons.svg#arrows-angle-expand"/>
         </svg>
       </button>
-      <button type="button" id="yeni">
+      <button type="button" aria-label="Yeni oyun" id="yeni">
         <svg class="ikon" fill="currentColor">
           <use href="./img/icons.svg#grid"/>
         </svg>
       </button>
-      <button type="button" class="skor-btn-beyaz" id="beyazskor" disabled>
+      <button type="button" class="skor-btn-beyaz" aria-label="Beyaz skor" id="beyazskor" disabled>
         <svg class="ikon skor-svg" viewBox="0 0 20 20">
           <rect x="0.5" y="0.5" width="19" height="19" rx="2"
                 fill="white" stroke="black" stroke-width="1" />
@@ -40,7 +47,7 @@
       </button>
     </div>
     <div>
-      <object data="./img/tahta.svg" type="image/svg+xml"></object>
+      <object data="./img/tahta.svg" type="image/svg+xml" aria-label="Dama Tahtası"></object>
     </div>
   </main>  
 
@@ -48,6 +55,7 @@
     import * as Dama from './js/dama.js';
 
     onload = () => {
+      navigator.serviceWorker.register('./serw.js');
       const beyaz_sayaç = new EventTarget();
       const siyah_sayaç = new EventTarget();
       const evnt = 'taş-aldı';
