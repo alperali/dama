@@ -85,25 +85,13 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
     if (alan.length) {
       if (e.target.dataset.x == from.dataset.x && e.target.dataset.y == from.dataset.y)
         return;
-      if (e.target.dataset.x == alan[0].x && e.target.dataset.y == alan[0].y) {
-        alt_marker_unset(0);
-        alan[0].x = from.dataset.x; alan[0].y = from.dataset.y;
-        marker_set(from=e.target);
-        alt_marker_set(0);
-      }
-      else if (e.target.dataset.x == alan[1]?.x && e.target.dataset.y == alan[1]?.y) {
-        alt_marker_unset(1);
-        alan[1].x = from.dataset.x; alan[1].y = from.dataset.y;
-        marker_set(from=e.target);
-        alt_marker_set(1);
-      }
-      else if (e.target.dataset.x == alan[2]?.x && e.target.dataset.y == alan[2]?.y) {
-        alt_marker_unset(2);
-        alan[2].x = from.dataset.x; alan[2].y = from.dataset.y;
-        marker_set(from=e.target);
-        alt_marker_set(2);
-      }
-      else return;
+      for (let i=0; i < alan.length; ++i)
+        if (e.target.dataset.x == alan[i].x && e.target.dataset.y == alan[i].y) {
+          alt_marker_unset(i);
+          alan[i].x = from.dataset.x; alan[i].y = from.dataset.y;
+          marker_set(from=e.target);
+          alt_marker_set(i);
+        }
     }
     else
       marker_set(from=e.target);
