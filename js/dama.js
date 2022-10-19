@@ -141,6 +141,12 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
       if (!devindi)  return;
       e.target.dataset.taş = renk;
       seçilen_taşın_karesi.dataset.taş = 'yok';
+      switch (alan.length) {
+        case 3: alt_marker_unset(2);  // bilerek fall-through
+        case 2: alt_marker_unset(1);
+        case 1: alt_marker_unset(0);
+      }
+      alan.length = 0;
       if (taş_aldı) {
         ++sayaçlar[yön].say;
         sayaçlar[yön].sayaç.dispatchEvent(new CustomEvent(evnt, {detail: sayaçlar[yön].say}));
@@ -154,11 +160,6 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
       seçim_sabit = false;
       sıra = (yön == Yön.Beyaz ? 'siyahta' : 'beyazda');
       marker_unset();
-      switch (alan.length) {
-        case 3: alt_marker_unset(2);  // bilerek fall-through
-        case 2: alt_marker_unset(1);
-        case 1: alt_marker_unset(0);
-      }
       th.querySelector(`line#${Yağı[yön]}`).setAttribute('visibility', 'visible');
       th.querySelector(`line#${renk}`).setAttribute('visibility', 'hidden');
       if (from.dataset.dama == '0' && from.dataset.y == dama_satırı) {
