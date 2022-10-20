@@ -1,4 +1,4 @@
-const Yön = {B: 0, K: 1, D: 2, G: 3, Beyaz: 1, Siyah: -1 };
+const Yön = {B: 0, K: 1, D: 2, G: 3, yok: 4, Beyaz: 1, Siyah: -1 };
 const Yağı = {[Yön.Beyaz]: 'siyah', [Yön.Siyah]: 'beyaz'};
 
 export { tahta_çevir, çerçeve_gör } from './gorsel.js';
@@ -39,12 +39,9 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
     marker_set(from=th.querySelector(`g g circle[data-x="${seç.x}"][data-y="${seç.y}"]`));
     switch (alan.length) {
       // aşağıda break unutulmuş değil, bilerek fall-through
-      case 3:
-        alt_marker_set(2);
-      case 2:
-        alt_marker_set(1);
-      case 1:
-        alt_marker_set(0);
+      case 3: alt_marker_set(2);
+      case 2: alt_marker_set(1);
+      case 1: alt_marker_set(0);
         break;
       default:
         seçim_sabit = true;
@@ -58,12 +55,12 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
       case 3: alt_marker_unset(2);  // bilerek fall-through
       case 2: alt_marker_unset(1);
       case 1: alt_marker_unset(0);
+      default: alan.length = 0;
     }
     th.querySelector('line#siyah').setAttribute('visibility', 'hidden');
     th.querySelector('line#beyaz').setAttribute('visibility', 'hidden');
     sıra = 'N/A';
     seçim_sabit = al = false;
-    alan.length = 0;
     th.querySelectorAll('g')[2].replaceChildren();
     th.querySelectorAll('g')[3].replaceChildren();
     for (let r of th.querySelectorAll('g g rect'))
@@ -131,10 +128,7 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
     let seçilen_taşın_karesi = th.querySelector(`g g rect[data-x="${from.dataset.x}"][data-y="${from.dataset.y}"]`);
     let to = { x: +e.target.dataset.x, y: +e.target.dataset.y };
 
-    if (sıra == 'beyazda')
-      devinim(Yön.Beyaz, 'beyaz', '8');
-    else
-      devinim(Yön.Siyah, 'siyah', '1');
+    sıra == 'beyazda' ? devinim(Yön.Beyaz, 'beyaz', '8') : devinim(Yön.Siyah, 'siyah', '1');
 
     function devinim(yön, renk, dama_satırı) {
       const [devindi, taş_aldı, dama_yön] = taş_devindir(from, to, yön);
@@ -145,8 +139,8 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
         case 3: alt_marker_unset(2);  // bilerek fall-through
         case 2: alt_marker_unset(1);
         case 1: alt_marker_unset(0);
+        default: alan.length = 0;
       }
-      alan.length = 0;
       if (taş_aldı) {
         ++sayaçlar[yön].say;
         sayaçlar[yön].sayaç.dispatchEvent(new CustomEvent(evnt, {detail: sayaçlar[yön].say}));
@@ -167,17 +161,15 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
         dama_çiz(from, renk);
       }
       oyun_kaydet(th, sıra, sayaçlar[Yön.Beyaz].say, sayaçlar[Yön.Siyah].say);
+    
       if (al=alır_mı(...(sıra=='siyahta' ? [2, Yön.Siyah] : [3, Yön.Beyaz]))) {
         const seç = alan.pop();
         marker_set(from=th.querySelector(`g g circle[data-x="${seç.x}"][data-y="${seç.y}"]`));
         switch (alan.length) {
           // aşağıda break unutulmuş değil, bilerek fall-through
-          case 3:
-            alt_marker_set(2);
-          case 2:
-            alt_marker_set(1);
-          case 1:
-            alt_marker_set(0);
+          case 3: alt_marker_set(2);
+          case 2: alt_marker_set(1);
+          case 1: alt_marker_set(0);
             break;
           default:
             seçim_sabit = true;
@@ -190,13 +182,13 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
   function alır_mı(g, yön) {
     alan.length = 0;
     for (const t of th.querySelectorAll('g')[g].children)
-      if (t.dataset.dama == '1' ? alım_olası_dama(t, yön) : alım_olası(t, yön))
+      if (t.dataset.dama == '1' ? alım_olası_dama(t, yön, Yön.yok) : alım_olası(t, yön))
         alan.push({x: t.dataset.x, y: t.dataset.y});
     return  alan.length > 0;
   }
 
   function daha_alır_mı(yön, dama_yön) {
-    return (from.dataset.dama == '1' ? daha_alır_mı_dama(yön, dama_yön) : alım_olası(from, yön));
+    return (from.dataset.dama == '1' ? alım_olası_dama(from, yön, dama_yön) : alım_olası(from, yön));
   }
 
   function alım_olası(t, yön) {
@@ -210,28 +202,13 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
     );
   }
 
-  function alım_olası_dama(t, yön) {
-    // daha_alır_mı_dama() ile çok benzer, sadece ters_yön hesabı yok atılım başı olduğundan
-    let kare, x=[-1,0,1,0], y=[0,1,0,-1];
-    for (let d=Yön.B; d<=Yön.G; ++d)
-      for (let i=1, buldu=false; kare=th.querySelector(`g g rect[data-x="${+t.dataset.x + x[d]*i}"][data-y="${+t.dataset.y + y[d]*i}"]`); ++i)
-        if (kare.dataset.taş == Yağı[yön])
-          if (buldu) break; /* yanyana iki yağı taş */
-            else buldu = true;
-          else if (kare.dataset.taş == 'yok')
-            if (buldu)  return true;
-            else continue;
-          else break; /* kendiyle aynı renk taş */
-
-    return false;
-  }
-
-  function daha_alır_mı_dama(yön, dama_yön) {
+  function alım_olası_dama(t, yön, dama_yön) {
     // dama_yön: damanın, son taşı alırken hangi yönde atılım yaptığı. Bu yönün
-    //           tam tersinde taş almaya devam edemez.
+    //           tam tersinde taş almaya devam edemez. Yeni atılımda bu yön yoktur,
+    //           Yön.yok değeri geçilir ve ters_yön[dama_yön] != d koşulu daima true olur.
     let kare, x=[-1,0,1,0], y=[0,1,0,-1], ters_yön=[Yön.D, Yön.G, Yön.B, Yön.K];
     for (let d=Yön.B; d<=Yön.G; ++d)
-      for (let i=1, buldu=false; kare=th.querySelector(`g g rect[data-x="${+from.dataset.x + x[d]*i}"][data-y="${+from.dataset.y + y[d]*i}"]`); ++i)
+      for (let i=1, buldu=false; kare=th.querySelector(`g g rect[data-x="${+t.dataset.x + x[d]*i}"][data-y="${+t.dataset.y + y[d]*i}"]`); ++i)
         if (kare.dataset.taş == Yağı[yön])
           if (buldu) break; /* yanyana iki yağı taş */
           else buldu = true;
@@ -260,24 +237,24 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
         return [true,false,];
       }
       else  {   /* taş alma atılımı */
-        let av;
+        let yağı;
         if (y == to.y && to.x == x-2 &&
-            (av=th.querySelector(`g g rect[data-x="${x-1}"][data-y="${y}"]`)).dataset.taş === Yağı[yön]) {
-            av.dataset.taş = 'yok';
+            (yağı=th.querySelector(`g g rect[data-x="${x-1}"][data-y="${y}"]`)).dataset.taş === Yağı[yön]) {
+            yağı.dataset.taş = 'yok';
             th.querySelector(`g g circle[data-x="${x-1}"][data-y="${y}"]`).remove();
             yatay_devinim();
             return [true,true,];
         }
         else if (y == to.y && to.x == x+2 &&
-            (av=th.querySelector(`g g rect[data-x="${x+1}"][data-y="${y}"]`)).dataset.taş === Yağı[yön]) {
-            av.dataset.taş = 'yok';
+            (yağı=th.querySelector(`g g rect[data-x="${x+1}"][data-y="${y}"]`)).dataset.taş === Yağı[yön]) {
+            yağı.dataset.taş = 'yok';
             th.querySelector(`g g circle[data-x="${x+1}"][data-y="${y}"]`).remove();
             yatay_devinim();
             return [true,true,];
         }
         else if (x == to.x && to.y == y+(2*yön) &&
-            (av=th.querySelector(`g g rect[data-x="${x}"][data-y="${y+yön}"]`)).dataset.taş === Yağı[yön]) {
-            av.dataset.taş = 'yok';
+            (yağı=th.querySelector(`g g rect[data-x="${x}"][data-y="${y+yön}"]`)).dataset.taş === Yağı[yön]) {
+            yağı.dataset.taş = 'yok';
             th.querySelector(`g g circle[data-x="${x}"][data-y="${y+yön}"]`).remove();
             düşey_devinim();
             return [true,true,];
