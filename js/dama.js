@@ -6,11 +6,11 @@ import { oyun_yükle, tahta_çiz, oyun_kaydet, dama_çiz } from './gorsel.js';
 
 export
 function oyna(th, byz_sayaç, syh_sayaç, evnt) {
-  const marker = th.querySelector('path');
+  const marker = th.querySelector('#marker');
   const alt_marker = [th.querySelector('#alan1'), th.querySelector('#alan2'), th.querySelector('#alan3')];
-  th.querySelectorAll('g')[1].addEventListener('click', kare_seç);
-  th.querySelectorAll('g')[2].addEventListener('click', siyah_seç);
-  th.querySelectorAll('g')[3].addEventListener('click', beyaz_seç);
+  th.querySelector('#kareler').addEventListener('click', kare_seç);
+  th.querySelector('#siyahlar').addEventListener('click', siyah_seç);
+  th.querySelector('#beyazlar').addEventListener('click', beyaz_seç);
   let from, sıra, seçim_sabit=false, taş_seçili=false, al=false, alan=[];
   const sayaçlar = {[Yön.Beyaz]: {sayaç: byz_sayaç, say: 0},
                     [Yön.Siyah]: {sayaç: syh_sayaç, say: 0}};
@@ -34,7 +34,7 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
   // sayaç 0 ise tabelası boş kalsın
 
   // aşağıdaki blok kare_seç()'teki ile aynı
-  if (al=alır_mı(...(sıra=='siyahta' ? [2, Yön.Siyah] : [3, Yön.Beyaz]))) {
+  if (al=alır_mı(...(sıra=='siyahta' ? ['#siyahlar', Yön.Siyah] : ['#beyazlar', Yön.Beyaz]))) {
     const seç = alan.pop();
     marker_set(from=th.querySelector(`g g circle[data-x="${seç.x}"][data-y="${seç.y}"]`));
     switch (alan.length) {
@@ -162,7 +162,7 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
       }
       oyun_kaydet(th, sıra, sayaçlar[Yön.Beyaz].say, sayaçlar[Yön.Siyah].say);
     
-      if (al=alır_mı(...(sıra=='siyahta' ? [2, Yön.Siyah] : [3, Yön.Beyaz]))) {
+      if (al=alır_mı(...(sıra=='siyahta' ? ['#siyahlar', Yön.Siyah] : ['#beyazlar', Yön.Beyaz]))) {
         const seç = alan.pop();
         marker_set(from=th.querySelector(`g g circle[data-x="${seç.x}"][data-y="${seç.y}"]`));
         switch (alan.length) {
@@ -181,7 +181,7 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
 
   function alır_mı(g, yön) {
     alan.length = 0;
-    for (const t of th.querySelectorAll('g')[g].children)
+    for (const t of th.querySelector(g).children)
       if (t.dataset.dama == '1' ? alım_olası_dama(t, yön, Yön.yok) : alım_olası(t, yön))
         alan.push({x: t.dataset.x, y: t.dataset.y});
     return  alan.length > 0;

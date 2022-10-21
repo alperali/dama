@@ -5,7 +5,7 @@ function tahta_çiz(th) {
 
   (function çerçeve_çiz() {
     let tt, x1 = 47, x2 = 57,  y1 = 436, y2 = 426;
-    const x_off = 54, y_off = 54;
+    const x_off = 54, y_off = 54, çv = th.querySelector('#çerçeve');
 
     for (let c of 'abcdefgh') {
       tt = celm(th, 'text');
@@ -14,7 +14,7 @@ function tahta_çiz(th) {
       tt.y.baseVal.appendItem(th.documentElement.createSVGLength());
       tt.y.baseVal[0].value = 472;
       tt.textContent = c;
-      th.querySelectorAll('g')[4].appendChild(tt);
+      çv.appendChild(tt);
       tt = celm(th, 'text');
       tt.x.baseVal.appendItem(th.documentElement.createSVGLength());
       tt.x.baseVal[0].value = x2;
@@ -23,7 +23,7 @@ function tahta_çiz(th) {
       tt.textContent = c;
       tt.rotate.baseVal.appendItem(th.documentElement.createSVGNumber());
       tt.rotate.baseVal[0].value = 180;
-      th.querySelectorAll('g')[4].appendChild(tt);
+      çv.appendChild(tt);
       x1 += x_off;
       x2 += x_off;
     }
@@ -35,7 +35,7 @@ function tahta_çiz(th) {
       tt.y.baseVal.appendItem(th.documentElement.createSVGLength());
       tt.y.baseVal[0].value = y1;
       tt.textContent = c;
-      th.querySelectorAll('g')[4].appendChild(tt);
+      çv.appendChild(tt);
       tt = celm(th, 'text');
       tt.x.baseVal.appendItem(th.documentElement.createSVGLength());
       tt.x.baseVal[0].value = 472;
@@ -44,12 +44,13 @@ function tahta_çiz(th) {
       tt.textContent = c;
       tt.rotate.baseVal.appendItem(th.documentElement.createSVGNumber());
       tt.rotate.baseVal[0].value = 180;
-      th.querySelectorAll('g')[4].appendChild(tt);
+      çv.appendChild(tt);
       y1 -= y_off;
       y2 -= y_off;
     }
   })();
 
+  const k = th.querySelector('#kareler');
   for (let y=25, y_say=0; y_say<8; y+=54, ++y_say)
     for (let x=25, x_say=0; x_say<8; x+=54, ++x_say) {
       const dd = celm(th, 'rect');  /* kareler */
@@ -60,7 +61,7 @@ function tahta_çiz(th) {
       dd.dataset.x = x_say+1;
       dd.dataset.y = 8-y_say;
       dd.dataset.taş = 'yok';
-      th.querySelectorAll('g')[1].appendChild(dd);
+      k.appendChild(dd);
     }
 }
 
@@ -80,8 +81,8 @@ function oyun_yükle(th) {
     "siyah_sayaç": "0"
   }
   let durum = JSON.parse(localStorage.getItem('damalper')) ?? ilk;
-  taşları_diz(durum['siyah'], 'siyah', th.querySelectorAll('g')[2]);
-  taşları_diz(durum['beyaz'], 'beyaz', th.querySelectorAll('g')[3]);
+  taşları_diz(durum['siyah'], 'siyah', th.querySelector('#siyahlar'));
+  taşları_diz(durum['beyaz'], 'beyaz', th.querySelector('#beyazlar'));
   return [durum['sıra'], +durum['beyaz_sayaç'], +durum['siyah_sayaç']];
 
   function taşları_diz(taşlar, renk, g) {
@@ -130,9 +131,9 @@ function oyun_kaydet(th, s, beyaz_sayaç, siyah_sayaç) {
     "beyaz_sayaç": "",
     "siyah_sayaç": ""
   };
-  for (let t of th.querySelectorAll('g')[2].querySelectorAll('circle'))
+  for (let t of th.querySelectorAll('#siyahlar circle'))
     durum['siyah'].push([t.dataset.x, t.dataset.y, t.dataset.dama]);
-  for (let t of th.querySelectorAll('g')[3].querySelectorAll('circle'))
+  for (let t of th.querySelectorAll('#beyazlar circle'))
     durum['beyaz'].push([t.dataset.x, t.dataset.y, t.dataset.dama]);
   durum['sıra'] = s;
   durum['beyaz_sayaç'] = beyaz_sayaç.toString();

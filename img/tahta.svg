@@ -6,13 +6,13 @@
     <rect width="430" height="430"
       stroke="black" stroke-opacity="33%" stroke-width="5"
       fill="black" x="25" y="25"/>
-    <g fill="wheat"></g>
-    <g fill="black" stroke="white" stroke-width="2" stroke-dasharray="2"></g>
-    <g fill="white" stroke="black" stroke-width="1" stroke-dasharray="1"></g>
-    <g fill="gray" font-family="sans-serif"></g>
+    <g fill="wheat" id="kareler"></g>
+    <g fill="black" stroke="white" stroke-width="2" stroke-dasharray="2" id="siyahlar"></g>
+    <g fill="white" stroke="black" stroke-width="1" stroke-dasharray="1" id="beyazlar"></g>
+    <g fill="gray" font-family="sans-serif" id="çerçeve"></g>
 
     <path d="M 27,43 27,27 43,27 M 59,27 75,27 75,43 M 75,59 75,75 59,75 M 43,75 27,75 27,59"
-      stroke-width="2.5" stroke="blue" fill="none" visibility="hidden">
+      stroke-width="2.5" stroke="blue" fill="none" visibility="hidden" id="marker">
       <animate attributeName="stroke-opacity" from="0" to="1" dur="250ms" begin="indefinite" />
     </path>
     <animateTransform attributeName="transform" type="rotate" dur="330ms" fill="freeze"
