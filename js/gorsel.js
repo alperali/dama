@@ -51,24 +51,31 @@ function tahta_çiz(th) {
   })();
 
   const k = th.querySelector('#kareler');
-  for (let y=25, y_say=0; y_say<8; y+=54, ++y_say)
-    for (let x=25, x_say=0; x_say<8; x+=54, ++x_say) {
+  const glgth = Array(9);
+  glgth[0] = null;  // 1 tabanlı
+  for (let y=25, y_say=8; y_say>0; y+=54, --y_say) {
+    glgth[y_say] = Array(9);
+    glgth[y_say][0] = null;  // 1 tabanlı
+    for (let x=25, x_say=1; x_say<9; x+=54, ++x_say) {
       const dd = celm(th, 'rect');  /* kareler */
       dd.x.baseVal.value = x;
       dd.y.baseVal.value = y;
       dd.width.baseVal.value = 52;
       dd.height.baseVal.value = 52;
-      dd.dataset.x = x_say+1;
-      dd.dataset.y = 8-y_say;
-      dd.dataset.taş = 'yok';
+      dd.dataset.x = x_say;
+      dd.dataset.y = y_say;
+      glgth[y_say][x_say] = 'yok';
       k.appendChild(dd);
     }
+  }
+
+  return glgth;
 }
 
 export
-function oyun_yükle(th) {
+function oyun_yükle(th, glgth) {
   const ilk = {
-    "siyah": [
+    "siyah": [                                 // x, y, dama
       ["1","7","0"],["2","7","0"],["3","7","0"],["4","7","0"],["5","7","0"],["6","7","0"],["7","7","0"],["8","7","0"],
       ["1","6","0"],["2","6","0"],["3","6","0"],["4","6","0"],["5","6","0"],["6","6","0"],["7","6","0"],["8","6","0"]
     ],
@@ -95,7 +102,7 @@ function oyun_yükle(th) {
       cc.r.baseVal.value = 21;
       cc.dataset.x = t[0];
       cc.dataset.y = t[1];
-      th.querySelector(`g g rect[data-x="${cc.dataset.x}"][data-y="${cc.dataset.y}"`).dataset.taş = renk;
+      glgth[+t[1]][+t[0]] = renk;
       cc.dataset.dama = t[2];
       at = celm(th, 'animate');
       at.setAttribute('dur', '250ms');
@@ -124,16 +131,16 @@ function dama_çiz(c, renk) {
 
 export
 function oyun_kaydet(th, s, beyaz_sayaç, siyah_sayaç) {
-  let durum = {
+  const durum = {
     "siyah": [ ],
     "beyaz": [ ],
     "sıra": "",
     "beyaz_sayaç": "",
     "siyah_sayaç": ""
   };
-  for (let t of th.querySelectorAll('#siyahlar circle'))
+  for (let t of th.querySelector('#siyahlar').children)
     durum['siyah'].push([t.dataset.x, t.dataset.y, t.dataset.dama]);
-  for (let t of th.querySelectorAll('#beyazlar circle'))
+  for (let t of th.querySelector('#beyazlar').children)
     durum['beyaz'].push([t.dataset.x, t.dataset.y, t.dataset.dama]);
   durum['sıra'] = s;
   durum['beyaz_sayaç'] = beyaz_sayaç.toString();
