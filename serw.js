@@ -1,4 +1,7 @@
-self.addEventListener('install', () => console.log('serw install.'));
+self.addEventListener('install', () => {
+  self.skipWaiting();
+  console.log('serw install.');
+});
 
 self.addEventListener("activate", () => console.log('serw activate.'));
 
