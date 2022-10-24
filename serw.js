@@ -1,5 +1,4 @@
 self.addEventListener('install', e => {
-  self.skipWaiting();
   e.waitUntil(
     caches.open('c-damalper')
     .then(c => c.addAll(['./index.html', './css/style.css',
