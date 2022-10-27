@@ -234,7 +234,7 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
       }
       else  {   /* taş alma atılımı */
         if (y == to.y && to.x == x-2 &&  glgth[y][x-1] == Yağı[yön]) {
-            glgth[y][x-1] = 'yok;'
+            glgth[y][x-1] = 'yok';
             th.querySelector(`g g circle[data-x="${x-1}"][data-y="${y}"]`).remove();
             yatay_devinim();
             return [true,true,];
