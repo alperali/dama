@@ -276,18 +276,19 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
   function alım_olası_dama(t, yön, dama_yön) {
     // dama_yön: damanın, son taşı alırken hangi yönde atılım yaptığı. Bu yönün
     //           tam tersinde taş almaya devam edemez. Yeni atılımda bu yön yoktur,
-    //           Yön.yok değeri geçilir ve ters_yön[dama_yön] != d koşulu daima true olur.
+    //           Yön.yok değeri geçilir ve ters_yön[dama_yön] == d koşulu daima false olur.
     let kare, x=[-1,0,1,0], y=[0,1,0,-1], ters_yön=[Yön.D, Yön.G, Yön.B, Yön.K];
-    for (let d=Yön.B; d<=Yön.G; ++d)
+    for (let d=Yön.B; d<=Yön.G; ++d) {
+      if (ters_yön[dama_yön] == d) continue;
       for (let i=1, buldu=false; kare=glgth[+t.dataset.y + y[d]*i]?.[+t.dataset.x + x[d]*i]; ++i)
         if (kare == Yağı[yön])
           if (buldu) break; /* yanyana iki yağı taş */
           else buldu = true;
         else if (kare == 'yok')
-          if (buldu && ters_yön[dama_yön] != d)  return true;
+          if (buldu)  return true;
           else continue;
         else break; /* kendiyle aynı renk taş */
-
+    }
     return false;
   }
 
