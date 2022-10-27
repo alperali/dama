@@ -1,4 +1,5 @@
 const celm = (th,e) => th.createElementNS('http://www.w3.org/2000/svg', e);
+export const Taş = { yok: 9, Syh: 13, Byz: 17 };
 
 export 
 function tahta_çiz(th) {
@@ -64,7 +65,7 @@ function tahta_çiz(th) {
       dd.height.baseVal.value = 52;
       dd.dataset.x = x_say;
       dd.dataset.y = y_say;
-      glgth[y_say][x_say] = 'yok';
+      glgth[y_say][x_say] = Taş.yok;
       k.appendChild(dd);
     }
   }
@@ -88,8 +89,8 @@ function oyun_yükle(th, glgth) {
     "siyah_sayaç": "0"
   }
   let durum = JSON.parse(localStorage.getItem('damalper')) ?? ilk;
-  taşları_diz(durum['siyah'], 'siyah', th.querySelector('#siyahlar'));
-  taşları_diz(durum['beyaz'], 'beyaz', th.querySelector('#beyazlar'));
+  taşları_diz(durum['siyah'], Taş.Syh, th.querySelector('#siyahlar'));
+  taşları_diz(durum['beyaz'], Taş.Byz, th.querySelector('#beyazlar'));
   return [durum['sıra'], +durum['beyaz_sayaç'], +durum['siyah_sayaç']];
 
   function taşları_diz(taşlar, renk, g) {
@@ -117,7 +118,7 @@ function oyun_yükle(th, glgth) {
 
 export
 function dama_çiz(c, renk) {
-  if (renk == 'beyaz') {
+  if (renk == Taş.Byz) {
     c.setAttribute('stroke-dasharray','none');
     c.setAttribute('stroke-width', '2');
     c.setAttribute('fill', 'url(#beyazdama)');
