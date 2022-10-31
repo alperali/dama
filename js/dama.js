@@ -11,14 +11,14 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
   th.querySelector('#kareler').addEventListener('click', kare_seç);
   th.querySelector('#siyahlar').addEventListener('click', siyah_seç);
   th.querySelector('#beyazlar').addEventListener('click', beyaz_seç);
-  let from, sıra, seçim_sabit=false, taş_seçili=false, al=false, alan=[], seçili_al_yön;
+  let from, sıra, seçim_sabit=false, taş_seçili=false, al=false, alan=[], seçili_alım;
   const sayaçlar = {[Yön.Beyaz]: {sayaç: byz_sayaç, say: 0},
                     [Yön.Siyah]: {sayaç: syh_sayaç, say: 0}};
 
   const glgth = tahta_çiz(th);
 
   [sıra, sayaçlar[Yön.Beyaz].say, sayaçlar[Yön.Siyah].say] = oyun_yükle(th, glgth);
-
+// console.log(glgth);
   if (sıra == 'beyazda')
     th.querySelector('line#beyaz').setAttribute('visibility', 'visible');
   if (sıra == 'siyahta')
@@ -37,7 +37,7 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
   if (al=alır_mı(...(sıra=='siyahta' ? ['#siyahlar', Yön.Siyah] : ['#beyazlar', Yön.Beyaz]))) {
     const seç = alan.pop();
     marker_set(from=th.querySelector(`g g circle[data-x="${seç.x}"][data-y="${seç.y}"]`));
-    seçili_al_yön = seç.al_yön;
+    seçili_alım = seç.alım;
     switch (alan.length) {
       // aşağıda break unutulmuş değil, bilerek fall-through
       case 3: alt_marker_set(2);
@@ -86,12 +86,12 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
         return;
       for (let i=0; i < alan.length; ++i)
         if (e.target.dataset.x == alan[i].x && e.target.dataset.y == alan[i].y) {
-          const tmp_yön = alan[i].al_yön;
+          const tmp_alım = alan[i].alım;
           alt_marker_unset(i);
-          alan[i].x = from.dataset.x; alan[i].y = from.dataset.y; alan[i].al_yön = seçili_al_yön;
+          alan[i].x = from.dataset.x; alan[i].y = from.dataset.y; alan[i].alım = seçili_alım;
           marker_set(from=e.target);
           alt_marker_set(i);
-          seçili_al_yön = tmp_yön;
+          seçili_alım = tmp_alım;
         }
     }
     else
@@ -128,14 +128,14 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
     if (!taş_seçili) return;
     if (glgth[+e.target.dataset.y][+e.target.dataset.x] != Taş.yok)  // boş karede zaten taş 'yok'tur fakat bir şekilde
       return;                                                        // taş olan kareye tıklamayı becermişse oyuncu... 
-    
+
     let to = { x: +e.target.dataset.x, y: +e.target.dataset.y };
 
     sıra == 'beyazda' ? devinim(Yön.Beyaz, Taş.Byz, '8') : devinim(Yön.Siyah, Taş.Syh, '1');
 
     function devinim(yön, renk, dama_satırı) {
       const [devindi, taş_aldı, dama_yön] = taş_devindir(from, to, yön);
-      if (!devindi)  return;
+      if (!devindi)  return;  // console.log(glgth);
       switch (alan.length) {
         case 3: alt_marker_unset(2);  // bilerek fall-through
         case 2: alt_marker_unset(1);
@@ -145,7 +145,10 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
       if (taş_aldı) {
         ++sayaçlar[yön].say;
         sayaçlar[yön].sayaç.dispatchEvent(new CustomEvent(evnt, {detail: sayaçlar[yön].say}));
-        if (al=daha_alır_mı(yön, dama_yön)) {
+        // daha alır mı?
+        [al, seçili_alım] = from.dataset.dama == '1' ? alım_olası_dama(+from.dataset.x, +from.dataset.y, yön, dama_yön)
+                                                     : alım_olası(+from.dataset.x, +from.dataset.y, yön);
+        if (al) {
           marker_set(from);
           seçim_sabit = true;
           return;
@@ -166,7 +169,7 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
       if (al=alır_mı(...(sıra=='siyahta' ? ['#siyahlar', Yön.Siyah] : ['#beyazlar', Yön.Beyaz]))) {
         const seç = alan.pop();
         marker_set(from=th.querySelector(`g g circle[data-x="${seç.x}"][data-y="${seç.y}"]`));
-        seçili_al_yön = seç.al_yön;
+        seçili_alım = seç.alım;
         switch (alan.length) {
           // aşağıda break unutulmuş değil, bilerek fall-through
           case 3: alt_marker_set(2);
@@ -182,114 +185,101 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
   } /* kare_seç */
 
   function alır_mı(g, yön) {
-    let say=0, al_yön, rv;
+    let say=0, alım, rv;
     alan.length = 0;
-    for (const t of th.querySelector(g).children)
-      if (t.dataset.dama == '1')
-        alım_olası_dama(t, yön, Yön.yok);
-      else {
-        [rv, al_yön] = alım_olası(t, yön);
-        if (rv)
-          if (rv > say) {
-            alan.length = 0;
-            say = rv;
-            alan.push({x: t.dataset.x, y: t.dataset.y, al_yön});
-          }
-          else if (rv == say)
-            alan.push({x: t.dataset.x, y: t.dataset.y, al_yön});
-      }
+    for (const t of th.querySelector(g).children) {
+      [rv, alım] = (t.dataset.dama == '1' ? alım_olası_dama(+t.dataset.x, +t.dataset.y, yön, Yön.yok)
+                                          : alım_olası(+t.dataset.x, +t.dataset.y, yön));
+      if (rv)
+        if (rv > say) {
+          alan.length = 0;
+          say = rv;
+          alan.push({x: t.dataset.x, y: t.dataset.y, alım});
+        }
+        else if (rv == say)
+          alan.push({x: t.dataset.x, y: t.dataset.y, alım});
+    }
     return alan.length > 0;
   }
 
-  function daha_alır_mı(yön, dama_yön) {
-    let rv;
-    if (from.dataset.dama == '1')
-      return alım_olası_dama(from, yön, dama_yön);
-    else {
-      [rv, seçili_al_yön] = alım_olası(from, yön);
-      return rv;
-    }
-  }
-
-  function alım_olası(t, yön) {
-    const x = +t.dataset.x, y = +t.dataset.y;
-    let say=0, rv, al_yön = [];
+  function alım_olası(x, y, yön) {
+    let say=0, rv, alım=[];
     if (glgth[y][x-2] == Taş.yok && glgth[y][x-1] == Yağı[yön]) {
       glgth[y][x-1] = Taş.yok;
-      rv = ileri_bak(x-2, y, yön) + 1;
-      if (rv > say) {
-        say = rv;
-        al_yön.length = 0;
-        al_yön.push(Yön.B);
+      // özyinelemeli çağrılarda alım konum bilgileri gerekli değil, yalnızca alım sayısı
+      [rv] = alım_olası(x-2, y, yön);
+      if (rv+1 > say) {
+        say = rv+1;
+        alım.length = 0;
+        alım.push({alınan_x: x-1, alınan_y: y, alan_yeni_x: x-2, alan_yeni_y: y});
       }
-      else if (rv == say) al_yön.push(Yön.B);
+      else if (rv+1 == say) alım.push({alınan_x: x-1, alınan_y: y, alan_yeni_x: x-2, alan_yeni_y: y});
       glgth[y][x-1] = Yağı[yön];
     }
     if (glgth[y][x+2] == Taş.yok && glgth[y][x+1] == Yağı[yön]) {
       glgth[y][x+1] = Taş.yok;
-      rv = ileri_bak(x+2, y, yön) + 1;
-      if (rv > say) {
-        say = rv;
-        al_yön.length = 0;
-        al_yön.push(Yön.D);
+      [rv] = alım_olası(x+2, y, yön);
+      if (rv+1 > say) {
+        say = rv+1;
+        alım.length = 0;
+        alım.push({alınan_x: x+1, alınan_y: y, alan_yeni_x: x+2, alan_yeni_y: y});
       }
-      else if (rv == say) al_yön.push(Yön.D);
+      else if (rv+1 == say) alım.push({alınan_x: x+1, alınan_y: y, alan_yeni_x: x+2, alan_yeni_y: y});
       glgth[y][x+1] = Yağı[yön];
     }
     if (glgth[y+(2*yön)]?.[x] == Taş.yok && glgth[y+yön]?.[x] == Yağı[yön]) {
       glgth[y+yön][x] = Taş.yok;
-      rv = ileri_bak(x, y+(2*yön), yön) + 1;
-      if (rv > say) {
-        say = rv;
-        al_yön.length = 0;
-        al_yön.push(yön == Yön.Beyaz ? Yön.K : Yön.G);
+      [rv] = alım_olası(x, y+(2*yön), yön);
+      if (rv+1 > say) {
+        say = rv+1;
+        alım.length = 0;
+        alım.push({alınan_x: x, alınan_y: y+yön, alan_yeni_x: x, alan_yeni_y: y+(2*yön)});
       }
-      else if (rv == say) al_yön.push(yön == Yön.Beyaz ? Yön.K : Yön.G);
+      else if (rv+1 == say) alım.push({alınan_x: x, alınan_y: y+yön, alan_yeni_x: x, alan_yeni_y: y+(2*yön)});
       glgth[y+yön][x] = Yağı[yön];
     }
-    return [say, al_yön];
+    return [say, alım];
   }
 
-  function ileri_bak(x, y, yön) {
-    let say=0, rv;
-    if (glgth[y][x-2] == Taş.yok && glgth[y][x-1] == Yağı[yön]) {
-      glgth[y][x-1] = Taş.yok;
-      rv = ileri_bak(x-2, y, yön) + 1;
-      if (rv > say) say = rv;
-      glgth[y][x-1] = Yağı[yön];
-    }
-    if (glgth[y][x+2] == Taş.yok && glgth[y][x+1] == Yağı[yön]) {
-      glgth[y][x+1] = Taş.yok;
-      rv = ileri_bak(x+2, y, yön) + 1;
-      if (rv > say) say = rv;
-      glgth[y][x+1] = Yağı[yön];
-    }
-    if (glgth[y+(2*yön)]?.[x] == Taş.yok && glgth[y+yön]?.[x] == Yağı[yön]) {
-      glgth[y+yön][x] = Taş.yok;
-      rv = ileri_bak(x, y+(2*yön), yön) + 1;
-      if (rv > say) say = rv;
-      glgth[y+yön][x] = Yağı[yön];
-    }
-    return say;
-  }
-
-  function alım_olası_dama(t, yön, dama_yön) {
+  function alım_olası_dama(x, y, yön, dama_yön) {
     // dama_yön: damanın, son taşı alırken hangi yönde atılım yaptığı. Bu yönün
     //           tam tersinde taş almaya devam edemez. Yeni atılımda bu yön yoktur,
     //           Yön.yok değeri geçilir ve ters_yön[dama_yön] == d koşulu daima false olur.
-    let kare, x=[-1,0,1,0], y=[0,1,0,-1], ters_yön=[Yön.D, Yön.G, Yön.B, Yön.K];
+    const rx=[-1,0,1,0], ry=[0,1,0,-1], ters_yön=[Yön.D, Yön.G, Yön.B, Yön.K],
+          bu_taş = (yön == Yön.Beyaz ? Taş.Byz : Taş.Syh);
+    let kare, say=0, rv, alım=[];
     for (let d=Yön.B; d<=Yön.G; ++d) {
       if (ters_yön[dama_yön] == d) continue;
-      for (let i=1, buldu=false; kare=glgth[+t.dataset.y + y[d]*i]?.[+t.dataset.x + x[d]*i]; ++i)
+      for (let i=1, buldu=false; kare=glgth[y+ry[d]*i]?.[x+rx[d]*i]; ++i)
         if (kare == Yağı[yön])
           if (buldu) break; /* yanyana iki yağı taş */
           else buldu = true;
         else if (kare == Taş.yok)
-          if (buldu)  return true;
+          if (buldu) {
+            glgth[y][x] = glgth[y+ry[d]*(i-1)][x+rx[d]*(i-1)] = Taş.yok;
+            for (let j=i; glgth[y+ry[d]*j]?.[x+rx[d]*j] == Taş.yok; ++j) {
+              glgth[y+ry[d]*j][x+rx[d]*j] = bu_taş;
+              [rv] = alım_olası_dama(x+rx[d]*j, y+ry[d]*j, yön, d);
+              if (rv+1 > say) {
+                say = rv+1;
+                alım.length = 0;
+                alım.push({alınan_x:    x+rx[d]*(i-1), alınan_y:    y+ry[d]*(i-1),
+                           alan_yeni_x: x+rx[d]*j,     alan_yeni_y: y+ry[d]*j,  dama_yön: d});
+              }
+              else if (rv+1 == say)
+                alım.push({alınan_x:    x+rx[d]*(i-1), alınan_y:    y+ry[d]*(i-1),
+                           alan_yeni_x: x+rx[d]*j,     alan_yeni_y: y+ry[d]*j,  dama_yön: d});
+
+              glgth[y+ry[d]*j][x+rx[d]*j] = Taş.yok;
+            }
+            glgth[y+ry[d]*(i-1)][x+rx[d]*(i-1)] = Yağı[yön];
+            glgth[y][x] = bu_taş;
+            break;
+          }
           else continue;
         else break; /* kendiyle aynı renk taş */
     }
-    return false;
+    return [say, alım];
   }
 
   function taş_devindir(from, to, yön) {
@@ -298,71 +288,42 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
     // dama taş, yağı taşı alarak devinirse [true, true, Yön]
     // devinemezse [false,,]
     // döndürür.
+    // yan etki: devinirse from.dataset'i değiştirir.
     let x=+from.dataset.x, y=+from.dataset.y, dama=+from.dataset.dama;
     if (!dama) // yoz taş
-      if (y == to.y && (to.x == x-1 || to.x == x+1) && !al) {
-        yatay_devinim();
+      if (!al && (
+          (y == to.y && (to.x == x-1 || to.x == x+1)) ||
+          (x == to.x && to.y == y+yön))) {
+        devin();
         return [true,false,];
       }
-      else if (x == to.x && to.y == y+yön && !al) {
-        düşey_devinim();
-        return [true,false,];
-      }
-      else  {   /* taş alma atılımı */
-        if (y == to.y && to.x == x-2 && glgth[y][x-1] == Yağı[yön] && alım_yönü(Yön.B)) {
-            glgth[y][x-1] = Taş.yok;
-            th.querySelector(`g g circle[data-x="${x-1}"][data-y="${y}"]`).remove();
-            yatay_devinim();
+      else {    /* taş alma atılımı */
+        for (let i=0; i<seçili_alım.length; ++i)
+          if (to.y == seçili_alım[i].alan_yeni_y && to.x == seçili_alım[i].alan_yeni_x) {
+            glgth[seçili_alım[i].alınan_y][seçili_alım[i].alınan_x] = Taş.yok;
+            th.querySelector(`g g circle[data-x="${seçili_alım[i].alınan_x}"][data-y="${seçili_alım[i].alınan_y}"]`).remove();
+            devin();
             return [true,true,];
-        }
-        else if (y == to.y && to.x == x+2 && glgth[y][x+1] == Yağı[yön] && alım_yönü(Yön.D)) {
-            glgth[y][x+1] = Taş.yok;
-            th.querySelector(`g g circle[data-x="${x+1}"][data-y="${y}"]`).remove();
-            yatay_devinim();
-            return [true,true,];
-        }
-        else if (x == to.x && to.y == y+(2*yön) && glgth[y+yön][x] == Yağı[yön] && alım_yönü(yön == Yön.Beyaz ? Yön.K : Yön.G)) {
-            glgth[y+yön][x] = Taş.yok;
-            th.querySelector(`g g circle[data-x="${x}"][data-y="${y+yön}"]`).remove();
-            düşey_devinim();
-            return [true,true,];
-        }
-        else
-          return [false,,];  // bu devinim olası değil.
+          }
+        return [false,,];  // bu devinim olası değil.
       }
 
     /* dama taş */
-    let val;
-    if (y == to.y && arası_kaç_yağı_yatay() == 0 && !al) {
-      yatay_devinim();
-      return [true,false,];
-    }
-    else if (x == to.x && arası_kaç_yağı_düşey() == 0 && !al) {
-      düşey_devinim();
+    if (!al && (
+        (y == to.y && arası_kaç_yağı_yatay() === 0) ||
+        (x == to.x && arası_kaç_yağı_düşey() === 0))) {
+      devin();
       return [true,false,];
     }
     else { /* taş alma atılımı */
-      if (y == to.y && (val=arası_kaç_yağı_yatay()) > 0) {
-        glgth[y][val] = Taş.yok;
-        th.querySelector(`g g circle[data-x="${val}"][data-y="${y}"]`).remove();
-        yatay_devinim();
-        return [true,true,(val < x ? Yön.B : Yön.D)];
-      }
-      else if (x == to.x && (val=arası_kaç_yağı_düşey()) > 0) {
-        glgth[val][x] = Taş.yok;
-        th.querySelector(`g g circle[data-x="${x}"][data-y="${val}"]`).remove();
-        düşey_devinim();
-        return [true,true,(val > y ? Yön.K : Yön.G)];
-      }
-      else
-        return [false,,];  // bu devinim olası değil.
-    }
-
-    function alım_yönü(yön) {
-      for (let i=0; i<seçili_al_yön.length; ++i)
-        if (seçili_al_yön[i] === yön) return true;
-
-      return false;
+      for (let i=0; i<seçili_alım.length; ++i)
+        if (to.y == seçili_alım[i].alan_yeni_y && to.x == seçili_alım[i].alan_yeni_x) {
+          glgth[seçili_alım[i].alınan_y][seçili_alım[i].alınan_x] = Taş.yok;
+          th.querySelector(`g g circle[data-x="${seçili_alım[i].alınan_x}"][data-y="${seçili_alım[i].alınan_y}"]`).remove();
+          devin();
+          return [true,true,seçili_alım[i].dama_yön];
+        }
+      return [false,,];  // bu devinim olası değil.
     }
 
     function arası_kaç_yağı_yatay() {
@@ -409,24 +370,25 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
       return say == 1 ? yağı_y : say;
     }
 
-    function yatay_devinim() {
-      from.children[0].setAttribute('attributeName', 'cx');
-      from.children[0].setAttribute('from', `${from.cx.baseVal.value}`);
-      from.children[0].setAttribute('to', `${(to.x-x)*54 + from.cx.baseVal.value}`);
-      glgth[y][to.x] = glgth[y][x];
-      glgth[y][x] = Taş.yok;
-      from.dataset.x = to.x;
-      from.setAttribute('cx', `${(to.x-x)*54 + from.cx.baseVal.value}`);
-      from.children[0].beginElement();
-    }
-    function düşey_devinim() {
-      from.children[0].setAttribute('attributeName', 'cy');
-      from.children[0].setAttribute('from', `${from.cy.baseVal.value}`);
-      from.children[0].setAttribute('to', `${(y-to.y)*54 + from.cy.baseVal.value}`);
-      glgth[to.y][x] = glgth[y][x];
-      glgth[y][x] = Taş.yok;
-      from.dataset.y = to.y;
-      from.setAttribute('cy', `${(y-to.y)*54 + from.cy.baseVal.value}`);
+    function devin() {
+      if (y == to.y) {   // yatay devinim
+        from.children[0].setAttribute('attributeName', 'cx');
+        from.children[0].setAttribute('from', `${from.cx.baseVal.value}`);
+        from.children[0].setAttribute('to', `${(to.x-x)*54 + from.cx.baseVal.value}`);
+        glgth[y][to.x] = glgth[y][x];
+        glgth[y][x] = Taş.yok;
+        from.dataset.x = to.x;
+        from.setAttribute('cx', `${(to.x-x)*54 + from.cx.baseVal.value}`);
+      }
+      else {   // düşey devinim
+        from.children[0].setAttribute('attributeName', 'cy');
+        from.children[0].setAttribute('from', `${from.cy.baseVal.value}`);
+        from.children[0].setAttribute('to', `${(y-to.y)*54 + from.cy.baseVal.value}`);
+        glgth[to.y][x] = glgth[y][x];
+        glgth[y][x] = Taş.yok;
+        from.dataset.y = to.y;
+        from.setAttribute('cy', `${(y-to.y)*54 + from.cy.baseVal.value}`);
+      }
       from.children[0].beginElement();
     }
 
