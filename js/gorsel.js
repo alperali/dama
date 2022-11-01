@@ -10,20 +10,15 @@ function tahta_çiz(th) {
 
     for (let c of 'abcdefgh') {
       tt = celm(th, 'text');
-      tt.x.baseVal.appendItem(th.documentElement.createSVGLength());
-      tt.x.baseVal[0].value = x1;
-      tt.y.baseVal.appendItem(th.documentElement.createSVGLength());
-      tt.y.baseVal[0].value = 472;
+      tt.setAttribute('x', x1);
+      tt.setAttribute('y', 472);
       tt.textContent = c;
       çv.appendChild(tt);
       tt = celm(th, 'text');
-      tt.x.baseVal.appendItem(th.documentElement.createSVGLength());
-      tt.x.baseVal[0].value = x2;
-      tt.y.baseVal.appendItem(th.documentElement.createSVGLength());
-      tt.y.baseVal[0].value = 8;
+      tt.setAttribute('x', x2);
+      tt.setAttribute('y', 8);
       tt.textContent = c;
-      tt.rotate.baseVal.appendItem(th.documentElement.createSVGNumber());
-      tt.rotate.baseVal[0].value = 180;
+      tt.setAttribute('rotate', '180');
       çv.appendChild(tt);
       x1 += x_off;
       x2 += x_off;
@@ -31,20 +26,15 @@ function tahta_çiz(th) {
 
     for (let c of '12345678') {
       tt = celm(th, 'text');
-      tt.x.baseVal.appendItem(th.documentElement.createSVGLength());
-      tt.x.baseVal[0].value = 8;
-      tt.y.baseVal.appendItem(th.documentElement.createSVGLength());
-      tt.y.baseVal[0].value = y1;
+      tt.setAttribute('x', 8);
+      tt.setAttribute('y', y1);
       tt.textContent = c;
       çv.appendChild(tt);
       tt = celm(th, 'text');
-      tt.x.baseVal.appendItem(th.documentElement.createSVGLength());
-      tt.x.baseVal[0].value = 472;
-      tt.y.baseVal.appendItem(th.documentElement.createSVGLength());
-      tt.y.baseVal[0].value = y2;
+      tt.setAttribute('x', 472);
+      tt.setAttribute('y', y2);
       tt.textContent = c;
-      tt.rotate.baseVal.appendItem(th.documentElement.createSVGNumber());
-      tt.rotate.baseVal[0].value = 180;
+      tt.setAttribute('rotate', '180');
       çv.appendChild(tt);
       y1 -= y_off;
       y2 -= y_off;

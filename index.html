@@ -62,14 +62,14 @@
       let beyaz_onlu=false, siyah_onlu=false;
       beyaz_sayaç.addEventListener(evnt, e => {
         if (!beyaz_onlu && +e.detail > 9) {
-          document.querySelector('#beyazskor svg text').x.baseVal[0].value = '1.75';
+          document.querySelector('#beyazskor svg text').setAttribute('x', '1.75');
           beyaz_onlu = true;
         }
         document.querySelector('#beyazskor svg text').textContent = e.detail;
       });
       siyah_sayaç.addEventListener(evnt, e => {
         if (!siyah_onlu && +e.detail > 9) {
-          document.querySelector('#siyahskor svg text').x.baseVal[0].value = '1.75';
+          document.querySelector('#siyahskor svg text').setAttribute('x', '1.75');
           siyah_onlu = true;
         }
         document.querySelector('#siyahskor svg text').textContent = e.detail;
@@ -77,8 +77,8 @@
       const th = document.querySelector('object').contentDocument;
       document.querySelector('#yeni').addEventListener('click', Dama.oyna(th, beyaz_sayaç, siyah_sayaç, evnt));
       document.querySelector('#yeni').addEventListener('click', () => {
-        document.querySelector('#beyazskor svg text').x.baseVal[0].value =
-        document.querySelector('#siyahskor svg text').x.baseVal[0].value = "6";
+        document.querySelector('#beyazskor svg text').setAttribute('x', '6');
+        document.querySelector('#siyahskor svg text').setAttribute('x', '6');
         beyaz_onlu = siyah_onlu = false;
       });
       document.querySelector('#çevir').addEventListener('click', Dama.tahta_çevir(th));
