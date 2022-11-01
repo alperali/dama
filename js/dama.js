@@ -18,7 +18,7 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
   const glgth = tahta_çiz(th);
 
   [sıra, sayaçlar[Yön.Beyaz].say, sayaçlar[Yön.Siyah].say] = oyun_yükle(th, glgth);
-// console.log(glgth);
+
   if (sıra == 'beyazda')
     th.querySelector('line#beyaz').setAttribute('visibility', 'visible');
   if (sıra == 'siyahta')
@@ -33,21 +33,7 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
 
   // sayaç 0 ise tabelası boş kalsın
 
-  // aşağıdaki blok kare_seç()'teki ile aynı
-  if (al=alır_mı(...(sıra=='siyahta' ? ['#siyahlar', Yön.Siyah] : ['#beyazlar', Yön.Beyaz]))) {
-    const seç = alan.pop();
-    marker_set(from=th.querySelector(`g g circle[data-x="${seç.x}"][data-y="${seç.y}"]`));
-    seçili_alım = seç.alım;
-    switch (alan.length) {
-      // aşağıda break unutulmuş değil, bilerek fall-through
-      case 3: alt_marker_set(2);
-      case 2: alt_marker_set(1);
-      case 1: alt_marker_set(0);
-        break;
-      default:
-        seçim_sabit = true;
-    }
-  }
+   alım_denetimi();
 
   return function yeni_oyun() {
     localStorage.removeItem('damalper');
@@ -124,6 +110,23 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
     alt_marker[i].setAttribute('visibility', 'hidden');
   }
 
+  function alım_denetimi() {
+    if (al=alır_mı(...(sıra=='siyahta' ? ['#siyahlar', Yön.Siyah] : ['#beyazlar', Yön.Beyaz]))) {
+      const seç = alan.pop();
+      marker_set(from=th.querySelector(`g g circle[data-x="${seç.x}"][data-y="${seç.y}"]`));
+      seçili_alım = seç.alım;
+      switch (alan.length) {
+        // aşağıda break unutulmuş değil, bilerek fall-through
+        case 3: alt_marker_set(2);
+        case 2: alt_marker_set(1);
+        case 1: alt_marker_set(0);
+          break;
+        default:
+          seçim_sabit = true;
+      }
+    }
+  }
+
   function kare_seç(e) {
     if (!taş_seçili) return;
     if (glgth[+e.target.dataset.y][+e.target.dataset.x] != Taş.yok)  // boş karede zaten taş 'yok'tur fakat bir şekilde
@@ -135,7 +138,7 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
 
     function devinim(yön, renk, dama_satırı) {
       const [devindi, taş_aldı, dama_yön] = taş_devindir(from, to, yön);
-      if (!devindi)  return;  // console.log(glgth);
+      if (!devindi)  return;
       switch (alan.length) {
         case 3: alt_marker_unset(2);  // bilerek fall-through
         case 2: alt_marker_unset(1);
@@ -166,20 +169,8 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
       }
       oyun_kaydet(th, sıra, sayaçlar[Yön.Beyaz].say, sayaçlar[Yön.Siyah].say);
     
-      if (al=alır_mı(...(sıra=='siyahta' ? ['#siyahlar', Yön.Siyah] : ['#beyazlar', Yön.Beyaz]))) {
-        const seç = alan.pop();
-        marker_set(from=th.querySelector(`g g circle[data-x="${seç.x}"][data-y="${seç.y}"]`));
-        seçili_alım = seç.alım;
-        switch (alan.length) {
-          // aşağıda break unutulmuş değil, bilerek fall-through
-          case 3: alt_marker_set(2);
-          case 2: alt_marker_set(1);
-          case 1: alt_marker_set(0);
-            break;
-          default:
-            seçim_sabit = true;
-        }
-      }
+      alım_denetimi();
+
     } /* devinim */
 
   } /* kare_seç */
