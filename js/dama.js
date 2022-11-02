@@ -61,7 +61,10 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
 
   function siyah_seç(e) {
     if (sıra == 'beyazda') return;
-    if (seçim_sabit)   return;
+    if (seçim_sabit) {
+      alım_göster();
+      return;
+    }
     if (sıra == 'N/A') sıra = 'siyahta';
     alan_seç(e);
   }
@@ -86,7 +89,10 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
 
   function beyaz_seç(e) {
     if (sıra == 'siyahta') return;
-    if (seçim_sabit)   return;
+    if (seçim_sabit) {
+      alım_göster();
+      return;
+    }
     if (sıra == 'N/A') sıra = 'beyazda';
     alan_seç(e);
   }
@@ -125,6 +131,12 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
           seçim_sabit = true;
       }
     }
+  }
+
+  function alım_göster() {
+    for (let i=0; i<seçili_alım.length; ++i)
+      th.querySelector(`rect[data-x="${seçili_alım[i].alan_yeni_x}"][data-y="${seçili_alım[i].alan_yeni_y}"]`)
+        .children[0].beginElement();
   }
 
   function kare_seç(e) {
@@ -296,6 +308,7 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
             devin();
             return [true,true,];
           }
+        alım_göster();
         return [false,,];  // bu devinim olası değil.
       }
 
@@ -314,6 +327,7 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
           devin();
           return [true,true,seçili_alım[i].dama_yön];
         }
+      alım_göster();
       return [false,,];  // bu devinim olası değil.
     }
 

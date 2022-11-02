@@ -56,6 +56,13 @@ function tahta_çiz(th) {
       dd.dataset.x = x_say;
       dd.dataset.y = y_say;
       glgth[y_say][x_say] = Taş.yok;
+      const at = celm(th, 'animate');
+      at.setAttribute('attributeName', 'fill');
+      at.setAttribute('from', 'olive');
+      at.setAttribute('to', 'wheat');
+      at.setAttribute('dur', '500ms');
+      at.setAttribute('begin', 'indefinite');
+      dd.appendChild(at);
       k.appendChild(dd);
     }
   }

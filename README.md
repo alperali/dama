@@ -14,8 +14,8 @@ Bulduğunuz hataları alper.goplay@gmail.com adresine bildirin, veya Issues alt�
   Telefon, tablet, dizüstü, masaüstü, smartTV, vb her ekran boyutuna uygundur.
 - **Temel dama kurallarını uygular:**  
   Taş almak zorunludur. Birden fazla taş alma yolu varsa en fazla taş alınan yolu seçmek zorunludur,
-  eşit taş alma durumunda tercih oyuncuya bırakılır.
-  Dama, son taş aldığı yönün tam tersi yönde taş alamaz.
+  eşit sayıda taş alma durumunda seçim oyuncuya bırakılır.
+  Dama, son taş aldığı yönün tam tersi yönde taş almaya devam edemez. Yapılan hamle geri alınmaz.
 - **Temel web teknolojilerine dayanır:**  
   Html, CSS, Javascript, SVG kullanılarak geliştirilmiştir.
   Herhangi bir oyun motoru veya _framework_ kullanmaz, %100 yerlidir.
