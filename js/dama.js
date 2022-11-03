@@ -207,40 +207,19 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
 
   function alım_olası(x, y, yön) {
     let say=0, rv, alım=[];
-    if (glgth[y][x-2] == Taş.yok && glgth[y][x-1] == Yağı[yön]) {
-      glgth[y][x-1] = Taş.yok;
-      // özyinelemeli çağrılarda alım konum bilgileri gerekli değil, yalnızca alım sayısı
-      [rv] = alım_olası(x-2, y, yön);
-      if (rv+1 > say) {
-        say = rv+1;
-        alım.length = 0;
-        alım.push({alınan_x: x-1, alınan_y: y, alan_yeni_x: x-2, alan_yeni_y: y});
+    for (const [ax,ay,kx,ky] of [[-1,0,-2,0], [1,0,2,0], [0,yön,0,2*yön]])
+      if (glgth[y+ky]?.[x+kx] == Taş.yok && glgth[y+ay]?.[x+ax] == Yağı[yön]) {
+        glgth[y+ay][x+ax] = Taş.yok;  // taşı almış gibi yap
+        // özyinelemeli çağrılarda alım konum bilgileri gerekli değil, yalnızca alım sayısı
+        [rv] = alım_olası(x+kx, y+ky, yön);
+        if (rv+1 > say) {
+          say = rv+1;
+          alım.length = 0;
+          alım.push({alınan_x: x+ax, alınan_y: y+ay, alan_yeni_x: x+kx, alan_yeni_y: y+ky});
+        }
+        else if (rv+1 == say) alım.push({alınan_x: x+ax, alınan_y: y+ay, alan_yeni_x: x+kx, alan_yeni_y: y+ky});
+        glgth[y+ay][x+ax] = Yağı[yön];  // almış gibi yaptığın taşı geri yerine koy
       }
-      else if (rv+1 == say) alım.push({alınan_x: x-1, alınan_y: y, alan_yeni_x: x-2, alan_yeni_y: y});
-      glgth[y][x-1] = Yağı[yön];
-    }
-    if (glgth[y][x+2] == Taş.yok && glgth[y][x+1] == Yağı[yön]) {
-      glgth[y][x+1] = Taş.yok;
-      [rv] = alım_olası(x+2, y, yön);
-      if (rv+1 > say) {
-        say = rv+1;
-        alım.length = 0;
-        alım.push({alınan_x: x+1, alınan_y: y, alan_yeni_x: x+2, alan_yeni_y: y});
-      }
-      else if (rv+1 == say) alım.push({alınan_x: x+1, alınan_y: y, alan_yeni_x: x+2, alan_yeni_y: y});
-      glgth[y][x+1] = Yağı[yön];
-    }
-    if (glgth[y+(2*yön)]?.[x] == Taş.yok && glgth[y+yön]?.[x] == Yağı[yön]) {
-      glgth[y+yön][x] = Taş.yok;
-      [rv] = alım_olası(x, y+(2*yön), yön);
-      if (rv+1 > say) {
-        say = rv+1;
-        alım.length = 0;
-        alım.push({alınan_x: x, alınan_y: y+yön, alan_yeni_x: x, alan_yeni_y: y+(2*yön)});
-      }
-      else if (rv+1 == say) alım.push({alınan_x: x, alınan_y: y+yön, alan_yeni_x: x, alan_yeni_y: y+(2*yön)});
-      glgth[y+yön][x] = Yağı[yön];
-    }
     return [say, alım];
   }
 
