@@ -71,8 +71,10 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
 
   function alan_seç(e) {
     if (alan.length) {
-      if (e.target.dataset.x == from.dataset.x && e.target.dataset.y == from.dataset.y)
+      if (e.target.dataset.x == from.dataset.x && e.target.dataset.y == from.dataset.y) {
+        alım_göster();
         return;
+      }
       for (let i=0; i < alan.length; ++i)
         if (e.target.dataset.x == alan[i].x && e.target.dataset.y == alan[i].y) {
           const tmp_alım = alan[i].alım;
@@ -207,18 +209,18 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
 
   function alım_olası(x, y, yön) {
     let say=0, rv, alım=[];
-    for (const [ax,ay,kx,ky] of [[-1,0,-2,0], [1,0,2,0], [0,yön,0,2*yön]])
-      if (glgth[y+ky]?.[x+kx] == Taş.yok && glgth[y+ay]?.[x+ax] == Yağı[yön]) {
-        glgth[y+ay][x+ax] = Taş.yok;  // taşı almış gibi yap
+    for (const [ax,ay,kx,ky] of [[x-1,y,x-2,y], [x+1,y,x+2,y], [x,y+yön,x,y+2*yön]])
+      if (glgth[ky]?.[kx] == Taş.yok && glgth[ay]?.[ax] == Yağı[yön]) {
+        glgth[ay][ax] = Taş.yok;  // taşı almış gibi yap
         // özyinelemeli çağrılarda alım konum bilgileri gerekli değil, yalnızca alım sayısı
-        [rv] = alım_olası(x+kx, y+ky, yön);
+        [rv] = alım_olası(kx, ky, yön);
         if (rv+1 > say) {
           say = rv+1;
           alım.length = 0;
-          alım.push({alınan_x: x+ax, alınan_y: y+ay, alan_yeni_x: x+kx, alan_yeni_y: y+ky});
+          alım.push({alınan_x: ax, alınan_y: ay, alan_yeni_x: kx, alan_yeni_y: ky});
         }
-        else if (rv+1 == say) alım.push({alınan_x: x+ax, alınan_y: y+ay, alan_yeni_x: x+kx, alan_yeni_y: y+ky});
-        glgth[y+ay][x+ax] = Yağı[yön];  // almış gibi yaptığın taşı geri yerine koy
+        else if (rv+1 == say) alım.push({alınan_x: ax, alınan_y: ay, alan_yeni_x: kx, alan_yeni_y: ky});
+        glgth[ay][ax] = Yağı[yön];  // almış gibi yaptığın taşı geri yerine koy
       }
     return [say, alım];
   }
