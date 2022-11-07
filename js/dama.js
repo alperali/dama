@@ -281,18 +281,9 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
         devin();
         return [true,false,];
       }
-      else {    /* taş alma atılımı */
-        for (let i=0; i<seçili_alım.length; ++i)
-          if (to.y == seçili_alım[i].alan_yeni_y && to.x == seçili_alım[i].alan_yeni_x) {
-            glgth[seçili_alım[i].alınan_y][seçili_alım[i].alınan_x] = Taş.yok;
-            th.querySelector(`g g circle[data-x="${seçili_alım[i].alınan_x}"][data-y="${seçili_alım[i].alınan_y}"]`).remove();
-            devin();
-            return [true,true,];
-          }
-        alım_göster();
-        return [false,,];  // bu devinim olası değil.
-      }
-
+      else
+        return taş_al();
+        
     /* dama taş */
     if (!al && (
         (y == to.y && arası_kaç_yağı_yatay() === 0) ||
@@ -300,11 +291,14 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
       devin();
       return [true,false,];
     }
-    else { /* taş alma atılımı */
+    else
+      return taş_al();
+
+    function taş_al() {
       for (let i=0; i<seçili_alım.length; ++i)
         if (to.y == seçili_alım[i].alan_yeni_y && to.x == seçili_alım[i].alan_yeni_x) {
           glgth[seçili_alım[i].alınan_y][seçili_alım[i].alınan_x] = Taş.yok;
-          th.querySelector(`g g circle[data-x="${seçili_alım[i].alınan_x}"][data-y="${seçili_alım[i].alınan_y}"]`).remove();
+          th.querySelector(`circle[data-x="${seçili_alım[i].alınan_x}"][data-y="${seçili_alım[i].alınan_y}"]`).remove();
           devin();
           return [true,true,seçili_alım[i].dama_yön];
         }
