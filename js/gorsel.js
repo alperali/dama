@@ -73,45 +73,52 @@ function tahta_çiz(th) {
 export
 function oyun_yükle(th, glgth) {
   const ilk = {
-    "siyah": [                                 // x, y, dama
+    siyah: [                                 // x, y, dama
       ["1","7","0"],["2","7","0"],["3","7","0"],["4","7","0"],["5","7","0"],["6","7","0"],["7","7","0"],["8","7","0"],
       ["1","6","0"],["2","6","0"],["3","6","0"],["4","6","0"],["5","6","0"],["6","6","0"],["7","6","0"],["8","6","0"]
     ],
-    "beyaz": [
+    beyaz: [
       ["1","3","0"],["2","3","0"],["3","3","0"],["4","3","0"],["5","3","0"],["6","3","0"],["7","3","0"],["8","3","0"],
       ["1","2","0"],["2","2","0"],["3","2","0"],["4","2","0"],["5","2","0"],["6","2","0"],["7","2","0"],["8","2","0"]
     ],
-    "sıra": "N/A",
-    "beyaz_sayaç": "0",
-    "siyah_sayaç": "0"
+    sıra: "N/A",
+    beyaz_sayaç: 0,
+    siyah_sayaç: 0,
+    makina: {
+      aktif: 1,
+      renk: "yok"
+    }
   }
-  let durum = JSON.parse(localStorage.getItem('damalper')) ?? ilk;
-  taşları_diz(durum['siyah'], Taş.Syh, th.querySelector('#siyahlar'));
-  taşları_diz(durum['beyaz'], Taş.Byz, th.querySelector('#beyazlar'));
-  return [durum['sıra'], +durum['beyaz_sayaç'], +durum['siyah_sayaç']];
+  const durum = JSON.parse(localStorage.getItem('damalper')) ?? ilk;
+  const siyahlar = taşları_diz(durum.siyah, Taş.Syh, th.querySelector('#siyahlar'));
+  const beyazlar = taşları_diz(durum.beyaz, Taş.Byz, th.querySelector('#beyazlar'));
+  return [durum.sıra, durum.beyaz_sayaç, durum.siyah_sayaç, beyazlar, siyahlar, durum.makina];
 
   function taşları_diz(taşlar, renk, g) {
-    const x_off = 54, y_off = 54, baş_x = 51, baş_y = 51;
+    const x_off = 54, y_off = 54, baş_x = 51, baş_y = 51, tga=[];
     let cc, at;
     for (const t of taşlar) {
+      const tg1 = {};
       cc = celm(th, 'circle');
       cc.cx.baseVal.value = baş_x + (+t[0]-1)*x_off;
       cc.cy.baseVal.value = baş_y + (8-(+t[1]))*y_off;
       cc.r.baseVal.value = 21;
-      cc.dataset.x = t[0];
-      cc.dataset.y = t[1];
+      cc.dataset.x = t[0];         tg1.x = +t[0];
+      cc.dataset.y = t[1];         tg1.y = +t[1];
       glgth[+t[1]][+t[0]] = renk;
-      cc.dataset.dama = t[2];
+      cc.dataset.dama = t[2];      tg1.dama = +t[2];
       at = celm(th, 'animate');
       at.setAttribute('dur', '250ms');
       at.setAttribute('fill', 'freeze');
       at.setAttribute('begin', 'indefinite');
       cc.appendChild(at);
       if (t[2] === '1') dama_çiz(cc, renk);
-      g.appendChild(cc);
+      g.appendChild(cc);           tga.push(tg1);
     }
+    return tga;
   }
-}
+
+} /* oyun_yükle */
 
 export
 function dama_çiz(c, renk) {
@@ -128,21 +135,27 @@ function dama_çiz(c, renk) {
 }
 
 export
-function oyun_kaydet(th, s, beyaz_sayaç, siyah_sayaç) {
+function oyun_kaydet(th, s, beyaz_sayaç, siyah_sayaç, makina) {
   const durum = {
-    "siyah": [ ],
-    "beyaz": [ ],
-    "sıra": "",
-    "beyaz_sayaç": "",
-    "siyah_sayaç": ""
+    siyah: [ ],
+    beyaz: [ ],
+    sıra: "",
+    beyaz_sayaç: 0,
+    siyah_sayaç: 0,
+    makina: { 
+      aktif: 0,
+      renk: ""
+    }
   };
   for (let t of th.querySelector('#siyahlar').children)
-    durum['siyah'].push([t.dataset.x, t.dataset.y, t.dataset.dama]);
+    durum.siyah.push([t.dataset.x, t.dataset.y, t.dataset.dama]);
   for (let t of th.querySelector('#beyazlar').children)
-    durum['beyaz'].push([t.dataset.x, t.dataset.y, t.dataset.dama]);
-  durum['sıra'] = s;
-  durum['beyaz_sayaç'] = beyaz_sayaç.toString();
-  durum['siyah_sayaç'] = siyah_sayaç.toString();
+    durum.beyaz.push([t.dataset.x, t.dataset.y, t.dataset.dama]);
+  durum.sıra = s;
+  durum.beyaz_sayaç = beyaz_sayaç;
+  durum.siyah_sayaç = siyah_sayaç;
+  durum.makina.aktif = makina.aktif;
+  durum.makina.renk = makina.renk;
   localStorage.setItem('damalper', JSON.stringify(durum));
 }
 

@@ -23,6 +23,11 @@
           <text x="6" y="14.5" font-family="sans-serif" fill="white"></text>
         </svg>
       </button>
+      <button type="button" aria-label="Oyuncu değiştir" id="oyuncu">
+        <svg class="ikon" fill="currentColor">
+          <use href="./img/icons.svg#cpu"/>
+        </svg>
+      </button>      
       <button type="button" aria-label="Tahta çevir" id="çevir">
         <svg class="ikon" fill="currentColor">
           <use href="./img/icons.svg#arrow-counterclockwise"/>
@@ -58,16 +63,15 @@
       navigator.serviceWorker.register('./serw.js');
       const beyaz_sayaç = new EventTarget();
       const siyah_sayaç = new EventTarget();
-      const evnt = 'taş-aldı';
       let beyaz_onlu=false, siyah_onlu=false;
-      beyaz_sayaç.addEventListener(evnt, e => {
+      beyaz_sayaç.addEventListener('taş-aldı', e => {
         if (!beyaz_onlu && +e.detail > 9) {
           document.querySelector('#beyazskor svg text').setAttribute('x', '1.75');
           beyaz_onlu = true;
         }
         document.querySelector('#beyazskor svg text').textContent = e.detail;
       });
-      siyah_sayaç.addEventListener(evnt, e => {
+      siyah_sayaç.addEventListener('taş-aldı', e => {
         if (!siyah_onlu && +e.detail > 9) {
           document.querySelector('#siyahskor svg text').setAttribute('x', '1.75');
           siyah_onlu = true;
@@ -75,11 +79,20 @@
         document.querySelector('#siyahskor svg text').textContent = e.detail;
       });
       const th = document.querySelector('object').contentDocument;
-      document.querySelector('#yeni').addEventListener('click', Dama.oyna(th, beyaz_sayaç, siyah_sayaç, evnt));
+      document.querySelector('#yeni').addEventListener('click', Dama.oyna(th, beyaz_sayaç, siyah_sayaç, 'taş-aldı'));
       document.querySelector('#yeni').addEventListener('click', () => {
         document.querySelector('#beyazskor svg text').setAttribute('x', '6');
         document.querySelector('#siyahskor svg text').setAttribute('x', '6');
         beyaz_onlu = siyah_onlu = false;
+      });
+
+      if (!Dama.makina.aktif)
+        document.querySelector('#oyuncu').children[0].children[0].attributes[0].value = './img/icons.svg#person';
+
+      document.querySelector('#oyuncu').addEventListener('click', e => {
+        Dama.oyuncu_değiştir();
+        e.currentTarget.children[0].children[0].attributes[0].value = Dama.makina.aktif ? './img/icons.svg#cpu' :
+                                                                                          './img/icons.svg#person';
       });
       document.querySelector('#çevir').addEventListener('click', Dama.tahta_çevir(th));
       document.querySelector('#çevir').addEventListener('click', (() => {
@@ -99,7 +112,7 @@
         let şimdi=0, önceki=1;
         return function(e) {
           [şimdi,önceki] = [önceki,şimdi];
-          e.target.children[0].attributes[0].value = ikon[şimdi];
+          e.currentTarget.children[0].children[0].attributes[0].value = ikon[şimdi];
         }
       })());
     };
