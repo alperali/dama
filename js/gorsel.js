@@ -147,6 +147,14 @@ function oyun_kaydet(th, s, beyaz_sayaç, siyah_sayaç, makina) {
       renk: ""
     }
   };
+  if (arguments.length == 1) {
+    const kyt = JSON.parse(localStorage.getItem('damalper'));
+    if (kyt) {
+      kyt.makina.aktif = arguments[0];
+      localStorage.setItem('damalper', JSON.stringify(kyt));
+    }
+    return;
+  }
   for (let t of th.querySelector('#siyahlar').children)
     durum.siyah.push([t.dataset.x, t.dataset.y, t.dataset.dama]);
   for (let t of th.querySelector('#beyazlar').children)

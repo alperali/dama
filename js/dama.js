@@ -21,6 +21,7 @@ function oyuncu_değiştir() {
     if (makina.renk != 'yok')
       makiwrk.postMessage({msg: 'aktif', sıra});
   }
+  oyun_kaydet(makina.aktif);
 }
 
 export
