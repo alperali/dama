@@ -39,7 +39,7 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
   th.querySelector('#beyazlar').addEventListener('click', beyaz_seç);
   
   [sıra, sayaçlar[Yön.Beyaz].say, sayaçlar[Yön.Siyah].say, beyazlar, siyahlar, makina] = oyun_yükle(th, glgth);
-  makiwrk.postMessage({msg: "oyun-yükle", glgth, beyazlar, siyahlar, renk: makina.renk});
+  makiwrk.postMessage({msg: "oyun-yükle", glgth, beyazlar, siyahlar, makina});
 
   if (sıra == 'beyazda')
     th.querySelector('line#beyaz').setAttribute('visibility', 'visible');
@@ -55,7 +55,10 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
 
   // sayaç 0 ise tabelası boş kalsın
 
-   alım_denetimi();
+  if (makina.aktif && ((makina.renk == 'byz' && sıra == 'beyazda') || (makina.renk == 'syh' && sıra == 'siyahta')))
+    makiwrk.postMessage({msg: 'aktif', sıra});
+  else
+    alım_denetimi();
 
   return function yeni_oyun() {
     localStorage.removeItem('damalper');
@@ -77,7 +80,7 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
     sayaçlar[Yön.Beyaz].sayaç.dispatchEvent(new CustomEvent(evnt, {detail: ""}));
     sayaçlar[Yön.Siyah].sayaç.dispatchEvent(new CustomEvent(evnt, {detail: ""}));
     [sıra, sayaçlar[Yön.Beyaz].say, sayaçlar[Yön.Siyah].say, beyazlar, siyahlar, makina] = oyun_yükle(th, glgth);
-    makiwrk.postMessage({msg: "oyun-yükle", glgth, beyazlar, siyahlar, renk: makina.renk});
+    makiwrk.postMessage({msg: "oyun-yükle", glgth, beyazlar, siyahlar, makina});
   };
 
   function siyah_seç(e) {
@@ -90,7 +93,22 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
     if (sıra == 'N/A') { 
       sıra = 'siyahta';
       makina.renk = 'byz';
-      makiwrk.postMessage({msg: 'seç-byz'});
+      makiwrk.postMessage({msg: 'seç-byz', sıra});
+    }
+    alan_seç(e);
+  }
+
+  function beyaz_seç(e) {
+    if (sıra == 'siyahta') return;
+    if (makina.aktif && makina.renk == 'byz') return;
+    if (seçim_sabit) {
+      alım_göster();
+      return;
+    }
+    if (sıra == 'N/A') {
+      sıra = 'beyazda';
+      makina.renk = 'syh';
+      makiwrk.postMessage({msg: 'seç-syh', sıra});
     }
     alan_seç(e);
   }
@@ -113,21 +131,6 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
     }
     else
       marker_set(from=e.target);
-  }
-
-  function beyaz_seç(e) {
-    if (sıra == 'siyahta') return;
-    if (makina.aktif && makina.renk == 'byz') return;
-    if (seçim_sabit) {
-      alım_göster();
-      return;
-    }
-    if (sıra == 'N/A') {
-      sıra = 'beyazda';
-      makina.renk = 'syh';
-      makiwrk.postMessage({msg: 'seç-syh'});
-    }
-    alan_seç(e);
   }
 
   function marker_set(m) {
@@ -199,12 +202,17 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
       sayaçlar[yön].sayaç.dispatchEvent(new CustomEvent(evnt, {detail: sayaçlar[yön].say}));
       // daha alır mı?
       [al, seçili_alım] = from.dataset.dama == '1' ? alım_olası_dama(+from.dataset.x, +from.dataset.y, yön, dama_yön)
-                                                    : alım_olası(+from.dataset.x, +from.dataset.y, yön);
+                                                   : alım_olası(+from.dataset.x, +from.dataset.y, yön);
       if (al) {
         marker_set(from);
         seçim_sabit = true;
         return;
       }
+    }
+    if (from.dataset.dama == '0' && from.dataset.y == dama_satırı) {
+      from.dataset.dama = '1';
+      dama_çiz(from, renk);
+      makiwrk.postMessage({msg: 'dama-oldu', x: +from.dataset.x, y: +from.dataset.y, renk});
     }
 
     seçim_sabit = false;
@@ -212,12 +220,11 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
     marker_unset();
     th.querySelector(`line#${Yağı[yön] == Taş.Syh ? 'siyah' : 'beyaz'}`).setAttribute('visibility', 'visible');
     th.querySelector(`line#${renk == Taş.Byz ? 'beyaz' : 'siyah'}`).setAttribute('visibility', 'hidden');
-    if (from.dataset.dama == '0' && from.dataset.y == dama_satırı) {
-      from.dataset.dama = '1';
-      dama_çiz(from, renk);
-    }
     oyun_kaydet(th, sıra, sayaçlar[Yön.Beyaz].say, sayaçlar[Yön.Siyah].say, makina);
-    alım_denetimi();
+    if (makina.aktif && ((makina.renk == 'byz' && sıra == 'beyazda') || (makina.renk == 'syh' && sıra == 'siyahta')))
+      makiwrk.postMessage({msg: 'oyna'});
+    else
+      alım_denetimi();
   }
 
   function alır_mı(g, yön) {
@@ -330,6 +337,7 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
         if (to.y == seçili_alım[i].alan_yeni_y && to.x == seçili_alım[i].alan_yeni_x) {
           glgth[seçili_alım[i].alınan_y][seçili_alım[i].alınan_x] = Taş.yok;
           th.querySelector(`circle[data-x="${seçili_alım[i].alınan_x}"][data-y="${seçili_alım[i].alınan_y}"]`).remove();
+          makiwrk.postMessage({msg: 'taş-al', x: seçili_alım[i].alınan_x, y: seçili_alım[i].alınan_y, yön});
           devin();
           return [true,true,seçili_alım[i].dama_yön];
         }
@@ -401,6 +409,7 @@ function oyna(th, byz_sayaç, syh_sayaç, evnt) {
         from.setAttribute('cy', `${(y-to.y)*54 + from.cy.baseVal.value}`);
       }
       from.children[0].beginElement();
+      makiwrk.postMessage({msg: 'devindir', x, y, to, yön});
     }
 
   } /* taş_devindir */
