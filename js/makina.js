@@ -1,7 +1,7 @@
 const Taş = { yok: 9, Syh: 13, Byz: 17 };
 const Yön = {B: 0, K: 1, D: 2, G: 3, yok: 4, Beyaz: 1, Siyah: -1 };
 const Yağı = {[Yön.Beyaz]: Taş.Syh, [Yön.Siyah]: Taş.Byz};
-let glgth, beyazlar, siyahlar, renk, aktif;
+let glgth, beyazlar, siyahlar, renk, alan=[];
 
 self.addEventListener('message', (e) => {
   let taşlar;
@@ -11,7 +11,7 @@ self.addEventListener('message', (e) => {
       beyazlar = e.data.beyazlar;
       siyahlar = e.data.siyahlar;
       renk = e.data.makina.renk;
-      aktif = e.data.makina.aktif;
+      // aktif = e.data.makina.aktif;
       break;
     case 'seç-byz':
       renk = 'byz';
@@ -48,22 +48,36 @@ self.addEventListener('message', (e) => {
         }
       break;
     case 'oyna':
-      oyna();
-      break;
-    case 'aktif':
-      aktif = 1;
-      if((e.data.sıra == 'beyazda' && renk == 'byz') ||
-         (e.data.sıra == 'siyahta' && renk == 'syh'))
-         oyna();
+      let seçili_alım;
+      if (e.data.alan.length) {
+        seçili_alım = alım_seç(alan_seç(e.data.seçili_alan, e.data.alan).alım);
+        postMessage({msg: 'devindir', 
+                     to: { x: seçili_alım.alan_yeni_x, y: seçili_alım.alan_yeni_y}});
+      }
+      else if (e.data.seçili_alan) {
+        seçili_alım = alım_seç(e.data.seçili_alan.alım);
+        postMessage({msg: 'devindir', 
+                     to: { x: seçili_alım.alan_yeni_x, y: seçili_alım.alan_yeni_y}});
+      }
+      else
+        oyna();
       break;
     case 'dur':
-      aktif = 0;
+      // aktif = 0;
       console.log('makina: devredışı.');
       break;
     default:
       console.log('makina: bilinmeyen mesaj geldi.');
   }
 });
+
+function alan_seç(seçili_alan, alan){
+  return seçili_alan;
+}
+
+function alım_seç(alım) {
+  return alım[0];
+}
 
 function oyna() {
   console.log('makina: atılım yaptı.');
