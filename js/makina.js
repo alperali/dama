@@ -1,7 +1,8 @@
 const Taş = { yok: 9, Syh: 13, Byz: 17 };
 const Yön = {B: 0, K: 1, D: 2, G: 3, yok: 4, Beyaz: 1, Siyah: -1 };
 const Yağı = {[Yön.Beyaz]: Taş.Syh, [Yön.Siyah]: Taş.Byz};
-let glgth, beyazlar, siyahlar, renk, alan=[];
+let glgth, beyazlar, siyahlar;
+let yön;
 
 self.addEventListener('message', (e) => {
   let taşlar;
@@ -10,14 +11,14 @@ self.addEventListener('message', (e) => {
       glgth = e.data.glgth;
       beyazlar = e.data.beyazlar;
       siyahlar = e.data.siyahlar;
-      renk = e.data.makina.renk;
+      yön = e.data.makina.yön;
       // aktif = e.data.makina.aktif;
       break;
     case 'seç-byz':
-      renk = 'byz';
+      yön = Yön.Beyaz;
       break;
     case 'seç-syh':
-      renk = 'syh';
+      yön = Yön.Siyah;
       break;
     case 'dama-oldu':
       taşlar = e.data.renk == Taş.Byz ? beyazlar : siyahlar;
@@ -80,5 +81,7 @@ function alım_seç(alım) {
 }
 
 function oyna() {
+  const taşlar = yön == Yön.Beyaz ? beyazlar : siyahlar;
+
   console.log('makina: atılım yaptı.');
 }

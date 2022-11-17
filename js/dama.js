@@ -1,6 +1,7 @@
 export { tahta_çevir, çerçeve_gör } from './gorsel.js';
-import { Taş, oyun_yükle, tahta_çiz, oyun_kaydet, dama_çiz } from './gorsel.js';
+import { oyun_yükle, tahta_çiz, oyun_kaydet, dama_çiz } from './gorsel.js';
 
+const Taş = { yok: 9, Syh: 13, Byz: 17 };
 const Yön = {B: 0, K: 1, D: 2, G: 3, yok: 4, Beyaz: 1, Siyah: -1 };
 const Yağı = {[Yön.Beyaz]: Taş.Syh, [Yön.Siyah]: Taş.Byz};
 
@@ -15,12 +16,12 @@ export
 function oyuncu_değiştir() {
   if (makina.aktif) {
     makina.aktif = 0;
-    if (makina.renk != 'yok')
+    if (makina.yön != Yön.yok)
       makiwrk.postMessage({msg: 'dur'});
   }
   else {
     makina.aktif = 1;
-    if ((makina.renk == 'byz' && sıra == 'beyazda') || (makina.renk == 'syh' && sıra == 'siyahta'))
+    if ((makina.yön == Yön.Beyaz && sıra == 'beyazda') || (makina.yön == Yön.Siyah && sıra == 'siyahta'))
       makiwrk.postMessage({msg: 'oyna', seçili_alan, alan});
   }
 
@@ -113,20 +114,21 @@ function alım_denetimi() {
         seçim_sabit = true;
     }
   }
-  if (makina.aktif && ((makina.renk == 'byz' && sıra == 'beyazda') || (makina.renk == 'syh' && sıra == 'siyahta')))
+
+  if (makina.aktif && ((makina.yön == Yön.Beyaz && sıra == 'beyazda') || (makina.yön == Yön.Siyah && sıra == 'siyahta')))
     makiwrk.postMessage({msg: 'oyna', seçili_alan, alan});
 }
 
 function siyah_seç(e) {
   if (sıra == 'beyazda') return;
-  if (makina.aktif && makina.renk == 'syh') return;
+  if (makina.aktif && makina.yön == Yön.Siyah) return;
   if (seçim_sabit) {
     alım_göster();
     return;
   }
   if (sıra == 'N/A') { 
     sıra = 'siyahta';
-    makina.renk = 'byz';
+    makina.yön = Yön.Beyaz;
     makiwrk.postMessage({msg: 'seç-byz'});
   }
   alan_seç(e);
@@ -134,14 +136,14 @@ function siyah_seç(e) {
 
 function beyaz_seç(e) {
   if (sıra == 'siyahta') return;
-  if (makina.aktif && makina.renk == 'byz') return;
+  if (makina.aktif && makina.yön == Yön.Beyaz) return;
   if (seçim_sabit) {
     alım_göster();
     return;
   }
   if (sıra == 'N/A') {
     sıra = 'beyazda';
-    makina.renk = 'syh';
+    makina.yön = Yön.Siyah;
     makiwrk.postMessage({msg: 'seç-syh'});
   }
   alan_seç(e);
@@ -193,8 +195,8 @@ function alım_göster() {
 }
 
 function kare_seç(e) {
-  if ((sıra == 'siyahta' && makina.aktif && makina.renk == 'syh') || 
-      (sıra == 'beyazda' && makina.aktif && makina.renk == 'byz'))  
+  if ((sıra == 'siyahta' && makina.aktif && makina.yön == Yön.Siyah) ||
+      (sıra == 'beyazda' && makina.aktif && makina.yön == Yön.Beyaz))
     return;
   if (!taş_seçili) return;
   if (glgth[+e.target.dataset.y][+e.target.dataset.x] != Taş.yok)  // boş karede zaten taş 'yok'tur fakat bir şekilde
@@ -223,7 +225,7 @@ function devinim(to, yön, renk, dama_satırı) {
     if (al) {
       marker_set(from);
       seçim_sabit = true;
-      if (makina.aktif && ((makina.renk == 'byz' && sıra == 'beyazda') || (makina.renk == 'syh' && sıra == 'siyahta')))
+      if (makina.aktif && ((makina.yön == Yön.Beyaz && sıra == 'beyazda') || (makina.yön == Yön.Siyah && sıra == 'siyahta')))
         makiwrk.postMessage({msg: 'oyna', seçili_alan: {x: +from.dataset.x, y: +from.dataset.y, alım: seçili_alım}, alan});
       return;
     }

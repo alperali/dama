@@ -1,5 +1,6 @@
 const celm = (th,e) => th.createElementNS('http://www.w3.org/2000/svg', e);
-export const Taş = { yok: 9, Syh: 13, Byz: 17 };
+const Taş = { yok: 9, Syh: 13, Byz: 17 };
+const Yön = {B: 0, K: 1, D: 2, G: 3, yok: 4, Beyaz: 1, Siyah: -1 };
 
 export 
 function tahta_çiz(th) {
@@ -86,7 +87,7 @@ function oyun_yükle(th, glgth) {
     siyah_sayaç: 0,
     makina: {
       aktif: 1,
-      renk: "yok"
+      yön: Yön.yok
     }
   }
   const durum = JSON.parse(localStorage.getItem('damalper')) ?? ilk;
@@ -144,7 +145,7 @@ function oyun_kaydet(th, s, beyaz_sayaç, siyah_sayaç, makina) {
     siyah_sayaç: 0,
     makina: { 
       aktif: 0,
-      renk: ""
+      yön: Yön.yok
     }
   };
   if (arguments.length == 1) {
@@ -163,7 +164,7 @@ function oyun_kaydet(th, s, beyaz_sayaç, siyah_sayaç, makina) {
   durum.beyaz_sayaç = beyaz_sayaç;
   durum.siyah_sayaç = siyah_sayaç;
   durum.makina.aktif = makina.aktif;
-  durum.makina.renk = makina.renk;
+  durum.makina.yön = makina.yön;
   localStorage.setItem('damalper', JSON.stringify(durum));
 }
 
