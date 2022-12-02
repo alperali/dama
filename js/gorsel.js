@@ -1,6 +1,6 @@
 const celm = (th,e) => th.createElementNS('http://www.w3.org/2000/svg', e);
-const Taş = { yok: 9, Syh: 13, Byz: 17 };
-const Yön = {B: 0, K: 1, D: 2, G: 3, yok: 4, Beyaz: 1, Siyah: -1 };
+const Taş = { yok: 9, Syh: 13, Byz: 17, Yoz: 0, Dama: 1 };
+const Yön = { B: 0, K: 1, D: 2, G: 3, yok: 4, Beyaz: 1, Siyah: -1 };
 
 export 
 function tahta_çiz(th) {
@@ -74,13 +74,13 @@ function tahta_çiz(th) {
 export
 function oyun_yükle(th, glgth) {
   const ilk = {
-    siyah: [                                   // x, y, dama
-      ["1","7","0"],["2","7","0"],["3","7","0"],["4","7","0"],["5","7","0"],["6","7","0"],["7","7","0"],["8","7","0"],
-      ["1","6","0"],["2","6","0"],["3","6","0"],["4","6","0"],["5","6","0"],["6","6","0"],["7","6","0"],["8","6","0"]
+    siyah: [                                     // x,y,dama/yoz
+      [1,7,Taş.Yoz], [2,7,Taş.Yoz], [3,7,Taş.Yoz], [4,7,Taş.Yoz], [5,7,Taş.Yoz], [6,7,Taş.Yoz], [7,7,Taş.Yoz], [8,7,Taş.Yoz],
+      [1,6,Taş.Yoz], [2,6,Taş.Yoz], [3,6,Taş.Yoz], [4,6,Taş.Yoz], [5,6,Taş.Yoz], [6,6,Taş.Yoz], [7,6,Taş.Yoz], [8,6,Taş.Yoz]
     ],
     beyaz: [
-      ["1","3","0"],["2","3","0"],["3","3","0"],["4","3","0"],["5","3","0"],["6","3","0"],["7","3","0"],["8","3","0"],
-      ["1","2","0"],["2","2","0"],["3","2","0"],["4","2","0"],["5","2","0"],["6","2","0"],["7","2","0"],["8","2","0"]
+      [1,3,Taş.Yoz], [2,3,Taş.Yoz], [3,3,Taş.Yoz], [4,3,Taş.Yoz], [5,3,Taş.Yoz], [6,3,Taş.Yoz], [7,3,Taş.Yoz], [8,3,Taş.Yoz],
+      [1,2,Taş.Yoz], [2,2,Taş.Yoz], [3,2,Taş.Yoz], [4,2,Taş.Yoz], [5,2,Taş.Yoz], [6,2,Taş.Yoz], [7,2,Taş.Yoz], [8,2,Taş.Yoz]
     ],
     sıra: "N/A",
     beyaz_sayaç: 0,
@@ -96,25 +96,25 @@ function oyun_yükle(th, glgth) {
   return [durum.sıra, durum.beyaz_sayaç, durum.siyah_sayaç, beyazlar, siyahlar, durum.makina];
 
   function taşları_diz(taşlar, renk, g) {
-    const x_off = 54, y_off = 54, baş_x = 51, baş_y = 51, tga=[];
+    const x_off = 54, y_off = 54, baş_x = 51, baş_y = 51, tga = new Map();
     let cc, at;
     for (const t of taşlar) {
-      const tg1 = {};
       cc = celm(th, 'circle');
       cc.cx.baseVal.value = baş_x + (+t[0]-1)*x_off;
       cc.cy.baseVal.value = baş_y + (8-(+t[1]))*y_off;
       cc.r.baseVal.value = 21;
-      cc.dataset.x = t[0];         tg1.x = +t[0];
-      cc.dataset.y = t[1];         tg1.y = +t[1];
+      cc.dataset.x = t[0];
+      cc.dataset.y = t[1];
       glgth[+t[1]][+t[0]] = renk;
-      cc.dataset.dama = t[2];      tg1.dama = +t[2];
+      cc.dataset.taş = t[2];
+      tga.set(`${t[1]}${t[0]}`, +t[2]);
       at = celm(th, 'animate');
       at.setAttribute('dur', '250ms');
       at.setAttribute('fill', 'freeze');
       at.setAttribute('begin', 'indefinite');
       cc.appendChild(at);
-      if (t[2] === '1') dama_çiz(cc, renk);
-      g.appendChild(cc);           tga.push(tg1);
+      if (+t[2] == Taş.Dama) dama_çiz(cc, renk);
+      g.appendChild(cc);
     }
     return tga;
   }
@@ -157,9 +157,9 @@ function oyun_kaydet(th, s, beyaz_sayaç, siyah_sayaç, makina) {
     return;
   }
   for (let t of th.querySelector('#siyahlar').children)
-    durum.siyah.push([t.dataset.x, t.dataset.y, t.dataset.dama]);
+    durum.siyah.push([t.dataset.x, t.dataset.y, t.dataset.taş]);
   for (let t of th.querySelector('#beyazlar').children)
-    durum.beyaz.push([t.dataset.x, t.dataset.y, t.dataset.dama]);
+    durum.beyaz.push([t.dataset.x, t.dataset.y, t.dataset.taş]);
   durum.sıra = s;
   durum.beyaz_sayaç = beyaz_sayaç;
   durum.siyah_sayaç = siyah_sayaç;

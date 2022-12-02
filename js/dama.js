@@ -1,7 +1,7 @@
 export { tahta_çevir, çerçeve_gör } from './gorsel.js';
 import { oyun_yükle, tahta_çiz, oyun_kaydet, dama_çiz } from './gorsel.js';
 
-const Taş = { yok: 9, Syh: 13, Byz: 17 };
+const Taş = { yok: 9, Syh: 13, Byz: 17, Yoz: 0, Dama: 1 };
 const Yön = {B: 0, K: 1, D: 2, G: 3, yok: 4, Beyaz: 1, Siyah: -1 };
 const Yağı = {[Yön.Beyaz]: Taş.Syh, [Yön.Siyah]: Taş.Byz};
 
@@ -220,8 +220,8 @@ function devinim(to, yön, renk, dama_satırı) {
     ++sayaçlar[yön].say;
     sayaçlar[yön].sayaç.dispatchEvent(new CustomEvent(evnt, {detail: sayaçlar[yön].say}));
     // daha alır mı?
-    [al, seçili_alım] = from.dataset.dama == '1' ? alım_olası_dama(+from.dataset.x, +from.dataset.y, yön, dama_yön)
-                                                  : alım_olası(+from.dataset.x, +from.dataset.y, yön);
+    [al, seçili_alım] = from.dataset.taş == Taş.Dama ? alım_olası_dama(+from.dataset.x, +from.dataset.y, yön, dama_yön)
+                                                     : alım_olası(+from.dataset.x, +from.dataset.y, yön);
     if (al) {
       marker_set(from);
       seçim_sabit = true;
@@ -230,8 +230,8 @@ function devinim(to, yön, renk, dama_satırı) {
       return;
     }
   }
-  if (from.dataset.dama == '0' && from.dataset.y == dama_satırı) {
-    from.dataset.dama = '1';
+  if (from.dataset.taş == Taş.Yoz && from.dataset.y == dama_satırı) {
+    from.dataset.taş = Taş.Dama;
     dama_çiz(from, renk);
     makiwrk.postMessage({msg: 'dama-oldu', x: +from.dataset.x, y: +from.dataset.y, renk});
   }
@@ -249,8 +249,8 @@ function alır_mı(g, yön) {
   let say=0, alım, rv;
   alan.length = 0;
   for (const t of th.querySelector(g).children) {
-    [rv, alım] = (t.dataset.dama == '1' ? alım_olası_dama(+t.dataset.x, +t.dataset.y, yön, Yön.yok)
-                                        : alım_olası(+t.dataset.x, +t.dataset.y, yön));
+    [rv, alım] = (t.dataset.taş == Taş.Dama ? alım_olası_dama(+t.dataset.x, +t.dataset.y, yön, Yön.yok)
+                                            : alım_olası(+t.dataset.x, +t.dataset.y, yön));
     if (rv)
       if (rv > say) {
         alan.length = 0;
@@ -329,8 +329,8 @@ function taş_devindir(from, to, yön) {
   // devinemezse [false,,]
   // döndürür.
   // yan etki: devinirse from.dataset'i değiştirir.
-  let x=+from.dataset.x, y=+from.dataset.y, dama=+from.dataset.dama;
-  if (!dama) // yoz taş
+  let x=+from.dataset.x, y=+from.dataset.y;
+  if (from.dataset.taş == Taş.Yoz)
     if (!al && (
         (y == to.y && (to.x == x-1 || to.x == x+1)) ||
         (x == to.x && to.y == y+yön))) {
