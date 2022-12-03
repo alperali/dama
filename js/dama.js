@@ -3,12 +3,19 @@ import { oyun_yükle, tahta_çiz, oyun_kaydet, dama_çiz } from './gorsel.js';
 
 const Taş = { yok: 9, Syh: 13, Byz: 17, Yoz: 0, Dama: 1 };
 const Yön = {B: 0, K: 1, D: 2, G: 3, yok: 4, Beyaz: 1, Siyah: -1 };
-const Yağı = {[Yön.Beyaz]: Taş.Syh, [Yön.Siyah]: Taş.Byz};
+const Karşı = {[Yön.Beyaz]: Yön.Siyah, [Yön.Siyah]: Yön.Beyaz};
+const C = {
+           [Yön.Beyaz]: {sıra_göster: '#beyaz', dama_satırı: '8', taş_grup: '#beyazlar', taş_renk: Taş.Byz, yağı: Taş.Syh},
+           [Yön.Siyah]: {sıra_göster: '#siyah', dama_satırı: '1', taş_grup: '#siyahlar', taş_renk: Taş.Syh, yağı: Taş.Byz}
+          };
 
 const makiwrk = new Worker('./js/makina.js');
 let th, marker, alt_marker, glgth, sayaçlar, evnt;
-let from, sıra, seçim_sabit=false, taş_seçili=false, al=false, alan=[], seçili_alım, seçili_alan,
+let from, yön, seçim_sabit=false, taş_seçili=false, al=false, alan=[], seçili_alım, seçili_alan,
       beyazlar, siyahlar;
+
+// yön değişkeni atılım yönüne ek olarak sırayı da belirtir:
+// yön == Yön.Beyaz ise sıra beyazda, Yön.Siyah ise sıra siyahta.
 
 export let makina;
 
@@ -21,7 +28,7 @@ function oyuncu_değiştir() {
   }
   else {
     makina.aktif = 1;
-    if ((makina.yön == Yön.Beyaz && sıra == 'beyazda') || (makina.yön == Yön.Siyah && sıra == 'siyahta'))
+    if (makina.yön == yön)
       makiwrk.postMessage({msg: 'oyna', seçili_alan, alan});
   }
 
@@ -43,15 +50,8 @@ function oyna(pth, byz_sayaç, syh_sayaç, pevt) {
   th.querySelector('#siyahlar').addEventListener('click', siyah_seç);
   th.querySelector('#beyazlar').addEventListener('click', beyaz_seç);
   
-  [sıra, sayaçlar[Yön.Beyaz].say, sayaçlar[Yön.Siyah].say, beyazlar, siyahlar, makina] = oyun_yükle(th, glgth);
+  [yön, sayaçlar[Yön.Beyaz].say, sayaçlar[Yön.Siyah].say, beyazlar, siyahlar, makina] = oyun_yükle(th, glgth);
   makiwrk.postMessage({msg: "oyun-yükle", glgth, beyazlar, siyahlar, makina});
-
-  if (sıra == 'beyazda')
-    th.querySelector('line#beyaz').setAttribute('visibility', 'visible');
-  if (sıra == 'siyahta')
-    th.querySelector('line#siyah').setAttribute('visibility', 'visible');
-
-  // sıra == 'N/A' ise ikisi de hidden kalsın
 
   if (sayaçlar[Yön.Beyaz].say)
     sayaçlar[Yön.Beyaz].sayaç.dispatchEvent(new CustomEvent(evnt, {detail: sayaçlar[Yön.Beyaz].say}));
@@ -60,7 +60,13 @@ function oyna(pth, byz_sayaç, syh_sayaç, pevt) {
 
   // sayaç 0 ise tabelası boş kalsın
 
-  alım_denetimi();
+  if (yön != 'N/A') {
+    th.querySelector(`line${C[yön].sıra_göster}`).setAttribute('visibility', 'visible');
+    alım_denetimi();
+  }
+
+// yön == 'N/A' ise ikisi de hidden kalsın
+
   makiwrk.addEventListener('message', mesaj_işle);
 
   return function yeni_oyun() {
@@ -82,7 +88,7 @@ function oyna(pth, byz_sayaç, syh_sayaç, pevt) {
         glgth[y][x] = Taş.yok;
     sayaçlar[Yön.Beyaz].sayaç.dispatchEvent(new CustomEvent(evnt, {detail: ""}));
     sayaçlar[Yön.Siyah].sayaç.dispatchEvent(new CustomEvent(evnt, {detail: ""}));
-    [sıra, sayaçlar[Yön.Beyaz].say, sayaçlar[Yön.Siyah].say, beyazlar, siyahlar, makina] = oyun_yükle(th, glgth);
+    [yön, sayaçlar[Yön.Beyaz].say, sayaçlar[Yön.Siyah].say, beyazlar, siyahlar, makina] = oyun_yükle(th, glgth);
     makiwrk.postMessage({msg: "oyun-yükle", glgth, beyazlar, siyahlar, makina});
   };
 }
@@ -90,8 +96,7 @@ function oyna(pth, byz_sayaç, syh_sayaç, pevt) {
 function mesaj_işle(e) {
   switch (e.data.msg) {
     case 'devindir':
-      sıra == 'beyazda' ? setTimeout(devinim, 500, e.data.to, Yön.Beyaz, Taş.Byz, '8')
-                        : setTimeout(devinim, 500, e.data.to, Yön.Siyah, Taş.Syh, '1');
+      setTimeout(devinim, 500, e.data.to, C[yön].dama_satırı);
       break;
     default:
       console.log('ana modül: bilinmeyen mesaj geldi.');
@@ -100,7 +105,7 @@ function mesaj_işle(e) {
 
 function alım_denetimi() {
   seçili_alan = null;
-  if (al=alır_mı(...(sıra=='siyahta' ? ['#siyahlar', Yön.Siyah] : ['#beyazlar', Yön.Beyaz]))) {
+  if (al=alır_mı(C[yön].taş_grup)) {
     seçili_alan = alan.pop();
     marker_set(from=th.querySelector(`circle[data-x="${seçili_alan.x}"][data-y="${seçili_alan.y}"]`));
     seçili_alım = seçili_alan.alım;
@@ -115,19 +120,19 @@ function alım_denetimi() {
     }
   }
 
-  if (makina.aktif && ((makina.yön == Yön.Beyaz && sıra == 'beyazda') || (makina.yön == Yön.Siyah && sıra == 'siyahta')))
+  if (makina.aktif && (makina.yön == yön))
     makiwrk.postMessage({msg: 'oyna', seçili_alan, alan});
 }
 
 function siyah_seç(e) {
-  if (sıra == 'beyazda') return;
+  if (yön == Yön.Beyaz) return;
   if (makina.aktif && makina.yön == Yön.Siyah) return;
   if (seçim_sabit) {
     alım_göster();
     return;
   }
-  if (sıra == 'N/A') { 
-    sıra = 'siyahta';
+  if (yön == 'N/A') {
+    yön = Yön.Siyah;
     makina.yön = Yön.Beyaz;
     makiwrk.postMessage({msg: 'seç-byz'});
   }
@@ -135,14 +140,14 @@ function siyah_seç(e) {
 }
 
 function beyaz_seç(e) {
-  if (sıra == 'siyahta') return;
+  if (yön == Yön.Siyah) return;
   if (makina.aktif && makina.yön == Yön.Beyaz) return;
   if (seçim_sabit) {
     alım_göster();
     return;
   }
-  if (sıra == 'N/A') {
-    sıra = 'beyazda';
+  if (yön == 'N/A') {
+    yön = Yön.Beyaz;
     makina.yön = Yön.Siyah;
     makiwrk.postMessage({msg: 'seç-syh'});
   }
@@ -195,8 +200,7 @@ function alım_göster() {
 }
 
 function kare_seç(e) {
-  if ((sıra == 'siyahta' && makina.aktif && makina.yön == Yön.Siyah) ||
-      (sıra == 'beyazda' && makina.aktif && makina.yön == Yön.Beyaz))
+  if (makina.aktif && (makina.yön == yön))
     return;
   if (!taş_seçili) return;
   if (glgth[+e.target.dataset.y][+e.target.dataset.x] != Taş.yok)  // boş karede zaten taş 'yok'tur fakat bir şekilde
@@ -204,11 +208,11 @@ function kare_seç(e) {
 
   const to = { x: +e.target.dataset.x, y: +e.target.dataset.y };
 
-  sıra == 'beyazda' ? devinim(to, Yön.Beyaz, Taş.Byz, '8') : devinim(to, Yön.Siyah, Taş.Syh, '1');
+  devinim(to, C[yön].dama_satırı);
 }
 
-function devinim(to, yön, renk, dama_satırı) {
-  const [devindi, taş_aldı, dama_yön] = taş_devindir(from, to, yön);
+function devinim(to, dama_satırı) {
+  const [devindi, taş_aldı, dama_yön] = taş_devindir(from, to);
   if (!devindi)  return;
   switch (alan.length) {
     case 3: alt_marker_unset(2);  // bilerek fall-through
@@ -225,32 +229,32 @@ function devinim(to, yön, renk, dama_satırı) {
     if (al) {
       marker_set(from);
       seçim_sabit = true;
-      if (makina.aktif && ((makina.yön == Yön.Beyaz && sıra == 'beyazda') || (makina.yön == Yön.Siyah && sıra == 'siyahta')))
+      if (makina.aktif && (makina.yön == yön))
         makiwrk.postMessage({msg: 'oyna', seçili_alan: {x: +from.dataset.x, y: +from.dataset.y, alım: seçili_alım}, alan});
       return;
     }
   }
   if (from.dataset.taş == Taş.Yoz && from.dataset.y == dama_satırı) {
     from.dataset.taş = Taş.Dama;
-    dama_çiz(from, renk);
-    makiwrk.postMessage({msg: 'dama-oldu', x: +from.dataset.x, y: +from.dataset.y, renk});
+    dama_çiz(from, C[yön].taş_renk);
+    makiwrk.postMessage({msg: 'dama-oldu', x: +from.dataset.x, y: +from.dataset.y, yön});
   }
 
   seçim_sabit = false;
-  sıra = (yön == Yön.Beyaz ? 'siyahta' : 'beyazda');
   marker_unset();
-  th.querySelector(`line#${Yağı[yön] == Taş.Syh ? 'siyah' : 'beyaz'}`).setAttribute('visibility', 'visible');
-  th.querySelector(`line#${renk == Taş.Byz ? 'beyaz' : 'siyah'}`).setAttribute('visibility', 'hidden');
-  oyun_kaydet(th, sıra, sayaçlar[Yön.Beyaz].say, sayaçlar[Yön.Siyah].say, makina);
+  th.querySelector(`line${C[yön].sıra_göster}`).setAttribute('visibility', 'hidden');
+  th.querySelector(`line${C[Karşı[yön]].sıra_göster}`).setAttribute('visibility', 'visible');
+  yön = Karşı[yön];
+  oyun_kaydet(th, yön, sayaçlar[Yön.Beyaz].say, sayaçlar[Yön.Siyah].say, makina);
   alım_denetimi();
 }
 
-function alır_mı(g, yön) {
+function alır_mı(g) {
   let say=0, alım, rv;
   alan.length = 0;
   for (const t of th.querySelector(g).children) {
-    [rv, alım] = (t.dataset.taş == Taş.Dama ? alım_olası_dama(+t.dataset.x, +t.dataset.y, yön, Yön.yok)
-                                            : alım_olası(+t.dataset.x, +t.dataset.y, yön));
+    [rv, alım] = (t.dataset.taş == Taş.Dama ? alım_olası_dama(+t.dataset.x, +t.dataset.y, Yön.yok)
+                                            : alım_olası(+t.dataset.x, +t.dataset.y));
     if (rv)
       if (rv > say) {
         alan.length = 0;
@@ -263,10 +267,10 @@ function alır_mı(g, yön) {
   return alan.length > 0;
 }
 
-function alım_olası(x, y, yön) {
+function alım_olası(x, y) {
   let say=0, rv, alım=[];
   for (const [ax,ay,kx,ky] of [[x-1,y,x-2,y], [x+1,y,x+2,y], [x,y+yön,x,y+2*yön]])
-    if (glgth[ky]?.[kx] == Taş.yok && glgth[ay]?.[ax] == Yağı[yön]) {
+    if (glgth[ky]?.[kx] == Taş.yok && glgth[ay]?.[ax] == C[yön].yağı) {
       glgth[ay][ax] = Taş.yok;  // taşı almış gibi yap
       // özyinelemeli çağrılarda alım konum bilgileri gerekli değil, yalnızca alım sayısı
       [rv] = alım_olası(kx, ky, yön);
@@ -276,22 +280,22 @@ function alım_olası(x, y, yön) {
         alım.push({alınan_x: ax, alınan_y: ay, alan_yeni_x: kx, alan_yeni_y: ky});
       }
       else if (rv+1 == say) alım.push({alınan_x: ax, alınan_y: ay, alan_yeni_x: kx, alan_yeni_y: ky});
-      glgth[ay][ax] = Yağı[yön];  // almış gibi yaptığın taşı geri yerine koy
+      glgth[ay][ax] = C[yön].yağı;  // almış gibi yaptığın taşı geri yerine koy
     }
   return [say, alım];
 }
 
-function alım_olası_dama(x, y, yön, dama_yön) {
+function alım_olası_dama(x, y, dama_yön) {
   // dama_yön: damanın, son taşı alırken hangi yönde atılım yaptığı. Bu yönün
   //           tam tersinde taş almaya devam edemez. Yeni atılımda bu yön yoktur,
   //           Yön.yok değeri geçilir ve ters_yön[dama_yön] == d koşulu daima false olur.
   const rx=[-1,0,1,0], ry=[0,1,0,-1], ters_yön=[Yön.D, Yön.G, Yön.B, Yön.K],
-        bu_taş = (yön == Yön.Beyaz ? Taş.Byz : Taş.Syh);
+        bu_taş = C[yön].taş_renk;
   let kare, say=0, rv, alım=[];
   for (let d=Yön.B; d<=Yön.G; ++d) {
     if (ters_yön[dama_yön] == d) continue;
     for (let i=1, buldu=false; kare=glgth[y+ry[d]*i]?.[x+rx[d]*i]; ++i)
-      if (kare == Yağı[yön])
+      if (kare == C[yön].yağı)
         if (buldu) break; /* yanyana iki yağı taş */
         else buldu = true;
       else if (kare == Taş.yok)
@@ -312,7 +316,7 @@ function alım_olası_dama(x, y, yön, dama_yön) {
 
             glgth[y+ry[d]*j][x+rx[d]*j] = Taş.yok;
           }
-          glgth[y+ry[d]*(i-1)][x+rx[d]*(i-1)] = Yağı[yön];
+          glgth[y+ry[d]*(i-1)][x+rx[d]*(i-1)] = C[yön].yağı;
           glgth[y][x] = bu_taş;
           break;
         }
@@ -322,7 +326,7 @@ function alım_olası_dama(x, y, yön, dama_yön) {
   return [say, alım];
 }
 
-function taş_devindir(from, to, yön) {
+function taş_devindir(from, to) {
   // devinirse [true, false,]
   // yağı taşı alarak devinirse [true, true,]
   // dama taş, yağı taşı alarak devinirse [true, true, Yön]
@@ -378,7 +382,7 @@ function taş_devindir(from, to, yön) {
     }
     for (let i=baş; i<son; ++i) {
       if (glgth[y][i] == Taş.yok) continue;
-      else if (glgth[y][i] == Yağı[yön] && ++say == 1) yağı_x = i;
+      else if (glgth[y][i] == C[yön].yağı && ++say == 1) yağı_x = i;
       else return -1;
     }
 
@@ -400,7 +404,7 @@ function taş_devindir(from, to, yön) {
     }
     for (let i=baş; i<son; ++i) {
       if (glgth[i][x] == Taş.yok) continue;
-      else if (glgth[i][x] == Yağı[yön] && ++say == 1) yağı_y = i;
+      else if (glgth[i][x] == C[yön].yağı && ++say == 1) yağı_y = i;
       else return -1;
     }
 

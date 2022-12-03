@@ -1,15 +1,18 @@
 const Taş = { yok: 9, Syh: 13, Byz: 17, Yoz: 0, Dama: 1 };
 const Yön = {B: 0, K: 1, D: 2, G: 3, yok: 4, Beyaz: 1, Siyah: -1 };
-const Yağı = {[Yön.Beyaz]: Taş.Syh, [Yön.Siyah]: Taş.Byz};
 const Karşı = {[Yön.Beyaz]: Yön.Siyah, [Yön.Siyah]: Yön.Beyaz};
+const C = {
+  [Yön.Beyaz]: {taş_renk: Taş.Byz, yağı: Taş.Syh},
+  [Yön.Siyah]: {taş_renk: Taş.Syh, yağı: Taş.Byz}
+ };
 let glgth, yön, taşlar={};
 
 self.addEventListener('message', (e) => {
   switch (e.data.msg) {
     case 'oyun-yükle':
       glgth = e.data.glgth;
-      taşlar[Yön.Beyaz] = taşlar[Taş.Byz] = e.data.beyazlar;
-      taşlar[Yön.Siyah] = taşlar[Taş.Syh] = e.data.siyahlar;
+      taşlar[Yön.Beyaz] = e.data.beyazlar;
+      taşlar[Yön.Siyah] = e.data.siyahlar;
       yön = e.data.makina.yön;
       // aktif = e.data.makina.aktif;
       break;
@@ -20,7 +23,7 @@ self.addEventListener('message', (e) => {
       yön = Yön.Siyah;
       break;
     case 'dama-oldu':
-      taşlar[e.data.renk].set(`${e.data.y}${e.data.x}`, Taş.Dama);
+      taşlar[e.data.yön].set(`${e.data.y}${e.data.x}`, Taş.Dama);
       break;
     case 'devindir':
       glgth[e.data.to.y][e.data.to.x] = glgth[e.data.y][e.data.x];
@@ -30,7 +33,7 @@ self.addEventListener('message', (e) => {
       break;
     case 'taş-al':
       glgth[e.data.y][e.data.x] = Taş.yok;
-      taşlar[e.data.yön].delete(`${e.data.y}${e.data.x}`);
+      taşlar[Karşı[e.data.yön]].delete(`${e.data.y}${e.data.x}`);
       break;
     case 'oyna':
       // buraya e.data ile gelen alım nesnesinde 'sonra' bağlantısı yok...
@@ -46,30 +49,11 @@ self.addEventListener('message', (e) => {
         postMessage({msg: 'devindir', from: { x: t.x, y: t.y },
                      to: { x: fav_alım.alan_yeni_x, y: fav_alım.alan_yeni_y}});
       }
-          // for (const cap of t.alım) {
-          //   glgth[cap.alan_yeni_y][cap.alan_yeni_x] = glgth[t.y][t.x];
-          //   glgth[cap.alınan_y][cap.alınan_x] = glgth[t.y][t.x] = Taş.yok;
-          //   const rv = ileri_bak(taşlar[Karşı[yön]], Karşı[yön]) + 1;
-          //   if (rv > puan) {
-          //     puan = rv;
-          //     fav = { x: t.x, y: t.y, alım: cap };
-          //   }
-          //   glgth[t.y][t.x] = glgth[cap.alan_yeni_y][cap.alan_yeni_x];
-          //   glgth[cap.alan_yeni_y][cap.alan_yeni_x] = Taş.yok;
-          //   glgth[cap.alınan_y][cap.alınan_x] = Yağı[yön];
-          // }
-        // seçili_alım = alım_seç(alan_seç(e.data.seçili_alan, e.data.alan).alım);
-        // postMessage({msg: 'devindir', 
-        //              to: { x: seçili_alım.alan_yeni_x, y: seçili_alım.alan_yeni_y}});
       else if (e.data.seçili_alan) {
         const [ , fav_alım] = alım_bak(e.data.seçili_alan.x, e.data.seçili_alan.y, e.data.seçili_alan.alım);
         postMessage({msg: 'devindir', from: { x: e.data.seçili_alan.x, y: e.data.seçili_alan.y },
                      to: { x: fav_alım.alan_yeni_x, y: fav_alım.alan_yeni_y}});
       }
-      //   seçili_alım = alım_seç(e.data.seçili_alan.alım);
-      //   postMessage({msg: 'devindir', 
-      //                to: { x: seçili_alım.alan_yeni_x, y: seçili_alım.alan_yeni_y}});
-      // }
       else
         oyna();
       break;
@@ -102,7 +86,6 @@ function alım_bak(x, y, alım) {
 
 // alan = [ {x, y, alım}, {x, y, alım}, ... ];
 // alım = [ {alınan_x, alınan_y, alan_yeni_x, alan_yeni_y, sonra}, ...]
-
 
 function oyna() {
   let puan = -Infinity, seçenekler=[];
@@ -207,7 +190,7 @@ function alır_mı(taşlar, yön) {
 function alım_olası(x, y, yön) {
   let say=0, rv, alım=[], ralım=[];
   for (const [ax,ay,kx,ky] of [[x-1,y,x-2,y], [x+1,y,x+2,y], [x,y+yön,x,y+2*yön]])
-    if (glgth[ky]?.[kx] == Taş.yok && glgth[ay]?.[ax] == Yağı[yön]) {
+    if (glgth[ky]?.[kx] == Taş.yok && glgth[ay]?.[ax] == C[yön].yağı) {
       glgth[ay][ax] = Taş.yok;  // taşı almış gibi yap
       [rv,ralım] = alım_olası(kx, ky, yön);
       if (rv+1 > say) {
@@ -216,7 +199,7 @@ function alım_olası(x, y, yön) {
         alım.push({alınan_x: ax, alınan_y: ay, alan_yeni_x: kx, alan_yeni_y: ky, sonra: ralım});
       }
       else if (rv+1 == say) alım.push({alınan_x: ax, alınan_y: ay, alan_yeni_x: kx, alan_yeni_y: ky, sonra: ralım});
-      glgth[ay][ax] = Yağı[yön];  // almış gibi yaptığın taşı geri yerine koy
+      glgth[ay][ax] = C[yön].yağı;  // almış gibi yaptığın taşı geri yerine koy
     }
   return [say, alım];
 }
@@ -226,12 +209,12 @@ function alım_olası_dama(x, y, yön, dama_yön) {
   //           tam tersinde taş almaya devam edemez. Yeni atılımda bu yön yoktur,
   //           Yön.yok değeri geçilir ve ters_yön[dama_yön] == d koşulu daima false olur.
   const rx=[-1,0,1,0], ry=[0,1,0,-1], ters_yön=[Yön.D, Yön.G, Yön.B, Yön.K],
-        bu_taş = (yön == Yön.Beyaz ? Taş.Byz : Taş.Syh);
+        bu_taş = C[yön].taş_renk;
   let kare, say=0, rv, alım=[];
   for (let d=Yön.B; d<=Yön.G; ++d) {
     if (ters_yön[dama_yön] == d) continue;
     for (let i=1, buldu=false; kare=glgth[y+ry[d]*i]?.[x+rx[d]*i]; ++i)
-      if (kare == Yağı[yön])
+      if (kare == C[yön].yağı)
         if (buldu) break; /* yanyana iki yağı taş */
         else buldu = true;
       else if (kare == Taş.yok)
@@ -252,7 +235,7 @@ function alım_olası_dama(x, y, yön, dama_yön) {
 
             glgth[y+ry[d]*j][x+rx[d]*j] = Taş.yok;
           }
-          glgth[y+ry[d]*(i-1)][x+rx[d]*(i-1)] = Yağı[yön];
+          glgth[y+ry[d]*(i-1)][x+rx[d]*(i-1)] = C[yön].yağı;
           glgth[y][x] = bu_taş;
           break;
         }

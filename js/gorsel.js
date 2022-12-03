@@ -82,7 +82,7 @@ function oyun_yükle(th, glgth) {
       [1,3,Taş.Yoz], [2,3,Taş.Yoz], [3,3,Taş.Yoz], [4,3,Taş.Yoz], [5,3,Taş.Yoz], [6,3,Taş.Yoz], [7,3,Taş.Yoz], [8,3,Taş.Yoz],
       [1,2,Taş.Yoz], [2,2,Taş.Yoz], [3,2,Taş.Yoz], [4,2,Taş.Yoz], [5,2,Taş.Yoz], [6,2,Taş.Yoz], [7,2,Taş.Yoz], [8,2,Taş.Yoz]
     ],
-    sıra: "N/A",
+    yön: "N/A",
     beyaz_sayaç: 0,
     siyah_sayaç: 0,
     makina: {
@@ -93,7 +93,7 @@ function oyun_yükle(th, glgth) {
   const durum = JSON.parse(localStorage.getItem('damalper')) ?? ilk;
   const siyahlar = taşları_diz(durum.siyah, Taş.Syh, th.querySelector('#siyahlar'));
   const beyazlar = taşları_diz(durum.beyaz, Taş.Byz, th.querySelector('#beyazlar'));
-  return [durum.sıra, durum.beyaz_sayaç, durum.siyah_sayaç, beyazlar, siyahlar, durum.makina];
+  return [durum.yön, durum.beyaz_sayaç, durum.siyah_sayaç, beyazlar, siyahlar, durum.makina];
 
   function taşları_diz(taşlar, renk, g) {
     const x_off = 54, y_off = 54, baş_x = 51, baş_y = 51, tga = new Map();
@@ -140,7 +140,7 @@ function oyun_kaydet(th, s, beyaz_sayaç, siyah_sayaç, makina) {
   const durum = {
     siyah: [ ],
     beyaz: [ ],
-    sıra: "",
+    yön: "",
     beyaz_sayaç: 0,
     siyah_sayaç: 0,
     makina: { 
@@ -160,7 +160,7 @@ function oyun_kaydet(th, s, beyaz_sayaç, siyah_sayaç, makina) {
     durum.siyah.push([t.dataset.x, t.dataset.y, t.dataset.taş]);
   for (let t of th.querySelector('#beyazlar').children)
     durum.beyaz.push([t.dataset.x, t.dataset.y, t.dataset.taş]);
-  durum.sıra = s;
+  durum.yön = s;
   durum.beyaz_sayaç = beyaz_sayaç;
   durum.siyah_sayaç = siyah_sayaç;
   durum.makina.aktif = makina.aktif;
