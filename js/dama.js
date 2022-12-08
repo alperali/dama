@@ -11,7 +11,7 @@ const C = {
 
 const makiwrk = new Worker('./js/makina.js');
 let th, marker, alt_marker, glgth, sayaçlar, evnt;
-let from, yön, seçim_sabit=false, taş_seçili=false, al=false, alan=[], seçili_alım, seçili_alan,
+let from, yön, seçim_sabit=false, taş_seçili=false, al=false, alan=[], seçili_alım,
       beyazlar, siyahlar;
 
 // yön değişkeni atılım yönüne ek olarak sırayı da belirtir:
@@ -29,7 +29,7 @@ function oyuncu_değiştir() {
   else {
     makina.aktif = 1;
     if (makina.yön == yön)
-      makiwrk.postMessage({msg: 'oyna', seçili_alan, alan});
+      makiwrk.postMessage({msg: 'oyna'});
   }
 
   oyun_kaydet(makina.aktif);
@@ -49,6 +49,7 @@ function oyna(pth, byz_sayaç, syh_sayaç, pevt) {
   th.querySelector('#kareler').addEventListener('click', kare_seç);
   th.querySelector('#siyahlar').addEventListener('click', siyah_seç);
   th.querySelector('#beyazlar').addEventListener('click', beyaz_seç);
+  makiwrk.addEventListener('message', mesaj_işle);
   
   [yön, sayaçlar[Yön.Beyaz].say, sayaçlar[Yön.Siyah].say, beyazlar, siyahlar, makina] = oyun_yükle(th, glgth);
   makiwrk.postMessage({msg: "oyun-yükle", glgth, beyazlar, siyahlar, makina});
@@ -62,12 +63,13 @@ function oyna(pth, byz_sayaç, syh_sayaç, pevt) {
 
   if (yön != 'N/A') {
     th.querySelector(`line${C[yön].sıra_göster}`).setAttribute('visibility', 'visible');
-    alım_denetimi();
+    if (makina.aktif && (makina.yön == yön))
+      makiwrk.postMessage({msg: 'oyna'});
+    else
+      alım_denetimi();
   }
 
-// yön == 'N/A' ise ikisi de hidden kalsın
-
-  makiwrk.addEventListener('message', mesaj_işle);
+  // yön == 'N/A' ise ikisi de hidden kalsın
 
   return function yeni_oyun() {
     localStorage.removeItem('damalper');
@@ -96,6 +98,8 @@ function oyna(pth, byz_sayaç, syh_sayaç, pevt) {
 function mesaj_işle(e) {
   switch (e.data.msg) {
     case 'devindir':
+      from = th.querySelector(`circle[data-x="${e.data.from.x}"][data-y="${e.data.from.y}"]`);
+      marker_set(from);
       setTimeout(devinim, 500, e.data.to, C[yön].dama_satırı);
       break;
     default:
@@ -104,9 +108,8 @@ function mesaj_işle(e) {
 }
 
 function alım_denetimi() {
-  seçili_alan = null;
   if (al=alır_mı(C[yön].taş_grup)) {
-    seçili_alan = alan.pop();
+    const seçili_alan = alan.pop();
     marker_set(from=th.querySelector(`circle[data-x="${seçili_alan.x}"][data-y="${seçili_alan.y}"]`));
     seçili_alım = seçili_alan.alım;
     switch (alan.length) {
@@ -119,9 +122,6 @@ function alım_denetimi() {
         seçim_sabit = true;
     }
   }
-
-  if (makina.aktif && (makina.yön == yön))
-    makiwrk.postMessage({msg: 'oyna', seçili_alan, alan});
 }
 
 function siyah_seç(e) {
@@ -155,6 +155,11 @@ function beyaz_seç(e) {
 }
 
 function alan_seç(e) {
+  // birden fazla alan varsa oyuncuya diğer alanı seçme imkanı verir,
+  // tek alan varsa seçim_sabit true olacağından bu fonksiyon hiç çağrılmaz,
+  // alan yoksa alan.length sıfır olacağından sadece marker_set()'i çağırır.
+  // (seçili_alan diye bir global yok, fakat seçilmiş alan from.dataset.x, 
+  // from.dataset.y ve seçili_alım üçlüsüyle represent edilir).
   if (alan.length) {
     if (e.target.dataset.x == from.dataset.x && e.target.dataset.y == from.dataset.y) {
       alım_göster();
@@ -223,17 +228,22 @@ function devinim(to, dama_satırı) {
   if (taş_aldı) {
     ++sayaçlar[yön].say;
     sayaçlar[yön].sayaç.dispatchEvent(new CustomEvent(evnt, {detail: sayaçlar[yön].say}));
-    // daha alır mı?
-    [al, seçili_alım] = from.dataset.taş == Taş.Dama ? alım_olası_dama(+from.dataset.x, +from.dataset.y, yön, dama_yön)
-                                                     : alım_olası(+from.dataset.x, +from.dataset.y, yön);
-    if (al) {
-      marker_set(from);
-      seçim_sabit = true;
-      if (makina.aktif && (makina.yön == yön))
-        makiwrk.postMessage({msg: 'oyna', seçili_alan: {x: +from.dataset.x, y: +from.dataset.y, alım: seçili_alım}, alan});
+    if (!makina.aktif || (makina.yön != yön)) {
+      // daha alır mı?
+      [al, seçili_alım] = from.dataset.taş == Taş.Dama ? alım_olası_dama(+from.dataset.x, +from.dataset.y, yön, dama_yön)
+                                                      : alım_olası(+from.dataset.x, +from.dataset.y, yön);
+      if (al) {
+        marker_set(from);
+        seçim_sabit = true;
+        return;
+      }
+    } else if (al) {
+      // makina taş almış ve daha alırım demiş (al'ı true yapmış), buradan tekrar ona devredelim.
+      makiwrk.postMessage({msg: 'oyna'});
       return;
     }
   }
+
   if (from.dataset.taş == Taş.Yoz && from.dataset.y == dama_satırı) {
     from.dataset.taş = Taş.Dama;
     dama_çiz(from, C[yön].taş_renk);
@@ -246,7 +256,10 @@ function devinim(to, dama_satırı) {
   th.querySelector(`line${C[Karşı[yön]].sıra_göster}`).setAttribute('visibility', 'visible');
   yön = Karşı[yön];
   oyun_kaydet(th, yön, sayaçlar[Yön.Beyaz].say, sayaçlar[Yön.Siyah].say, makina);
-  alım_denetimi();
+  if (makina.aktif && (makina.yön == yön))
+    makiwrk.postMessage({msg: 'oyna'});
+  else
+    alım_denetimi();
 }
 
 function alır_mı(g) {
@@ -289,8 +302,7 @@ function alım_olası_dama(x, y, dama_yön) {
   // dama_yön: damanın, son taşı alırken hangi yönde atılım yaptığı. Bu yönün
   //           tam tersinde taş almaya devam edemez. Yeni atılımda bu yön yoktur,
   //           Yön.yok değeri geçilir ve ters_yön[dama_yön] == d koşulu daima false olur.
-  const rx=[-1,0,1,0], ry=[0,1,0,-1], ters_yön=[Yön.D, Yön.G, Yön.B, Yön.K],
-        bu_taş = C[yön].taş_renk;
+  const rx=[-1,0,1,0], ry=[0,1,0,-1], ters_yön=[Yön.D, Yön.G, Yön.B, Yön.K];
   let kare, say=0, rv, alım=[];
   for (let d=Yön.B; d<=Yön.G; ++d) {
     if (ters_yön[dama_yön] == d) continue;
@@ -302,7 +314,7 @@ function alım_olası_dama(x, y, dama_yön) {
         if (buldu) {
           glgth[y][x] = glgth[y+ry[d]*(i-1)][x+rx[d]*(i-1)] = Taş.yok;
           for (let j=i; glgth[y+ry[d]*j]?.[x+rx[d]*j] == Taş.yok; ++j) {
-            glgth[y+ry[d]*j][x+rx[d]*j] = bu_taş;
+            glgth[y+ry[d]*j][x+rx[d]*j] = C[yön].taş_renk;
             [rv] = alım_olası_dama(x+rx[d]*j, y+ry[d]*j, yön, d);
             if (rv+1 > say) {
               say = rv+1;
@@ -317,7 +329,7 @@ function alım_olası_dama(x, y, dama_yön) {
             glgth[y+ry[d]*j][x+rx[d]*j] = Taş.yok;
           }
           glgth[y+ry[d]*(i-1)][x+rx[d]*(i-1)] = C[yön].yağı;
-          glgth[y][x] = bu_taş;
+          glgth[y][x] = C[yön].taş_renk;
           break;
         }
         else continue;

@@ -89,7 +89,7 @@ function oyun_yükle(th, glgth) {
       aktif: 1,
       yön: Yön.yok
     }
-  }
+  };
   const durum = JSON.parse(localStorage.getItem('damalper')) ?? ilk;
   const siyahlar = taşları_diz(durum.siyah, Taş.Syh, th.querySelector('#siyahlar'));
   const beyazlar = taşları_diz(durum.beyaz, Taş.Byz, th.querySelector('#beyazlar'));
@@ -107,7 +107,7 @@ function oyun_yükle(th, glgth) {
       cc.dataset.y = t[1];
       glgth[+t[1]][+t[0]] = renk;
       cc.dataset.taş = t[2];
-      tga.set(`${t[1]}${t[0]}`, +t[2]);
+      tga.set({x: t[0], y: t[1]}, +t[2]);
       at = celm(th, 'animate');
       at.setAttribute('dur', '250ms');
       at.setAttribute('fill', 'freeze');
@@ -184,7 +184,7 @@ function tahta_çevir(th) {
       beyaz_taraf = true;
     }
     at.beginElement();
-  }
+  };
 }
 
 export
@@ -209,5 +209,5 @@ function çerçeve_gör(th) {
     }
     at1.beginElement();
     at2.beginElement();
-  }
+  };
 }
