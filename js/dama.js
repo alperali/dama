@@ -98,9 +98,20 @@ function oyna(pth, byz_sayaç, syh_sayaç, pevt) {
 function mesaj_işle(e) {
   switch (e.data.msg) {
     case 'devindir':
-      from = th.querySelector(`circle[data-x="${e.data.from.x}"][data-y="${e.data.from.y}"]`);
+      let to = {};
+      from = th.querySelector(`circle[data-x="${e.data.dn.from.x}"][data-y="${e.data.dn.from.y}"]`);
       marker_set(from);
-      setTimeout(devinim, 500, e.data.to, C[yön].dama_satırı);
+      if (e.data.dn.alım) {
+        seçili_alım = e.data.alım;
+        al = e.data.dn.alım.sonra ? true : false;
+        to.x = e.data.dn.alım.alan_yeni_x;
+        to.y = e.data.dn.alım.alan_yeni_y;
+      }
+      else {
+        al = false;
+        to = e.data.dn.to;
+      }
+      setTimeout(devinim, 500, to, C[yön].dama_satırı);
       break;
     default:
       console.log('ana modül: bilinmeyen mesaj geldi.');

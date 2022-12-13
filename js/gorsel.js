@@ -107,7 +107,7 @@ function oyun_yükle(th, glgth) {
       cc.dataset.y = t[1];
       glgth[+t[1]][+t[0]] = renk;
       cc.dataset.taş = t[2];
-      tga.set({x: t[0], y: t[1]}, +t[2]);
+      tga.set({x: +t[0], y: +t[1]}, +t[2]);
       at = celm(th, 'animate');
       at.setAttribute('dur', '250ms');
       at.setAttribute('fill', 'freeze');
