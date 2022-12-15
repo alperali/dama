@@ -61,19 +61,19 @@ self.addEventListener('message', (e) => {
 // alım = [ {alınan_x, alınan_y, alan_yeni_x, alan_yeni_y, sonra}, ...]
 
 function oyna() {
-  let puan, p, rm, seçenekler=[];
+  let puan, p, ri, seçenekler=[];
   const [rv,alan] = alır_mı(taşlar[yön], yön);
   if (rv) {
     puan = +Infinity;
     for (const n of alan) {
-      [p,rm] = ileri_al(n.k, n.alım, yön);
+      [p,ri] = ileri_al(n.k, n.alım, yön);
       if (p < puan) {
         puan = p;
         seçenekler.length = 0;
-        seçenekler.push({from: {x: n.k.x, y: n.k.y}, alım: rm});
+        seçenekler.push({from: {x: n.k.x, y: n.k.y}, to: {x: n.alım[ri].alan_yeni_x, y: n.alım[ri].alan_yeni_y}, alım: n.alım});
       }
       else if (p == puan)
-        seçenekler.push({from: {x: n.k.x, y: n.k.y}, alım: rm});
+        seçenekler.push({from: {x: n.k.x, y: n.k.y}, to: {x: n.alım[ri].alan_yeni_x, y: n.alım[ri].alan_yeni_y}, alım: n.alım});
     }
   }
   else {
@@ -143,9 +143,10 @@ function ileri_bak(taşlar, yön) {
     return rv; // hep sıfır aslında.. return 0;  da olur.
 }
 
-function ileri_al(k, alım, yön) {
-  let puan=-Infinity, sav={}, rm=null;
-  for (const m of alım) {
+function ileri_al(k, alım, yön, dal=false) {
+  let puan=-Infinity, sav={}, ri;
+  for (let i=0; i<alım.length; ++i) {
+    const m = alım[i];
     glgth[m.alan_yeni_y][m.alan_yeni_x] = glgth[k.y][k.x];
     glgth[m.alınan_y][m.alınan_x] = glgth[k.y][k.x] = Taş.yok;
     sav.x = k.x; sav.y = k.y;
@@ -159,21 +160,26 @@ function ileri_al(k, alım, yön) {
       }
     taşlar[Karşı[yön]].set(alınank, Taş.yok);
     if (m.sonra.length)
-      [puan,rm] = ileri_al(k, m.sonra, yön);
+      [puan] = ileri_al(k, m.sonra, yön, true);
     else {
+      dal = false;
       p = ileri_bak(taşlar[Karşı[yön]], Karşı[yön]);
+    }
+    if (!dal)
       if (p > puan) {
         puan = p;
-        rm = m;
+        ri = i;
       }
-    }
+      else if (p == puan  &&  Math.floor(Math.random()*2))
+        ri = i;
+
     k.x = sav.x; k.y = sav.y;
     glgth[k.y][k.x] = glgth[m.alan_yeni_y][m.alan_yeni_x];
     glgth[m.alınan_y][m.alınan_x] = C[yön].yağı;
     glgth[m.alan_yeni_y][m.alan_yeni_x] = Taş.yok;
     taşlar[Karşı[yön]].set(alınank, alınanval);
   }
-  return [puan, rm];
+  return [puan, ri];
 }
 
 function alır_mı(taşlar, yön) {
@@ -220,7 +226,7 @@ function alım_olası_dama(x, y, yön, dama_yön) {
   //           tam tersinde taş almaya devam edemez. Yeni atılımda bu yön yoktur,
   //           Yön.yok değeri geçilir ve ters_yön[dama_yön] == d koşulu daima false olur.
   const rx=[-1,0,1,0], ry=[0,1,0,-1], ters_yön=[Yön.D, Yön.G, Yön.B, Yön.K];
-  let kare, say=0, rv, alım=[];
+  let kare, say=0, rv, alım=[], ralım=[];
   for (let d=Yön.B; d<=Yön.G; ++d) {
     if (ters_yön[dama_yön] == d) continue;
     for (let i=1, buldu=false; kare=glgth[y+ry[d]*i]?.[x+rx[d]*i]; ++i)
@@ -232,16 +238,16 @@ function alım_olası_dama(x, y, yön, dama_yön) {
           glgth[y][x] = glgth[y+ry[d]*(i-1)][x+rx[d]*(i-1)] = Taş.yok;
           for (let j=i; glgth[y+ry[d]*j]?.[x+rx[d]*j] == Taş.yok; ++j) {
             glgth[y+ry[d]*j][x+rx[d]*j] = C[yön].taş_renk;
-            [rv] = alım_olası_dama(x+rx[d]*j, y+ry[d]*j, yön, d);
+            [rv,ralım] = alım_olası_dama(x+rx[d]*j, y+ry[d]*j, yön, d);
             if (rv+1 > say) {
               say = rv+1;
               alım.length = 0;
               alım.push({alınan_x:    x+rx[d]*(i-1), alınan_y:    y+ry[d]*(i-1),
-                         alan_yeni_x: x+rx[d]*j,     alan_yeni_y: y+ry[d]*j,  dama_yön: d});
+                         alan_yeni_x: x+rx[d]*j,     alan_yeni_y: y+ry[d]*j,  dama_yön: d, sonra: ralım});
             }
             else if (rv+1 == say)
               alım.push({alınan_x:    x+rx[d]*(i-1), alınan_y:    y+ry[d]*(i-1),
-                         alan_yeni_x: x+rx[d]*j,     alan_yeni_y: y+ry[d]*j,  dama_yön: d});
+                         alan_yeni_x: x+rx[d]*j,     alan_yeni_y: y+ry[d]*j,  dama_yön: d, sonra: ralım});
 
             glgth[y+ry[d]*j][x+rx[d]*j] = Taş.yok;
           }
