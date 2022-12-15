@@ -70,10 +70,10 @@ function oyna() {
       if (p < puan) {
         puan = p;
         seçenekler.length = 0;
-        seçenekler.push({from: {x: n.k.x, y: n.k.y}, to: {x: n.alım[ri].alan_yeni_x, y: n.alım[ri].alan_yeni_y}, alım: n.alım});
+        seçenekler.push({from: {x: n.k.x, y: n.k.y}, to: {x: n.alım[ri].alan_yeni_x, y: n.alım[ri].alan_yeni_y}, alım: n.alım, ri});
       }
       else if (p == puan)
-        seçenekler.push({from: {x: n.k.x, y: n.k.y}, to: {x: n.alım[ri].alan_yeni_x, y: n.alım[ri].alan_yeni_y}, alım: n.alım});
+        seçenekler.push({from: {x: n.k.x, y: n.k.y}, to: {x: n.alım[ri].alan_yeni_x, y: n.alım[ri].alan_yeni_y}, alım: n.alım, ri});
     }
   }
   else {
@@ -160,24 +160,25 @@ function ileri_al(k, alım, yön, dal=false) {
       }
     taşlar[Karşı[yön]].set(alınank, Taş.yok);
     if (m.sonra.length)
-      [puan] = ileri_al(k, m.sonra, yön, true);
-    else {
-      dal = false;
+      [p] = ileri_al(k, m.sonra, yön, true);
+    else
       p = ileri_bak(taşlar[Karşı[yön]], Karşı[yön]);
-    }
-    if (!dal)
-      if (p > puan) {
-        puan = p;
-        ri = i;
-      }
-      else if (p == puan  &&  Math.floor(Math.random()*2))
-        ri = i;
 
     k.x = sav.x; k.y = sav.y;
     glgth[k.y][k.x] = glgth[m.alan_yeni_y][m.alan_yeni_x];
     glgth[m.alınan_y][m.alınan_x] = C[yön].yağı;
     glgth[m.alan_yeni_y][m.alan_yeni_x] = Taş.yok;
     taşlar[Karşı[yön]].set(alınank, alınanval);
+
+    if (dal)
+      puan = p;
+    else
+      if (p > puan) {
+        puan = p;
+        ri = i;
+      }
+      else if (p == puan  &&  Math.floor(Math.random()*2))
+        ri = i;
   }
   return [puan, ri];
 }

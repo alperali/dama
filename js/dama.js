@@ -102,7 +102,7 @@ function mesaj_işle(e) {
       marker_set(from);
       if (e.data.dn.alım) {
         seçili_alım = e.data.dn.alım;
-        al = e.data.dn.alım.sonra ? true : false;
+        al = e.data.dn.alım[e.data.dn.ri].sonra.length ? true : false;
       }
       else
         al = false;
