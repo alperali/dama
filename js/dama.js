@@ -98,11 +98,11 @@ function oyna(pth, byz_sayaç, syh_sayaç, pevt) {
 function mesaj_işle(e) {
   switch (e.data.msg) {
     case 'devindir':
-      from = th.querySelector(`circle[data-x="${e.data.dn.from.x}"][data-y="${e.data.dn.from.y}"]`);
+      from = th.querySelector(`circle[data-x="${e.data.dn.k.x}"][data-y="${e.data.dn.k.y}"]`);
       marker_set(from);
       if (e.data.dn.alım) {
         seçili_alım = e.data.dn.alım;
-        al = e.data.dn.alım[e.data.dn.ri].sonra.length ? true : false;
+        al = e.data.dn.alım[0].sonra.length ? true : false;
       }
       else
         al = false;
@@ -246,7 +246,7 @@ function devinim(to, dama_satırı) {
       }
     } else if (al) {
       // makina taş almış ve daha alırım demiş (al'ı true yapmış), buradan tekrar ona devredelim.
-      makiwrk.postMessage({msg: 'oyna'});
+      makiwrk.postMessage({msg: 'oyna', al: true, taş: from.dataset.taş});
       return;
     }
   }

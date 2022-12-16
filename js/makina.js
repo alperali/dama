@@ -5,7 +5,7 @@ const C = {
   [Yön.Beyaz]: {taş_renk: Taş.Byz, yağı: Taş.Syh},
   [Yön.Siyah]: {taş_renk: Taş.Syh, yağı: Taş.Byz}
  };
-let glgth, yön, taşlar={}, al=false;
+let glgth, yön, taşlar={}, from;
 
 self.addEventListener('message', (e) => {
   switch (e.data.msg) {
@@ -47,7 +47,7 @@ self.addEventListener('message', (e) => {
         }
       break;
     case 'oyna':
-        oyna();
+        oyna(e.data.al, e.data.taş);
       break;
     case 'dur':
       console.log('makina: devredışı.');
@@ -60,9 +60,13 @@ self.addEventListener('message', (e) => {
 // alan = [ {x, y, alım}, {x, y, alım}, ... ];
 // alım = [ {alınan_x, alınan_y, alan_yeni_x, alan_yeni_y, sonra}, ...]
 
-function oyna() {
-  let puan, p, ri, seçenekler=[];
-  const [rv,alan] = alır_mı(taşlar[yön], yön);
+function oyna(al, taş) {
+  let puan, p, ri, seçenekler=[], rv, alan;
+  if (al)
+    [rv,alan] = alır_mı(new Map().set(from, taşlar[yön].get(from)), yön);
+  else
+    [rv,alan] = alır_mı(taşlar[yön], yön);
+
   if (rv) {
     puan = +Infinity;
     for (const n of alan) {
@@ -70,10 +74,10 @@ function oyna() {
       if (p < puan) {
         puan = p;
         seçenekler.length = 0;
-        seçenekler.push({from: {x: n.k.x, y: n.k.y}, to: {x: n.alım[ri].alan_yeni_x, y: n.alım[ri].alan_yeni_y}, alım: n.alım, ri});
+        seçenekler.push({k: n.k, to: {x: n.alım[ri].alan_yeni_x, y: n.alım[ri].alan_yeni_y}, alım: [n.alım[ri]]});
       }
       else if (p == puan)
-        seçenekler.push({from: {x: n.k.x, y: n.k.y}, to: {x: n.alım[ri].alan_yeni_x, y: n.alım[ri].alan_yeni_y}, alım: n.alım, ri});
+        seçenekler.push({k: n.k, to: {x: n.alım[ri].alan_yeni_x, y: n.alım[ri].alan_yeni_y}, alım: [n.alım[ri]]});
     }
   }
   else {
@@ -83,10 +87,10 @@ function oyna() {
       if (to.puan > puan) {
         puan = to.puan;
         seçenekler.length = 0;
-        seçenekler.push({from: {x: k.x, y: k.y}, to});
+        seçenekler.push({k, to});
       }
       else if (to.puan != -Infinity  &&  to.puan == puan)
-        seçenekler.push({from: {x: k.x, y: k.y}, to});
+        seçenekler.push({k, to});
     }
   }
 
@@ -99,6 +103,7 @@ function oyna() {
     console.log('makina: atılım mümkün değil.');
     return;
   }
+  from = seçenekler[s].k;
   postMessage({msg: 'devindir', dn: seçenekler[s]});
 }
 
