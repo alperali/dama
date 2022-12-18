@@ -1,9 +1,10 @@
 const Taş = { yok: 9, Syh: 13, Byz: 17, Yoz: 0, Dama: 1 };
 const Yön = {B: 0, K: 1, D: 2, G: 3, yok: 4, Beyaz: 1, Siyah: -1 };
 const Karşı = {[Yön.Beyaz]: Yön.Siyah, [Yön.Siyah]: Yön.Beyaz};
+const dama_değeri = 4;  // bir damanın tahminen kaç yoz taş değerinde olduğu
 const C = {
-  [Yön.Beyaz]: {taş_renk: Taş.Byz, yağı: Taş.Syh},
-  [Yön.Siyah]: {taş_renk: Taş.Syh, yağı: Taş.Byz}
+  [Yön.Beyaz]: {taş_renk: Taş.Byz, yağı: Taş.Syh, dama_satırı: 8},
+  [Yön.Siyah]: {taş_renk: Taş.Syh, yağı: Taş.Byz, dama_satırı: 1}
  };
 let glgth, yön, taşlar={}, from;
 
@@ -108,14 +109,16 @@ function oyna(al, taş) {
 }
 
 function devin_bak(k) {
-  let puan = -Infinity, to={puan}, sav={};
+  let puan = -Infinity, to={puan}, sav={}, rv;
   for (const [mx,my] of [[k.x-1,k.y], [k.x,k.y+yön], [k.x+1,k.y]])
     if (glgth[my]?.[mx] == Taş.yok) {
       glgth[my][mx] = glgth[k.y][k.x];
       glgth[k.y][k.x] = Taş.yok;
       sav.x = k.x; sav.y = k.y;
       k.y = my; k.x = mx;
-      const rv = ileri_bak(taşlar[Karşı[yön]], Karşı[yön]);
+      rv = ileri_bak(taşlar[Karşı[yön]], Karşı[yön]);
+      if (my == C[yön].dama_satırı)
+        rv -= dama_değeri;
       if (rv > puan) {
         to.x = mx;
         to.y = my;
