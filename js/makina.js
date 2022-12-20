@@ -82,15 +82,15 @@ function oyna(al, taş) {
     }
   }
   else {
-    puan = -Infinity;
+    puan = +Infinity;
     for (const [k,val] of taşlar[yön]) {
       const to = val == Taş.Dama ? devin_bak_dama(k, yön) : devin_bak(k);
-      if (to.puan > puan) {
+      if (to.puan < puan) {
         puan = to.puan;
         seçenekler.length = 0;
         seçenekler.push({k, to});
       }
-      else if (to.puan != -Infinity  &&  to.puan == puan)
+      else if (to.puan != +Infinity  &&  to.puan == puan)
         seçenekler.push({k, to});
     }
   }
@@ -109,7 +109,7 @@ function oyna(al, taş) {
 }
 
 function devin_bak(k) {
-  let puan = -Infinity, to={puan}, sav={}, rv;
+  let puan = +Infinity, to={puan}, sav={}, rv;
   for (const [mx,my] of [[k.x-1,k.y], [k.x,k.y+yön], [k.x+1,k.y]])
     if (glgth[my]?.[mx] == Taş.yok) {
       glgth[my][mx] = glgth[k.y][k.x];
@@ -119,7 +119,7 @@ function devin_bak(k) {
       rv = ileri_bak(taşlar[Karşı[yön]], Karşı[yön]);
       if (my == C[yön].dama_satırı)
         rv -= dama_değeri;
-      if (rv > puan) {
+      if (rv < puan) {
         to.x = mx;
         to.y = my;
         to.puan = puan = rv;
@@ -133,17 +133,17 @@ function devin_bak(k) {
       glgth[k.y][k.x] = glgth[my][mx];
       glgth[my][mx] = Taş.yok;
     }
-  if (puan != -Infinity)  to.puan = -to.puan;
-  return to;  // devinim mümkün değilse to.puan -Infinity olarak döner.
+
+  return to;  // devinim mümkün değilse to.puan +Infinity olarak döner.
 }
 
 function ileri_bak(taşlar, yön) {
-  let puan = -Infinity;
+  let puan = +Infinity;
   const [rv,alan] = alır_mı(taşlar, yön);
   if (rv) {
     for (const n of alan) {
       const [p] = ileri_al(n.k, n.alım, yön);
-      puan = Math.max(p, puan);
+      puan = Math.min(p, puan);
     }
     return rv-puan;
   }
@@ -152,7 +152,7 @@ function ileri_bak(taşlar, yön) {
 }
 
 function ileri_al(k, alım, yön, dal=false) {
-  let puan=-Infinity, sav={}, ri;
+  let puan=+Infinity, sav={}, ri;
   for (let i=0; i<alım.length; ++i) {
     const m = alım[i];
     glgth[m.alan_yeni_y][m.alan_yeni_x] = glgth[k.y][k.x];
@@ -172,6 +172,8 @@ function ileri_al(k, alım, yön, dal=false) {
     else
       p = ileri_bak(taşlar[Karşı[yön]], Karşı[yön]);
 
+    if (alınanval == Taş.Dama)
+      p -= dama_değeri;
     k.x = sav.x; k.y = sav.y;
     glgth[k.y][k.x] = glgth[m.alan_yeni_y][m.alan_yeni_x];
     glgth[m.alınan_y][m.alınan_x] = C[yön].yağı;
@@ -181,11 +183,12 @@ function ileri_al(k, alım, yön, dal=false) {
     if (dal)
       puan = p;
     else
-      if (p > puan) {
+      if (p < puan) {
         puan = p;
         ri = i;
       }
       else if (p == puan  &&  Math.floor(Math.random()*2))
+        // eşitlik durumunda ikisinden birini rasgele seç.
         ri = i;
   }
   return [puan, ri];

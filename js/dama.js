@@ -11,7 +11,7 @@ const C = {
 
 const makiwrk = new Worker('./js/makina.js');
 let th, marker, alt_marker, glgth, sayaçlar, evnt;
-let from, yön, seçim_sabit=false, taş_seçili=false, al=false, alan=[], seçili_alım,
+let from, yön, seçim_sabit=false, taş_seçili=false, al=false, alan=[], seçili_alım=[],
       beyazlar, siyahlar;
 
 // yön değişkeni atılım yönüne ek olarak sırayı da belirtir:
@@ -104,8 +104,10 @@ function mesaj_işle(e) {
         seçili_alım = e.data.dn.alım;
         al = e.data.dn.alım[0].sonra.length ? true : false;
       }
-      else
+      else {
         al = false;
+        seçili_alım.length = 0;
+      }
 
       setTimeout(devinim, 500, e.data.dn.to, C[yön].dama_satırı);
       break;
@@ -166,7 +168,7 @@ function alan_seç(e) {
   // tek alan varsa seçim_sabit true olacağından bu fonksiyon hiç çağrılmaz,
   // alan yoksa alan.length sıfır olacağından sadece marker_set()'i çağırır.
   // (seçili_alan diye bir global yok, fakat seçilmiş alan from.dataset.x, 
-  // from.dataset.y ve seçili_alım üçlüsüyle represent edilir).
+  // from.dataset.y ve seçili_alım üçlüsüyle temsil edilir).
   if (alan.length) {
     if (e.target.dataset.x == from.dataset.x && e.target.dataset.y == from.dataset.y) {
       alım_göster();
@@ -238,7 +240,7 @@ function devinim(to, dama_satırı) {
     if (!makina.aktif || (makina.yön != yön)) {
       // daha alır mı?
       [al, seçili_alım] = from.dataset.taş == Taş.Dama ? alım_olası_dama(+from.dataset.x, +from.dataset.y, yön, dama_yön)
-                                                      : alım_olası(+from.dataset.x, +from.dataset.y, yön);
+                                                       : alım_olası(+from.dataset.x, +from.dataset.y, yön);
       if (al) {
         marker_set(from);
         seçim_sabit = true;
@@ -327,11 +329,11 @@ function alım_olası_dama(x, y, dama_yön) {
               say = rv+1;
               alım.length = 0;
               alım.push({alınan_x:    x+rx[d]*(i-1), alınan_y:    y+ry[d]*(i-1),
-                          alan_yeni_x: x+rx[d]*j,     alan_yeni_y: y+ry[d]*j,  dama_yön: d});
+                         alan_yeni_x: x+rx[d]*j,     alan_yeni_y: y+ry[d]*j,  dama_yön: d});
             }
             else if (rv+1 == say)
               alım.push({alınan_x:    x+rx[d]*(i-1), alınan_y:    y+ry[d]*(i-1),
-                          alan_yeni_x: x+rx[d]*j,     alan_yeni_y: y+ry[d]*j,  dama_yön: d});
+                         alan_yeni_x: x+rx[d]*j,     alan_yeni_y: y+ry[d]*j,  dama_yön: d});
 
             glgth[y+ry[d]*j][x+rx[d]*j] = Taş.yok;
           }
