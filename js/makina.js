@@ -48,7 +48,7 @@ self.addEventListener('message', (e) => {
         }
       break;
     case 'oyna':
-        oyna(e.data.al, e.data.taş);
+        oyna(e.data.al, e.data.dama_yön);
       break;
     case 'dur':
       console.log('makina: devredışı.');
@@ -61,12 +61,12 @@ self.addEventListener('message', (e) => {
 // alan = [ {x, y, alım}, {x, y, alım}, ... ];
 // alım = [ {alınan_x, alınan_y, alan_yeni_x, alan_yeni_y, sonra}, ...]
 
-function oyna(al, taş) {
+function oyna(al, dama_yön) {
   let puan, p, ri, seçenekler=[], rv, alan;
   if (al)
-    [rv,alan] = alır_mı(new Map().set(from, taşlar[yön].get(from)), yön);
+    [rv,alan] = alır_mı(new Map().set(from, taşlar[yön].get(from)), yön, dama_yön);
   else
-    [rv,alan] = alır_mı(taşlar[yön], yön);
+    [rv,alan] = alır_mı(taşlar[yön], yön, Yön.yok);
 
   if (rv) {
     puan = +Infinity;
@@ -84,7 +84,7 @@ function oyna(al, taş) {
   else {
     puan = +Infinity;
     for (const [k,val] of taşlar[yön]) {
-      const to = val == Taş.Dama ? devin_bak_dama(k, yön) : devin_bak(k);
+      const to = val == Taş.Dama ? devin_bak_dama(k) : devin_bak(k);
       if (to.puan < puan) {
         puan = to.puan;
         seçenekler.length = 0;
@@ -118,14 +118,18 @@ function devin_bak(k) {
       k.y = my; k.x = mx;
       rv = ileri_bak(taşlar[Karşı[yön]], Karşı[yön]);
       if (my == C[yön].dama_satırı)
+        // damaya çıkıyorsa
         rv -= dama_değeri;
+      else if (my == C[yön.dama_satırı - yön])
+        // damaya çıkmaya bir satır kalıyorsa...
+        rv -= Math.floor(dama_değeri/2);
       if (rv < puan) {
         to.x = mx;
         to.y = my;
         to.puan = puan = rv;
       }
       else if (rv == puan  &&  Math.floor(Math.random()*2)) {
-        // eşitlik durumunda ikisinden birini rasgele seç.
+        // eşitlik durumunda ikisinden birini rastgele seç.
         to.x = mx;
         to.y = my;
       }
@@ -139,7 +143,7 @@ function devin_bak(k) {
 
 function ileri_bak(taşlar, yön) {
   let puan = +Infinity;
-  const [rv,alan] = alır_mı(taşlar, yön);
+  const [rv,alan] = alır_mı(taşlar, yön, Yön.yok);
   if (rv) {
     for (const n of alan) {
       const [p] = ileri_al(n.k, n.alım, yön);
@@ -188,19 +192,19 @@ function ileri_al(k, alım, yön, dal=false) {
         ri = i;
       }
       else if (p == puan  &&  Math.floor(Math.random()*2))
-        // eşitlik durumunda ikisinden birini rasgele seç.
+        // eşitlik durumunda ikisinden birini rastgele seç.
         ri = i;
   }
   return [puan, ri];
 }
 
-function alır_mı(taşlar, yön) {
+function alır_mı(taşlar, yön, dama_yön) {
   let alan=[], say=0, alım, rv;
   for (const [k,val] of taşlar) {
     if (val == Taş.Yoz)
       [rv, alım] = alım_olası(k.x, k.y, yön);
     else if (val == Taş.Dama)
-      [rv, alım] = alım_olası_dama(k.x, k.y, yön, Yön.yok);
+      [rv, alım] = alım_olası_dama(k.x, k.y, yön, dama_yön);
     else
       continue;   // val == Taş.yok ise bu taşı atla
 
@@ -231,6 +235,39 @@ function alım_olası(x, y, yön) {
       glgth[ay][ax] = C[yön].yağı;  // almış gibi yaptığın taşı geri yerine koy
     }
   return [say, alım];
+}
+
+function devin_bak_dama(k) {
+  const rx=[-1,0,1,0], ry=[0,1,0,-1];
+  let puan=+Infinity, to={puan}, sav={}, rv;
+  for (let d=Yön.B; d<=Yön.G; ++d)
+    for (let i=1; ;++i) {
+      const [my,mx] = [k.y+ry[d]*i, k.x+rx[d]*i];
+      if (glgth[my]?.[mx] == Taş.yok) {
+        glgth[my][mx] = glgth[k.y][k.x];
+        glgth[k.y][k.x] = Taş.yok;
+        sav.x = k.x; sav.y = k.y;
+        k.y = my; k.x = mx;
+        rv = ileri_bak(taşlar[Karşı[yön]], Karşı[yön]);
+        if (rv < puan) {
+          to.x = mx;
+          to.y = my;
+          to.puan = puan = rv;
+        }
+        else if (rv == puan  &&  Math.floor(Math.random()*2)) {
+          // eşitlik durumunda ikisinden birini rastgele seç.
+          to.x = mx;
+          to.y = my;
+        }
+        k.x = sav.x; k.y = sav.y;
+        glgth[k.y][k.x] = glgth[my][mx];
+        glgth[my][mx] = Taş.yok;
+      }
+      else
+        break;
+    }
+
+    return to;  // devinim mümkün değilse to.puan +Infinity olarak döner.
 }
 
 function alım_olası_dama(x, y, yön, dama_yön) {

@@ -248,7 +248,7 @@ function devinim(to, dama_satırı) {
       }
     } else if (al) {
       // makina taş almış ve daha alırım demiş (al'ı true yapmış), buradan tekrar ona devredelim.
-      makiwrk.postMessage({msg: 'oyna', al: true, taş: from.dataset.taş});
+      makiwrk.postMessage({msg: 'oyna', al: true, dama_yön});
       return;
     }
   }
