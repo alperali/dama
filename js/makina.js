@@ -120,7 +120,7 @@ function devin_bak(k) {
       if (my == C[yön].dama_satırı)
         // damaya çıkıyorsa
         rv -= dama_değeri;
-      else if (my == C[yön.dama_satırı - yön])
+      else if (my == C[yön].dama_satırı - yön)
         // damaya çıkmaya bir satır kalıyorsa...
         rv -= Math.floor(dama_değeri/2);
       if (rv < puan) {

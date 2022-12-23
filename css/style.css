@@ -12,6 +12,7 @@ body {
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.5;
+  background-color: #616247;
 }
 
 main {
@@ -62,7 +63,10 @@ button {
     align-content: center;
   }
   button {
+    margin: 0.75vmin 0.75vmin;
     display: inline;
+    padding-top: 0.5vmin;
+    padding-bottom: 0.5vmin;
   }
   div object {
     width: min(100vmin, calc(100vh - calc(2 * var(--buton-en))));
@@ -83,4 +87,7 @@ button {
   text-transform: none;
 }
 
-.çerçeve { border: 1px solid black; }
+.çerçeve {
+  border: 2px solid dimgray;
+  background-color: #EAE6DA;
+}
