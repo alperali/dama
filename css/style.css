@@ -1,3 +1,7 @@
+/*---------------------------------------------------------------------------
+ * Telif Hakkı/Copyright A. Alper Atıcı. Her Hakkı Saklıdır.
+ * All Rights Reserved. This is not free software.
+ *---------------------------------------------------------------------------*/
 :root {
   --buton-en: 6vmin;
 }
@@ -78,7 +82,6 @@ button {
 @media screen and (orientation: portrait) {
   main {
     height: 100vh;
-    /* flex-direction: column; */
     align-content: center;
   }
   .solüst {
@@ -89,7 +92,7 @@ button {
   }
 
   button {
-    margin: 0.75vmin 0.75vmin;
+    margin: 1vmin 1vmin;
     display: inline;
     padding-top: 0.5vmin;
     padding-bottom: 0.5vmin;

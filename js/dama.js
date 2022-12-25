@@ -1,3 +1,7 @@
+/*---------------------------------------------------------------------------
+ * Telif Hakkı/Copyright A. Alper Atıcı. Her Hakkı Saklıdır.
+ * All Rights Reserved. This is not free software.
+ *---------------------------------------------------------------------------*/
 export { tahta_çevir, çerçeve_gör } from './gorsel.js';
 import { oyun_yükle, tahta_çiz, oyun_kaydet, dama_çiz } from './gorsel.js';
 
@@ -21,11 +25,8 @@ export let makina;
 
 export
 function oyuncu_değiştir() {
-  if (makina.aktif) {
+  if (makina.aktif)
     makina.aktif = 0;
-    if (makina.yön != Yön.yok)
-      makiwrk.postMessage({msg: 'dur'});
-  }
   else {
     makina.aktif = 1;
     if (makina.yön == yön)

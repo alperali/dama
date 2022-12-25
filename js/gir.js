@@ -1,3 +1,7 @@
+/*---------------------------------------------------------------------------
+ * Telif Hakkı/Copyright A. Alper Atıcı. Her Hakkı Saklıdır.
+ * All Rights Reserved. This is not free software.
+ *---------------------------------------------------------------------------*/
 import * as Dama from './dama.js';
 
 onload = () => {

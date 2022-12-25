@@ -1,3 +1,7 @@
+/*---------------------------------------------------------------------------
+ * Telif Hakkı/Copyright A. Alper Atıcı. Her Hakkı Saklıdır.
+ * All Rights Reserved. This is not free software.
+ *---------------------------------------------------------------------------*/
 const celm = (th,e) => th.createElementNS('http://www.w3.org/2000/svg', e);
 const Taş = { yok: 9, Syh: 13, Byz: 17, Yoz: 0, Dama: 1 };
 const Yön = { B: 0, K: 1, D: 2, G: 3, yok: 4, Beyaz: 1, Siyah: -1 };
