@@ -63,14 +63,13 @@ self.addEventListener('message', (e) => {
 // alım = [ {alınan_x, alınan_y, alan_yeni_x, alan_yeni_y, sonra}, ...]
 
 function oyna(al, dama_yön) {
-  let puan, p, ri, seçenekler=[], rv, alan;
+  let puan = +Infinity, p, ri, seçenekler=[], rv, alan;
   if (al)
     [rv,alan] = alır_mı(new Map().set(from, taşlar[yön].get(from)), yön, dama_yön);
   else
     [rv,alan] = alır_mı(taşlar[yön], yön, Yön.yok);
 
-  if (rv) {
-    puan = +Infinity;
+  if (rv)
     for (const n of alan) {
       [p,ri] = ileri_al(n.k, n.alım, yön);
       if (p < puan) {
@@ -81,9 +80,7 @@ function oyna(al, dama_yön) {
       else if (p == puan)
         seçenekler.push({k: n.k, to: {x: n.alım[ri].alan_yeni_x, y: n.alım[ri].alan_yeni_y}, alım: [n.alım[ri]]});
     }
-  }
-  else {
-    puan = +Infinity;
+  else
     for (const [k,val] of taşlar[yön]) {
       const to = val == Taş.Dama ? devin_bak_dama(k) : devin_bak(k);
       if (to.puan < puan) {
@@ -94,7 +91,6 @@ function oyna(al, dama_yön) {
       else if (to.puan != +Infinity  &&  to.puan == puan)
         seçenekler.push({k, to});
     }
-  }
 
   let s;
   if (seçenekler.length > 1)
@@ -157,7 +153,7 @@ function ileri_bak(taşlar, yön) {
 }
 
 function ileri_al(k, alım, yön, dal=false) {
-  let puan=+Infinity, sav={}, ri;
+  let puan = +Infinity, sav={}, ri;
   for (let i=0; i<alım.length; ++i) {
     const m = alım[i];
     glgth[m.alan_yeni_y][m.alan_yeni_x] = glgth[k.y][k.x];
@@ -179,6 +175,9 @@ function ileri_al(k, alım, yön, dal=false) {
 
     if (alınanval == Taş.Dama)
       p -= dama_değeri;
+    else if (alınank.y == (C[Karşı[yön]].dama_satırı - Karşı[yön]))
+      p -= Math.floor(dama_değeri/2);
+
     k.x = sav.x; k.y = sav.y;
     glgth[k.y][k.x] = glgth[m.alan_yeni_y][m.alan_yeni_x];
     glgth[m.alınan_y][m.alınan_x] = C[yön].yağı;

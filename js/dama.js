@@ -34,7 +34,6 @@ function oyuncu_değiştir() {
   }
 
   oyun_kaydet(makina.aktif);
-  // alım_denetimi();
 }
 
 export
