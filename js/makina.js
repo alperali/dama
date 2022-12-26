@@ -117,9 +117,7 @@ function devin_bak(k) {
       if (my == C[yön].dama_satırı)
         // damaya çıkıyorsa
         rv -= dama_değeri;
-      else if (my == C[yön].dama_satırı - yön)
-        // damaya çıkmaya bir satır kalıyorsa...
-        rv -= Math.floor(dama_değeri/2);
+
       if (rv < puan) {
         to.x = mx;
         to.y = my;
@@ -175,8 +173,6 @@ function ileri_al(k, alım, yön, dal=false) {
 
     if (alınanval == Taş.Dama)
       p -= dama_değeri;
-    else if (alınank.y == (C[Karşı[yön]].dama_satırı - Karşı[yön]))
-      p -= Math.floor(dama_değeri/2);
 
     k.x = sav.x; k.y = sav.y;
     glgth[k.y][k.x] = glgth[m.alan_yeni_y][m.alan_yeni_x];
@@ -224,7 +220,8 @@ function alım_olası(x, y, yön) {
   let say=0, rv, alım=[], ralım=[];
   for (const [ax,ay,kx,ky] of [[x-1,y,x-2,y], [x+1,y,x+2,y], [x,y+yön,x,y+2*yön]])
     if (glgth[ky]?.[kx] == Taş.yok && glgth[ay]?.[ax] == C[yön].yağı) {
-      glgth[ay][ax] = Taş.yok;  // taşı almış gibi yap
+      glgth[ky][kx] = C[yön].taş_renk;
+      glgth[y][x] = glgth[ay][ax] = Taş.yok;  // taşı almış gibi yap
       [rv,ralım] = alım_olası(kx, ky, yön);
       if (rv+1 > say) {
         say = rv+1;
@@ -233,6 +230,8 @@ function alım_olası(x, y, yön) {
       }
       else if (rv+1 == say) alım.push({alınan_x: ax, alınan_y: ay, alan_yeni_x: kx, alan_yeni_y: ky, sonra: ralım});
       glgth[ay][ax] = C[yön].yağı;  // almış gibi yaptığın taşı geri yerine koy
+      glgth[y][x] = C[yön].taş_renk;
+      glgth[ky][kx] = Taş.yok;
     }
   return [say, alım];
 }

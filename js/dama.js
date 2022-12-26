@@ -293,7 +293,8 @@ function alım_olası(x, y) {
   let say=0, rv, alım=[];
   for (const [ax,ay,kx,ky] of [[x-1,y,x-2,y], [x+1,y,x+2,y], [x,y+yön,x,y+2*yön]])
     if (glgth[ky]?.[kx] == Taş.yok && glgth[ay]?.[ax] == C[yön].yağı) {
-      glgth[ay][ax] = Taş.yok;  // taşı almış gibi yap
+      glgth[ky][kx] = C[yön].taş_renk;
+      glgth[y][x] = glgth[ay][ax] = Taş.yok;  // taşı almış gibi yap
       // özyinelemeli çağrılarda alım konum bilgileri gerekli değil, yalnızca alım sayısı
       [rv] = alım_olası(kx, ky, yön);
       if (rv+1 > say) {
@@ -303,6 +304,8 @@ function alım_olası(x, y) {
       }
       else if (rv+1 == say) alım.push({alınan_x: ax, alınan_y: ay, alan_yeni_x: kx, alan_yeni_y: ky});
       glgth[ay][ax] = C[yön].yağı;  // almış gibi yaptığın taşı geri yerine koy
+      glgth[y][x] = C[yön].taş_renk;
+      glgth[ky][kx] = Taş.yok;
     }
   return [say, alım];
 }
