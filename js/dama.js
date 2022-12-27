@@ -109,7 +109,7 @@ function mesaj_işle(e) {
         seçili_alım.length = 0;
       }
 
-      setTimeout(devinim, 500, e.data.dn.to, C[yön].dama_satırı);
+      setTimeout(devinim, al && from.dataset.taş == Taş.Dama ? 750 : 500, e.data.dn.to, C[yön].dama_satırı);
       break;
     default:
       console.log('ana modül: bilinmeyen mesaj geldi.');
