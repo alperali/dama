@@ -239,8 +239,8 @@ function devinim(to, dama_satırı) {
     sayaçlar[yön].sayaç.dispatchEvent(new CustomEvent(evnt, {detail: sayaçlar[yön].say}));
     if (!makina.aktif || (makina.yön != yön)) {
       // daha alır mı?
-      [al, seçili_alım] = from.dataset.taş == Taş.Dama ? alım_olası_dama(+from.dataset.x, +from.dataset.y, yön, dama_yön)
-                                                       : alım_olası(+from.dataset.x, +from.dataset.y, yön);
+      [al, seçili_alım] = from.dataset.taş == Taş.Dama ? alım_olası_dama(+from.dataset.x, +from.dataset.y, dama_yön)
+                                                       : alım_olası(+from.dataset.x, +from.dataset.y);
       if (al) {
         marker_set(from);
         seçim_sabit = true;
@@ -296,7 +296,7 @@ function alım_olası(x, y) {
       glgth[ky][kx] = C[yön].taş_renk;
       glgth[y][x] = glgth[ay][ax] = Taş.yok;  // taşı almış gibi yap
       // özyinelemeli çağrılarda alım konum bilgileri gerekli değil, yalnızca alım sayısı
-      [rv] = alım_olası(kx, ky, yön);
+      [rv] = alım_olası(kx, ky);
       if (rv+1 > say) {
         say = rv+1;
         alım.length = 0;
@@ -327,7 +327,7 @@ function alım_olası_dama(x, y, dama_yön) {
           glgth[y][x] = glgth[y+ry[d]*(i-1)][x+rx[d]*(i-1)] = Taş.yok;
           for (let j=i; glgth[y+ry[d]*j]?.[x+rx[d]*j] == Taş.yok; ++j) {
             glgth[y+ry[d]*j][x+rx[d]*j] = C[yön].taş_renk;
-            [rv] = alım_olası_dama(x+rx[d]*j, y+ry[d]*j, yön, d);
+            [rv] = alım_olası_dama(x+rx[d]*j, y+ry[d]*j, d);
             if (rv+1 > say) {
               say = rv+1;
               alım.length = 0;
