@@ -173,6 +173,9 @@ function ileri_al(k, alım, yön, dal=false) {
 
     if (alınanval == Taş.Dama)
       p -= dama_değeri;
+    if (taşlar[yön].get(k) == Taş.Yoz && sav.y != C[yön].dama_satırı && k.y == C[yön].dama_satırı)
+      // taş alırken yoz taş damaya çıkıyorsa
+      p -= (dama_değeri-1);
 
     k.x = sav.x; k.y = sav.y;
     glgth[k.y][k.x] = glgth[m.alan_yeni_y][m.alan_yeni_x];
