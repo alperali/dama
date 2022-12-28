@@ -1,6 +1,11 @@
-[{
+[
+      {
         "relation": ["delegate_permission/common.handle_all_urls"],
-        "target" : { "namespace": "android_app", "package_name": "io.github.alperali.dama",
-                     "sha256_cert_fingerprints": ["9D:80:AA:B4:B2:90:4B:10:4B:CC:2F:33:2A:1C:19:0A:91:4B:0A:7C:91:EE:C8:B9:2B:9C:CA:9E:18:58:FD:A0"] }
+        "target": {
+          "namespace": "android_app",
+          "package_name": "",
+          "sha256_cert_fingerprints":
+            ["67:57:5C:C3:E7:AC:A0:FF:99:C3:C7:1D:16:B3:49:3F:1F:24:C0:86:A3:5A:B9:3E:13:54:62:CB:42:38:8D:A8"]
+        }
       }
-]
+    ]
