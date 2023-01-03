@@ -91,6 +91,11 @@ button {
     flex-direction: column-reverse;
   }
 
+  div button svg {
+    width: calc(var(--buton-en) + 1vh);
+    height: calc(var(--buton-en) + 1vh);
+  }
+
   button {
     margin: 1vmin 1vmin;
     display: inline;
@@ -103,11 +108,11 @@ button {
   }
   #oyuncu {
     margin-top: 0.75vmin;
-    margin-left: 4vmin;
+    margin-left: 3vmin;
   }
   #yeni {
     margin-bottom: 0.75vmin;
-    margin-right: 4vmin;
+    margin-right: 3vmin;
   }
   .yatay {
     display: none;
