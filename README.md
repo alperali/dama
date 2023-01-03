@@ -1,10 +1,17 @@
 # Dama
 Türk dama oyunudur.
 
+![Demo animasyonu](./demo.webp)
+
 ## [>> Demo için tıklayın](https://alperali.github.io/dama/)
 > Demo için güncel bir Firefox, Chrome, Edge vs sürümü kullanın.
 
-Bulduğunuz hataları alper.goplay@gmail.com adresine bildirin, veya Issues altında bir kayıt açın.
+Gerçek kişi veya bilgisayara karşı oynayabilirsiniz (çevrim içi eşleşme henüz yoktur, tablet/surface üzerinde karşılıklı iki kişi oynayabilir).
+Oyun sırasında gerçek kişi - makina arası geçiş yapılabilir, oyun kaldığı yerden devam eder.
+
+Denetim işlevleri: Tahta çevirme, büyültme/küçültme, sıfırlama(yeni oyun), oyuncu seçimi, çubuk taşıma, sayaçlar.
+
+**Bulduğunuz hataları alper.goplay@gmail.com adresine bildirin, veya Issues altında bir kayıt açın.**
 
 ## Özellikleri
 - **PWA (_Progessive Web App_) :**  
