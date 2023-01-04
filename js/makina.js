@@ -22,8 +22,7 @@ self.addEventListener('message', (e) => {
       taşlar[Yön.Beyaz] = e.data.beyazlar;
       taşlar[Yön.Siyah] = e.data.siyahlar;
       yön = e.data.makina.yön;
-      for (let i=1; i<th2k.length; ++i)
-        th2k[i].fill(null);
+      for (let i=1; i<th2k.length; th2k[i].fill(null), ++i);
       for (t of [Yön.Beyaz,Yön.Siyah])
         for (const k of taşlar[t].keys())
           th2k[k.y][k.x] = k;
@@ -173,7 +172,7 @@ function ileri_al(k, alım, yön, dal=false) {
       p = ileri_bak(taşlar[Karşı[yön]], Karşı[yön]);
 
     if (alınanval == Taş.Dama)
-      p -= dama_değeri;
+      p -= (dama_değeri-1);
     if (taşlar[yön].get(k) == Taş.Yoz && sav.y != C[yön].dama_satırı && k.y == C[yön].dama_satırı)
       // taş alırken yoz taş damaya çıkıyorsa
       p -= (dama_değeri-1);
@@ -235,7 +234,9 @@ function alım_olası(x, y, yön) {
         alım.length = 0;
         alım.push({alınan_x: ax, alınan_y: ay, alan_yeni_x: kx, alan_yeni_y: ky, sonra: ralım});
       }
-      else if (rv+1 == say) alım.push({alınan_x: ax, alınan_y: ay, alan_yeni_x: kx, alan_yeni_y: ky, sonra: ralım});
+      else if (rv+1 == say)
+        alım.push({alınan_x: ax, alınan_y: ay, alan_yeni_x: kx, alan_yeni_y: ky, sonra: ralım});
+
       glgth[ay][ax] = C[yön].yağı;  // almış gibi yaptığın taşı geri yerine koy
       glgth[y][x] = C[yön].taş_renk;
       glgth[ky][kx] = Taş.yok;

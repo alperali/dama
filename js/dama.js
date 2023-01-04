@@ -302,7 +302,9 @@ function alım_olası(x, y) {
         alım.length = 0;
         alım.push({alınan_x: ax, alınan_y: ay, alan_yeni_x: kx, alan_yeni_y: ky});
       }
-      else if (rv+1 == say) alım.push({alınan_x: ax, alınan_y: ay, alan_yeni_x: kx, alan_yeni_y: ky});
+      else if (rv+1 == say)
+        alım.push({alınan_x: ax, alınan_y: ay, alan_yeni_x: kx, alan_yeni_y: ky});
+
       glgth[ay][ax] = C[yön].yağı;  // almış gibi yaptığın taşı geri yerine koy
       glgth[y][x] = C[yön].taş_renk;
       glgth[ky][kx] = Taş.yok;
