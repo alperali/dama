@@ -9,7 +9,9 @@ Türk dama oyunudur.
 Gerçek kişi veya bilgisayara karşı oynayabilirsiniz (çevrim içi eşleşme henüz yoktur, tablet/surface üzerinde karşılıklı iki kişi oynayabilir).
 Oyun sırasında gerçek kişi - makina arası geçiş yapılabilir, oyun kaldığı yerden devam eder.
 
-Denetim işlevleri: Tahta çevirme, büyültme/küçültme, sıfırlama(yeni oyun), oyuncu seçimi, çubuk taşıma, sayaçlar.
+- *Denetim işlevleri:* Tahta çevirme, büyültme/küçültme, sıfırlama(yeni oyun), oyuncu seçimi, çubuk taşıma.
+
+- *Görsel işlevler:* Sayaçlar, alım kılavuzları (zorunlu taş alımında yanlış kareye tıklanırsa kılavuzlar belirir), sıra göstergesi (yatay yeşil çubuk).
 
 **Bulduğunuz hataları alper.goplay@gmail.com adresine bildirin, veya Issues altında bir kayıt açın.**
 
