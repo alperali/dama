@@ -5,7 +5,7 @@
 const Taş = { yok: 9, Syh: 13, Byz: 17, Yoz: 0, Dama: 1 };
 const Yön = {B: 0, K: 1, D: 2, G: 3, yok: 4, Beyaz: 1, Siyah: -1 };
 const Karşı = {[Yön.Beyaz]: Yön.Siyah, [Yön.Siyah]: Yön.Beyaz};
-const dama_değeri = 4;  // bir damanın tahminen kaç yoz taş değerinde olduğu
+const dama_değeri = 3;  // bir damanın tahminen kaç yoz taş değerinde olduğu
 const C = {
   [Yön.Beyaz]: {taş_renk: Taş.Byz, yağı: Taş.Syh, dama_satırı: 8},
   [Yön.Siyah]: {taş_renk: Taş.Syh, yağı: Taş.Byz, dama_satırı: 1}
@@ -172,10 +172,10 @@ function ileri_al(k, alım, yön, dal=false) {
       p = ileri_bak(taşlar[Karşı[yön]], Karşı[yön]);
 
     if (alınanval == Taş.Dama)
-      p -= (dama_değeri-1);
+      p -= dama_değeri;
     if (taşlar[yön].get(k) == Taş.Yoz && sav.y != C[yön].dama_satırı && k.y == C[yön].dama_satırı)
       // taş alırken yoz taş damaya çıkıyorsa
-      p -= (dama_değeri-1);
+      p -= dama_değeri;
 
     k.x = sav.x; k.y = sav.y;
     glgth[k.y][k.x] = glgth[m.alan_yeni_y][m.alan_yeni_x];
