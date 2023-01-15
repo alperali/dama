@@ -15,6 +15,10 @@ onload = () => {
       beyaz_onlu = true;
     }
     document.querySelector('#beyazskor svg text').textContent = e.detail;
+    if (+e.detail == 16) {
+      document.querySelector('#framanim').setAttribute('visibility', 'visible');
+      document.querySelector('#anim1').beginElement();
+    }
   });
   siyah_sayaç.addEventListener('taş-aldı', e => {
     if (!siyah_onlu && +e.detail > 9) {
@@ -22,6 +26,10 @@ onload = () => {
       siyah_onlu = true;
     }
     document.querySelector('#siyahskor svg text').textContent = e.detail;
+    if (+e.detail == 16) {
+      document.querySelector('#framanim').setAttribute('visibility', 'visible');
+      document.querySelector('#anim1').beginElement();
+    }
   });
   const th = document.querySelector('object').contentDocument;
   document.querySelector('#yeni').addEventListener('click', Dama.oyna(th, beyaz_sayaç, siyah_sayaç, 'taş-aldı'));
@@ -30,6 +38,8 @@ onload = () => {
     document.querySelector('#siyahskor svg text').setAttribute('x', '6');
     beyaz_onlu = siyah_onlu = false;
     document.querySelector('#oyuncu').children[0].children[0].attributes[0].value = './img/icons.svg#cpu';
+    document.querySelector('#anim1').endElement();
+    document.querySelector('#framanim').setAttribute('visibility', 'hidden');
   });
 
   if (!Dama.makina.aktif)

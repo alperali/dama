@@ -24,7 +24,7 @@
         </svg>
       </button>
       <button type="button" aria-label="Oyuncu değiştir" id="oyuncu">
-        <svg class="ikon" fill="currentColor">
+        <svg class="ikon">
           <use href="./img/icons.svg#cpu"/>
         </svg>
       </button>      
@@ -34,20 +34,25 @@
         </svg>
       </button>
       <button type="button" aria-label="Çerçeve kaldır-göster" id="çgör">
-        <svg class="ikon" fill="currentColor">
+        <svg class="ikon">
           <use href="./img/icons.svg#arrows-angle-expand"/>
         </svg>
       </button>
       <button type="button" aria-label="Çubuk taşı" id="çutaşı">
-        <svg class="ikon yatay" fill="currentColor">
+        <svg class="ikon yatay">
           <use href="./img/icons.svg#arrow-bar-right"/>
         </svg>
-        <svg class="ikon düşey" fill="currentColor">
+        <svg class="ikon düşey">
           <use href="./img/icons.svg#arrow-bar-down"/>
         </svg>
       </button>
       <button type="button" aria-label="Yeni oyun" id="yeni">
-        <svg class="ikon" fill="currentColor">
+        <svg class="ikon" viewBox="0 0 16 16">
+          <rect x="0" y="0" width="16" height="16" rx="1" id="framanim"
+                stroke="blue" stroke-width="2" stroke-dasharray="2 2" fill="yellow" fill-opacity="0" visibility="hidden">
+            <animate id="anim1" attributeName="stroke-dashoffset" by="4" repeatCount="indefinite" dur="2s" begin="indefinite" end="indefinite" />
+            <animate attributeName="fill-opacity" values="0;1;0" repeatCount="indefinite" dur="2s" begin="anim1.begin" end="anim1.end" />
+          </rect>
           <use href="./img/icons.svg#grid"/>
         </svg>
       </button>

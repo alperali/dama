@@ -108,7 +108,6 @@ function mesaj_işle(e) {
         al = false;
         seçili_alım.length = 0;
       }
-
       setTimeout(devinim, al && from.dataset.taş == Taş.Dama ? 750 : 500, e.data.dn.to, C[yön].dama_satırı);
       break;
     default:
