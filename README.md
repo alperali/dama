@@ -21,6 +21,8 @@ Türk dama oyunudur.
 - **PWA (_Progessive Web App_) :**  
   Hem çevrimiçi hem de çevrimdışı çalışabilir.
   Chrome, Edge, Safari, PWA destekli tarayıcı kullanan her platformda çalışır, kurulabilir.
+  PWABuilder, Bubblewrap gibi araçlar ile mobil marketlere uygun paketlenip yüklenebilir
+  (_Trusted Web Activity(TWA)_ bazlı örnek bir APK _Releases_ altına eklenmiştir).
 - **_Responsive_ tasarım:**  
   Telefon, tablet, dizüstü, masaüstü, smartTV, vb her ekran boyutuna uygundur.
 - **Temel dama kurallarını uygular:**  
