@@ -1,6 +1,7 @@
 {
   "short_name": "Dama",
   "name": "Türk Dama",
+  "description": "Klasik Türk Daması",
   "icons": [
     {
       "src": "./img/ikon-apple.png",
@@ -13,9 +14,9 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": "./",
+  "start_url": "https://alperali.github.io/dama",
   "id": "./",
-  "background_color": "lemonchiffon",
-  "theme_color": "wheat",
+  "background_color": "#FFFACD",
+  "theme_color": "#F5DEB3",
   "display": "standalone"
 }
