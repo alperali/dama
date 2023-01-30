@@ -18,7 +18,7 @@
       "purpose": "any"
     }
   ],
-  "start_url": "./index.html",
+  "start_url": "https://alperali.github.io/dama/index.html",
   "background_color": "#FFFACD",
   "theme_color": "#F5DEB3",
   "display": "standalone"
