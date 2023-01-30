@@ -3,6 +3,7 @@
   "name": "Türk Dama",
   "lang": "tr",
   "description": "Klasik Türk daması",
+  "categories": ["games"],
   "icons": [
     {
       "src": "./img/ikon-apple.png",
