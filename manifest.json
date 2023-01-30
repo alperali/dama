@@ -2,7 +2,8 @@
   "short_name": "Dama",
   "name": "Türk Dama",
   "lang": "tr",
-  "description": "Klasik Türk daması",
+  "dir": "ltr",
+  "description": "Klasik Türk dama oyunu",
   "categories": ["games"],
   "orientation": "any",
   "icons": [
