@@ -17,7 +17,7 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": "https://alperali.github.io/dama",
+  "start_url": "/dama",
   "background_color": "#FFFACD",
   "theme_color": "#F5DEB3",
   "display": "standalone"
