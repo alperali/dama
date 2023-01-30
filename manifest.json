@@ -4,6 +4,7 @@
   "lang": "tr",
   "description": "Klasik Türk daması",
   "categories": ["games"],
+  "orientation": "any",
   "icons": [
     {
       "src": "./img/ikon-apple.png",

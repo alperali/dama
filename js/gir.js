@@ -5,7 +5,7 @@
 import * as Dama from './dama.js';
 
 onload = () => {
-  navigator.serviceWorker.register('./serw.js');
+  navigator.serviceWorker.register('/serw.js');
   const beyaz_sayaç = new EventTarget();
   const siyah_sayaç = new EventTarget();
   let beyaz_onlu=false, siyah_onlu=false;
