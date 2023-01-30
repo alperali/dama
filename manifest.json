@@ -19,6 +19,32 @@
       "purpose": "any"
     }
   ],
+  "screenshots": [
+    {
+      "src": "./img/7in1.png",
+      "sizes": "1920x1200",
+      "type": "image/png",
+      "label": "Yatay görünüm, tablet/PC"
+    },
+    {
+      "src": "./img/7in2.png",
+      "sizes": "1200x1920",
+      "type": "image/png",
+      "label": "Düşey görünüm, tablet/PC"
+    },
+    {
+      "src": "./img/phone1.png",
+      "sizes": "1080x2340",
+      "type": "image/png",
+      "label": "Düşey görünüm, telefon"
+    },
+    {
+      "src": "./img/phone2.png",
+      "sizes": "2340x1080",
+      "type": "image/png",
+      "label": "Yatay görünüm, telefon"
+    }
+  ],
   "start_url": "https://alperali.github.io/dama/index.html",
   "background_color": "#FFFACD",
   "theme_color": "#F5DEB3",
