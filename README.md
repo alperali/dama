@@ -3,8 +3,9 @@ Türk dama oyunudur.
 
 ![Demo animasyonu](./demo.webp)
 
-## [>> Demo için tıklayın](https://alperali.github.io/dama/)
-> Demo için güncel bir Firefox, Chrome, Edge vs sürümü kullanın.
+### Microsoft Store üzerinden yüklenebilir (sadece Türkiye, Kıbrıs)
+> https://www.microsoft.com/store/productId/9NZ067RSDNRV
+---
 
 - Gerçek kişi veya bilgisayara karşı oynayabilirsiniz (çevrim içi eşleşme henüz yoktur, tablet/surface üzerinde karşılıklı iki kişi oynayabilir).
   Oyun sırasında gerçek kişi - makina arası geçiş yapılabilir, oyun kaldığı yerden devam eder.
