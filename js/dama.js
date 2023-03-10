@@ -75,9 +75,9 @@ function oyna(pth, byz_sayaç, syh_sayaç, pevt) {
     localStorage.removeItem('damalper');
     marker_unset();
     switch (alan.length) {
-      case 3: alt_marker_unset(2);  // bilerek fall-through
-      case 2: alt_marker_unset(1);
-      case 1: alt_marker_unset(0);
+      case 3: alt_marker_unset(2);  // falls through
+      case 2: alt_marker_unset(1);  // falls through
+      case 1: alt_marker_unset(0);  // falls through
       default: alan.length = 0;
     }
     th.querySelector('line#siyah').setAttribute('visibility', 'hidden');
@@ -116,15 +116,15 @@ function mesaj_işle(e) {
 }
 
 function alım_denetimi() {
-  if (al=alır_mı(C[yön].taş_grup)) {
+  if ((al=alır_mı(C[yön].taş_grup))) {
     const seçili_alan = alan.pop();
     marker_set(from=th.querySelector(`circle[data-x="${seçili_alan.x}"][data-y="${seçili_alan.y}"]`));
     seçili_alım = seçili_alan.alım;
     switch (alan.length) {
       // aşağıda break unutulmuş değil, bilerek fall-through
-      case 3: alt_marker_set(2);
-      case 2: alt_marker_set(1);
-      case 1: alt_marker_set(0);
+      case 3: alt_marker_set(2);  // falls through
+      case 2: alt_marker_set(1);  // falls through
+      case 1: alt_marker_set(0);  // falls through
         break;
       default:
         seçim_sabit = true;
@@ -228,9 +228,9 @@ function devinim(to, dama_satırı) {
   const [devindi, taş_aldı, dama_yön] = taş_devindir(from, to);
   if (!devindi)  return;
   switch (alan.length) {
-    case 3: alt_marker_unset(2);  // bilerek fall-through
-    case 2: alt_marker_unset(1);
-    case 1: alt_marker_unset(0);
+    case 3: alt_marker_unset(2);  // falls through
+    case 2: alt_marker_unset(1);  // falls through
+    case 1: alt_marker_unset(0);  // falls through
     default: alan.length = 0;
   }
   if (taş_aldı) {
@@ -319,7 +319,7 @@ function alım_olası_dama(x, y, dama_yön) {
   let kare, say=0, rv, alım=[];
   for (let d=Yön.B; d<=Yön.G; ++d) {
     if (ters_yön[dama_yön] == d) continue;
-    for (let i=1, buldu=false; kare=glgth[y+ry[d]*i]?.[x+rx[d]*i]; ++i)
+    for (let i=1, buldu=false; (kare=glgth[y+ry[d]*i]?.[x+rx[d]*i]); ++i)
       if (kare == C[yön].yağı)
         if (buldu) break; /* yanyana iki yağı taş */
         else buldu = true;
