@@ -23,7 +23,7 @@ self.addEventListener('message', (e) => {
       taşlar[Yön.Siyah] = e.data.siyahlar;
       yön = e.data.makina.yön;
       for (let i=1; i<th2k.length; th2k[i].fill(null), ++i);
-      for (t of [Yön.Beyaz,Yön.Siyah])
+      for (const t of [Yön.Beyaz,Yön.Siyah])
         for (const k of taşlar[t].keys())
           th2k[k.y][k.x] = k;
       break;
@@ -36,7 +36,7 @@ self.addEventListener('message', (e) => {
     case 'dama-oldu':
       taşlar[e.data.yön].set(th2k[e.data.y][e.data.x], Taş.Dama);
       break;
-    case 'devindir':
+    case 'devindir': {
       glgth[e.data.to.y][e.data.to.x] = glgth[e.data.y][e.data.x];
       glgth[e.data.y][e.data.x] = Taş.yok;
       const k = th2k[e.data.y][e.data.x];
@@ -45,6 +45,7 @@ self.addEventListener('message', (e) => {
       th2k[e.data.y][e.data.x] = null;
       th2k[k.y][k.x] = k;
       break;
+    }
     case 'taş-al':
       glgth[e.data.y][e.data.x] = Taş.yok;
       taşlar[Karşı[e.data.yön]].delete(th2k[e.data.y][e.data.x]);
@@ -154,7 +155,7 @@ function ileri_bak(taşlar, yön) {
 }
 
 function ileri_al(k, alım, yön, dal=false) {
-  let puan = +Infinity, sav={}, ri, alınank, alınanval;
+  let puan = +Infinity, sav={}, ri, alınank, alınanval, p;
   for (let i=0; i<alım.length; ++i) {
     const m = alım[i];
     glgth[m.alan_yeni_y][m.alan_yeni_x] = glgth[k.y][k.x];
