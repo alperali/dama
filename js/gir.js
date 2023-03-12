@@ -34,7 +34,6 @@ onload = () => {
     document.querySelector('#beyazskor svg text').setAttribute('x', '6');
     document.querySelector('#siyahskor svg text').setAttribute('x', '6');
     beyaz_onlu = siyah_onlu = false;
-    document.querySelector('#oyuncu').children[0].children[0].attributes[0].value = './img/icons.svg#cpu';
     document.querySelector('#yeni').classList.remove('oyun-sonu');
   });
 

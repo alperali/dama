@@ -90,7 +90,9 @@ function oyna(pth, byz_sayaç, syh_sayaç, pevt) {
         glgth[y][x] = Taş.yok;
     sayaçlar[Yön.Beyaz].sayaç.dispatchEvent(new CustomEvent(evnt, {detail: ""}));
     sayaçlar[Yön.Siyah].sayaç.dispatchEvent(new CustomEvent(evnt, {detail: ""}));
+    const durum_mak = makina.aktif;
     [yön, sayaçlar[Yön.Beyaz].say, sayaçlar[Yön.Siyah].say, beyazlar, siyahlar, makina] = oyun_yükle(th, glgth);
+    makina.aktif = durum_mak;
     makiwrk.postMessage({msg: "oyun-yükle", glgth, beyazlar, siyahlar, makina});
   };
 }
