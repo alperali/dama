@@ -23,6 +23,11 @@
           <text x="6" y="14.5" font-family="sans-serif" fill="white"></text>
         </svg>
       </button>
+      <button type="button" aria-label="Çevrim değiştir" id="çevrim">
+        <svg class="ikon">
+          <use href="./img/icons.svg#cloud-slash"/>
+        </svg>
+      </button>
       <button type="button" aria-label="Oyuncu değiştir" id="oyuncu">
         <svg class="ikon">
           <use href="./img/icons.svg#cpu"/>
@@ -47,12 +52,7 @@
         </svg>
       </button>
       <button type="button" aria-label="Yeni oyun" id="yeni">
-        <svg class="ikon" viewBox="0 0 20 20">
-          <rect x="0" y="0" width="20" height="20" id="framanim"
-                stroke="blue" stroke-width="2" stroke-dasharray="2 2" fill="yellow" fill-opacity="0" visibility="hidden">
-            <animate id="anim1" attributeName="stroke-dashoffset" by="4" repeatCount="indefinite" dur="2s" begin="indefinite" end="indefinite" />
-            <animate attributeName="fill-opacity" values="0;1;0" repeatCount="indefinite" dur="3s" begin="anim1.begin" end="anim1.end" />
-          </rect>
+        <svg class="ikon">
           <use href="./img/icons.svg#grid"/>
         </svg>
       </button>

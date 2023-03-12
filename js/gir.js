@@ -15,8 +15,7 @@ onload = () => {
     }
     document.querySelector('#beyazskor svg text').textContent = e.detail;
     if (+e.detail == 16) {
-      document.querySelector('#framanim').setAttribute('visibility', 'visible');
-      document.querySelector('#anim1').beginElement();
+      document.querySelector('#yeni').classList.add('oyun-sonu');
     }
   });
   siyah_sayaç.addEventListener('taş-aldı', e => {
@@ -26,8 +25,7 @@ onload = () => {
     }
     document.querySelector('#siyahskor svg text').textContent = e.detail;
     if (+e.detail == 16) {
-      document.querySelector('#framanim').setAttribute('visibility', 'visible');
-      document.querySelector('#anim1').beginElement();
+      document.querySelector('#yeni').classList.add('oyun-sonu');
     }
   });
   const th = document.querySelector('object').contentDocument;
@@ -37,8 +35,7 @@ onload = () => {
     document.querySelector('#siyahskor svg text').setAttribute('x', '6');
     beyaz_onlu = siyah_onlu = false;
     document.querySelector('#oyuncu').children[0].children[0].attributes[0].value = './img/icons.svg#cpu';
-    document.querySelector('#anim1').endElement();
-    document.querySelector('#framanim').setAttribute('visibility', 'hidden');
+    document.querySelector('#yeni').classList.remove('oyun-sonu');
   });
 
   if (!Dama.makina.aktif)

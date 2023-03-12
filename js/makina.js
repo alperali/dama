@@ -290,7 +290,7 @@ function alım_olası_dama(x, y, yön, dama_yön) {
   let kare, say=0, rv, alım=[], ralım=[];
   for (let d=Yön.B; d<=Yön.G; ++d) {
     if (ters_yön[dama_yön] == d) continue;
-    for (let i=1, buldu=false; kare=glgth[y+ry[d]*i]?.[x+rx[d]*i]; ++i)
+    for (let i=1, buldu=false; (kare=glgth[y+ry[d]*i]?.[x+rx[d]*i]); ++i)
       if (kare == C[yön].yağı)
         if (buldu) break; /* yanyana iki yağı taş */
         else buldu = true;

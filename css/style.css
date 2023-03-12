@@ -60,11 +60,12 @@ button {
   border: 0;
 }
 
-#oyuncu {
-  margin-top: 6vmin;
+#çevrim {
+  margin-top: 5vmin;
 }
+
 #yeni {
-  margin-bottom: 6vmin;
+  margin-bottom: 5vmin;
 }
 
 .ikon {
@@ -79,6 +80,31 @@ button {
   display: none;
 }
 
+.oyun-sonu {
+  animation-name: ani1;
+  animation-duration: 1.33s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+@keyframes ani1 {
+  from {
+    background-color: goldenrod;
+  }
+  to {
+    background-color: #ffff99;
+  }
+}
+.bağlı {
+  background-color: #ffff99;
+}
+.bağlı:hover {
+  background-color: #ffec80;
+}
+.bağlı:active {
+  background-color: #ffff99;
+}
+
+
 @media screen and (orientation: portrait) {
   main {
     height: 100vh;
@@ -92,12 +118,12 @@ button {
   }
 
   div button svg {
-    width: calc(var(--buton-en) + 1vh);
-    height: calc(var(--buton-en) + 1vh);
+    width: calc(var(--buton-en) + 0.85vh);
+    height: calc(var(--buton-en) + 0.85vh);
   }
 
   button {
-    margin: 1vmin 1vmin;
+    margin: 1vmin 0.5vmin;
     display: inline;
     padding-top: 0.5vmin;
     padding-bottom: 0.5vmin;
@@ -106,13 +132,19 @@ button {
     width: min(100vmin, calc(100vh - calc(2 * var(--buton-en))));
     height: auto;
   }
-  #oyuncu {
+  .skor-btn-beyaz {
+    padding-right: 0.75vmin;
+    margin-left: 0;
+  }
+  .skor-btn-siyah {
+    padding-left: 0.75vmin;
+    margin-right: 0;
+  }
+  #çevrim {
     margin-top: 0.75vmin;
-    margin-left: 3vmin;
   }
   #yeni {
     margin-bottom: 0.75vmin;
-    margin-right: 3vmin;
   }
   .yatay {
     display: none;
