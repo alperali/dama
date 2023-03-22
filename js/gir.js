@@ -7,7 +7,9 @@ import * as Dama from './dama.js';
 onload = () => {
   const beyaz_sayaç = new EventTarget();
   const siyah_sayaç = new EventTarget();
+  const bağ_durum = new EventTarget();
   let beyaz_onlu=false, siyah_onlu=false;
+  let bağlı = false, bağlanıyor = false;
   beyaz_sayaç.addEventListener('taş-aldı', e => {
     if (!beyaz_onlu && +e.detail > 9) {
       document.querySelector('#beyazskor svg text').setAttribute('x', '1.75');
@@ -29,8 +31,9 @@ onload = () => {
     }
   });
   const th = document.querySelector('object').contentDocument;
-  document.querySelector('#yeni').addEventListener('click', Dama.oyna(th, beyaz_sayaç, siyah_sayaç, 'taş-aldı'));
+  document.querySelector('#yeni').addEventListener('click', Dama.başlat(th, beyaz_sayaç, siyah_sayaç, bağ_durum, 'taş-aldı'));
   document.querySelector('#yeni').addEventListener('click', () => {
+    if (bağlanıyor) return;
     document.querySelector('#beyazskor svg text').setAttribute('x', '6');
     document.querySelector('#siyahskor svg text').setAttribute('x', '6');
     beyaz_onlu = siyah_onlu = false;
@@ -41,6 +44,7 @@ onload = () => {
     document.querySelector('#oyuncu').children[0].children[0].attributes[0].value = './img/icons.svg#person';
 
   document.querySelector('#oyuncu').addEventListener('click', e => {
+    if (bağlı || bağlanıyor)  return;
     Dama.oyuncu_değiştir();
     e.currentTarget.children[0].children[0].attributes[0].value = Dama.makina.aktif ? './img/icons.svg#cpu' :
                                                                                       './img/icons.svg#person';
@@ -78,4 +82,55 @@ onload = () => {
       document.querySelector('main').className = konum[şimdi];
     };
   })());
+
+  document.querySelector('#çevrim').addEventListener('click', e => {
+    if (bağlı || bağlanıyor) {
+      Dama.kişi.kop();
+      bağlı = bağlanıyor = false;
+      e.currentTarget.classList.remove('bağlı');
+      e.currentTarget.children[0].children[0].attributes[0].value = './img/icons.svg#cloud-slash';
+      document.querySelector('#anons').style.opacity="0";
+    }
+    else {
+      e.currentTarget.children[0].children[0].attributes[0].value = './img/icons.svg#cloud';
+      document.querySelector('#mesaj1').textContent = "Bağlanıyor...";
+      document.querySelector('#anons').style.visibility="visible";
+      document.querySelector('#anons').style.opacity="1";
+      bağlanıyor = true;
+      Dama.kişi.bağlan();
+    }
+  });
+
+  document.querySelector('#anons').addEventListener('transitionend', e => {
+    if (e.currentTarget.style.opacity == '0')
+      e.currentTarget.style.visibility = 'hidden';
+  }, true);
+
+  bağ_durum.addEventListener('izlemci-bağlanma-hatası', e => {
+    document.querySelector('#mesaj1').textContent = "İzlemci bağlanamadı.";
+    document.querySelector('#mesaj2').textContent = e.detail;
+    setTimeout(() => document.querySelector('#anons').style.opacity="0", 1500);
+    bağlanıyor = false;
+    document.querySelector('#çevrim').children[0].children[0].attributes[0].value = './img/icons.svg#cloud-slash';
+  });
+  bağ_durum.addEventListener('soket-hatası', () => {
+    document.querySelector('#mesaj1').textContent = 'İzlemci soket hatası.';
+    setTimeout(() => document.querySelector('#anons').style.opacity="0", 1500);
+    bağlanıyor = false;
+    document.querySelector('#çevrim').children[0].children[0].attributes[0].value = './img/icons.svg#cloud-slash';
+  });
+  bağ_durum.addEventListener('bağlandı', e => {
+    document.querySelector('#yeni').click();
+    if (Dama.makina.aktif)  document.querySelector('#oyuncu').click();
+    if (e.detail)  // ben_başlarım
+      document.querySelector('#mesaj1').textContent = 'Oyuna başlayın.';
+    else
+      document.querySelector('#mesaj1').textContent = 'Karşısı başlar.';
+
+    document.querySelector('#mesaj2').textContent = 'Bağlandı.';
+    bağlı = true; bağlanıyor = false;
+    document.querySelector('#çevrim').classList.add('bağlı');
+    // oyuncu butonu rengini de degistir burada
+  });
+
 };

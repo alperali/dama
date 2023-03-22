@@ -14,14 +14,56 @@ const C = {
           };
 
 const makiwrk = new Worker('./js/makina.js');
-let th, marker, alt_marker, glgth, sayaçlar, evnt;
+let th, marker, alt_marker, glgth, sayaçlar, evnt, bağ_durum;
 let from, yön, seçim_sabit=false, taş_seçili=false, al=false, alan=[], seçili_alım=[],
-      beyazlar, siyahlar;
+      beyazlar, siyahlar, bağlanıyor=false, bağlı=false;
 
 // yön değişkeni atılım yönüne ek olarak sırayı da belirtir:
 // yön == Yön.Beyaz ise sıra beyazda, Yön.Siyah ise sıra siyahta.
 
 export let makina;
+export const kişi = {
+  kimlik: localStorage.getItem('kim') ?? kimlik_üret(),
+  wrk: new Worker('./js/taydas.js'),
+  bağlan: function() {
+    bağlanıyor = true;
+    this.wrk.postMessage({msg: 'bağlan', id: this.kimlik});
+  },
+  kop: function() {
+    bağlı = bağlanıyor = false;
+    this.wrk.postMessage({msg: 'kop'});
+  },
+  mesaj_işle: function(e) {
+    switch (e.data.msg) {
+      case 'izlemci-bağlanma-hatası':
+        bağ_durum.dispatchEvent(new CustomEvent('izlemci-bağlanma-hatası', {detail: e.data.neden}));
+        bağlanıyor = false;
+        break;
+      case 'soket-hatası':
+        bağ_durum.dispatchEvent(new CustomEvent('soket-hatası'));
+        bağlanıyor = false;
+        break;
+      case 'bağlandı':
+        bağ_durum.dispatchEvent(new CustomEvent('bağlandı', {detail: e.data.ben_başlarım}));
+        bağlı = true;
+        // if (e.data.ben_başlarım)  bağlanıyor = false;
+        bağlanıyor = false;
+        break;
+      case 'seç-byz':
+        yön = kişi.yön = makina.yön = Yön.Siyah;
+        makiwrk.postMessage({msg: 'seç-syh'});
+        break;
+      case 'seç-syh':
+        yön = kişi.yön = makina.yön = Yön.Beyaz;        
+        makiwrk.postMessage({msg: 'seç-byz'});
+        break;
+      case 'devindir':
+        alan_seç({data: {x: e.data.x, y: e.data.y}});
+        devinim(e.data.to, C[yön].dama_satırı);
+        break;
+    }
+  }
+};
 
 export
 function oyuncu_değiştir() {
@@ -37,9 +79,10 @@ function oyuncu_değiştir() {
 }
 
 export
-function oyna(pth, byz_sayaç, syh_sayaç, pevt) {
+function başlat(pth, byz_sayaç, syh_sayaç, bağdur, pevt) {
   th = pth;
   evnt = pevt;
+  bağ_durum = bağdur;
   marker = th.querySelector('#marker');
   alt_marker = [th.querySelector('#alan1'), th.querySelector('#alan2'), th.querySelector('#alan3')];
   sayaçlar = {[Yön.Beyaz]: {sayaç: byz_sayaç, say: 0},
@@ -50,6 +93,7 @@ function oyna(pth, byz_sayaç, syh_sayaç, pevt) {
   th.querySelector('#siyahlar').addEventListener('click', siyah_seç);
   th.querySelector('#beyazlar').addEventListener('click', beyaz_seç);
   makiwrk.addEventListener('message', mesaj_işle);
+  kişi.wrk.addEventListener('message', kişi.mesaj_işle);
   
   [yön, sayaçlar[Yön.Beyaz].say, sayaçlar[Yön.Siyah].say, beyazlar, siyahlar, makina] = oyun_yükle(th, glgth);
   makiwrk.postMessage({msg: "oyun-yükle", glgth, beyazlar, siyahlar, makina});
@@ -97,6 +141,12 @@ function oyna(pth, byz_sayaç, syh_sayaç, pevt) {
   };
 }
 
+function kimlik_üret() {
+  const id = String.fromCharCode(...crypto.randomUUID().replace(/-/g,'').match(/.{2}/g).map(e => parseInt(e,16)))+'dama';
+  localStorage.setItem('kim', id);
+  return id;
+}
+
 function mesaj_işle(e) {
   switch (e.data.msg) {
     case 'devindir':
@@ -135,7 +185,8 @@ function alım_denetimi() {
 }
 
 function siyah_seç(e) {
-  if (yön == Yön.Beyaz) return;
+  if (yön == Yön.Beyaz || bağlanıyor) return;
+  if (bağlı && kişi.yön == Yön.Siyah) return;
   if (makina.aktif && makina.yön == Yön.Siyah) return;
   if (seçim_sabit) {
     alım_göster();
@@ -143,14 +194,16 @@ function siyah_seç(e) {
   }
   if (yön == 'N/A') {
     yön = Yön.Siyah;
-    makina.yön = Yön.Beyaz;
+    kişi.yön = makina.yön = Yön.Beyaz;
     makiwrk.postMessage({msg: 'seç-byz'});
+    if (bağlı) kişi.wrk.postMessage({msg: 'seç-byz'});
   }
-  alan_seç(e);
+  alan_seç(e.target);
 }
 
 function beyaz_seç(e) {
-  if (yön == Yön.Siyah) return;
+  if (yön == Yön.Siyah || bağlanıyor) return;
+  if (bağlı && kişi.yön == Yön.Beyaz) return;
   if (makina.aktif && makina.yön == Yön.Beyaz) return;
   if (seçim_sabit) {
     alım_göster();
@@ -158,35 +211,36 @@ function beyaz_seç(e) {
   }
   if (yön == 'N/A') {
     yön = Yön.Beyaz;
-    makina.yön = Yön.Siyah;
+    kişi.yön = makina.yön = Yön.Siyah;
     makiwrk.postMessage({msg: 'seç-syh'});
+    if (bağlı) kişi.wrk.postMessage({msg: 'seç-syh'});
   }
-  alan_seç(e);
+  alan_seç(e.target);
 }
 
-function alan_seç(e) {
+function alan_seç(t) {
   // birden fazla alan varsa oyuncuya diğer alanı seçme imkanı verir,
   // tek alan varsa seçim_sabit true olacağından bu fonksiyon hiç çağrılmaz,
   // alan yoksa alan.length sıfır olacağından sadece marker_set()'i çağırır.
   // (seçili_alan diye bir global yok, fakat seçilmiş alan from.dataset.x, 
   // from.dataset.y ve seçili_alım üçlüsüyle temsil edilir).
   if (alan.length) {
-    if (e.target.dataset.x == from.dataset.x && e.target.dataset.y == from.dataset.y) {
+    if (t.dataset.x == from.dataset.x && t.dataset.y == from.dataset.y) {
       alım_göster();
       return;
     }
     for (let i=0; i < alan.length; ++i)
-      if (e.target.dataset.x == alan[i].x && e.target.dataset.y == alan[i].y) {
+      if (t.dataset.x == alan[i].x && t.dataset.y == alan[i].y) {
         const tmp_alım = alan[i].alım;
         alt_marker_unset(i);
         alan[i].x = from.dataset.x; alan[i].y = from.dataset.y; alan[i].alım = seçili_alım;
-        marker_set(from=e.target);
+        marker_set(from=t);
         alt_marker_set(i);
         seçili_alım = tmp_alım;
       }
   }
   else
-    marker_set(from=e.target);
+    marker_set(from=t);
 }
 
 function marker_set(m) {
@@ -215,9 +269,9 @@ function alım_göster() {
 }
 
 function kare_seç(e) {
-  if (makina.aktif && (makina.yön == yön))
+  if ((makina.aktif && (makina.yön == yön)) || (bağlı && (kişi.yön == yön)))
     return;
-  if (!taş_seçili) return;
+  if (!taş_seçili || bağlanıyor) return;
   if (glgth[+e.target.dataset.y][+e.target.dataset.x] != Taş.yok)  // boş karede zaten taş 'yok'tur fakat bir şekilde
     return;                                                        // taş olan kareye tıklamayı becermişse oyuncu... 
 
@@ -238,7 +292,17 @@ function devinim(to, dama_satırı) {
   if (taş_aldı) {
     ++sayaçlar[yön].say;
     sayaçlar[yön].sayaç.dispatchEvent(new CustomEvent(evnt, {detail: sayaçlar[yön].say}));
-    if (!makina.aktif || (makina.yön != yön)) {
+    if (makina.aktif && makina.yön == yön && al) {
+    // makina taş almış ve daha alırım demiş (al'ı true yapmış), buradan tekrar ona devredelim.
+      makiwrk.postMessage({msg: 'oyna', al: true, dama_yön});
+      return;
+    }
+    // else if (bağlı && kişi.yön == yön && al) {
+      // kişi taş almış ve daha alırım demiş (al'ı true yapmış), buradan tekrar ona devredelim.
+      // kişi.wrk.postMessage({msg: 'oyna', al: true, dama_yön});
+      // return;
+    // }
+    else {
       // daha alır mı?
       [al, seçili_alım] = from.dataset.taş == Taş.Dama ? alım_olası_dama(+from.dataset.x, +from.dataset.y, dama_yön)
                                                        : alım_olası(+from.dataset.x, +from.dataset.y);
@@ -247,10 +311,6 @@ function devinim(to, dama_satırı) {
         seçim_sabit = true;
         return;
       }
-    } else if (al) {
-      // makina taş almış ve daha alırım demiş (al'ı true yapmış), buradan tekrar ona devredelim.
-      makiwrk.postMessage({msg: 'oyna', al: true, dama_yön});
-      return;
     }
   }
 
@@ -258,6 +318,7 @@ function devinim(to, dama_satırı) {
     from.dataset.taş = Taş.Dama;
     dama_çiz(from, C[yön].taş_renk);
     makiwrk.postMessage({msg: 'dama-oldu', x: +from.dataset.x, y: +from.dataset.y, yön});
+    // if (bağlı)  kişi.wrk.postMessage({msg: 'dama-oldu', x: +from.dataset.x, y: +from.dataset.y, yön});
   }
 
   seçim_sabit = false;
@@ -268,6 +329,9 @@ function devinim(to, dama_satırı) {
   oyun_kaydet(th, yön, sayaçlar[Yön.Beyaz].say, sayaçlar[Yön.Siyah].say, makina);
   if (makina.aktif && (makina.yön == yön))
     makiwrk.postMessage({msg: 'oyna'});
+  // else if (bağlı && (kişi.yön == yön))
+    // kişi.wrk.postMessage({msg: 'oyna'});
+    // return;
   else
     alım_denetimi();
 }
@@ -387,6 +451,7 @@ function taş_devindir(from, to) {
         glgth[seçili_alım[i].alınan_y][seçili_alım[i].alınan_x] = Taş.yok;
         th.querySelector(`circle[data-x="${seçili_alım[i].alınan_x}"][data-y="${seçili_alım[i].alınan_y}"]`).remove();
         makiwrk.postMessage({msg: 'taş-al', x: seçili_alım[i].alınan_x, y: seçili_alım[i].alınan_y, yön});
+        // if (bağlı && yön == Karşı[kişi.yön])  kişi.wrk.postMessage({msg: 'taş-al', x: seçili_alım[i].alınan_x, y: seçili_alım[i].alınan_y, yön});
         devin();
         return [true,true,seçili_alım[i].dama_yön];
       }
@@ -459,6 +524,7 @@ function taş_devindir(from, to) {
     }
     from.children[0].beginElement();
     makiwrk.postMessage({msg: 'devindir', x, y, to, yön});
+    if (bağlı && yön == Karşı[kişi.yön])  kişi.wrk.postMessage({msg: 'devindir', x, y, to, yön});
   }
 
 } /* taş_devindir */

@@ -165,7 +165,7 @@
             "error"
         ],
         "no-unused-vars": [
-            "error"
+            "warn"
         ],
         "no-useless-backreference": [
             "error"

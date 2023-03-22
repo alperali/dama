@@ -104,6 +104,29 @@ button {
   background-color: #ffff99;
 }
 
+.mesaj-kutu {
+  display: flex;
+  align-items: center;
+  padding-left: 2vmin;
+  visibility: hidden;
+  position: absolute;
+  top: 14vmin;
+  left: 7.5vmin;
+  right: 7.5vmin;
+  height: 20vmin;
+  border-width: 1;
+  background-color: lightcyan;
+  font-size: 8vmin;
+  font-weight: bold;
+  border: 0.66vmin solid darkolivegreen;
+  border-radius: 2vmin;
+  opacity: 0;
+  transition: opacity 1s;
+}
+#mesaj2 {
+  font-size: 6vmin;
+  font-weight: normal;
+}
 
 @media screen and (orientation: portrait) {
   main {
