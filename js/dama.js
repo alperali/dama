@@ -133,12 +133,12 @@ function izlemci_mesaj_işle(e) {
       break;
     case 'soket-açıldı':
       taydaş = new RTCPeerConnection({'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]});
-      // taydaş.addEventListener('signalingstatechange', () => console.log(`signal state: ${taydaş.signalingState}`));
+      taydaş.addEventListener('signalingstatechange', () => console.log(`signal state: ${taydaş.signalingState}`));
       taydaş.addEventListener('icecandidate', c => {
         if (c.candidate !== null) ice.push(c.candidate);
       });
       taydaş.addEventListener('icegatheringstatechange', () => {
-        // console.log(`ice state: ${taydaş.iceGatheringState}`);
+        console.log(`ice state: ${taydaş.iceGatheringState}`);
         if (taydaş.iceGatheringState == 'complete' && !teklif_yapıldı) {
           // worker'a RTCSessionDescription ve RTCIceCandidate gönderilemiyor, o nedenle JSON.stringify yapıldı.
           izlemci.postMessage({msg: 'teklif-yap', sd: JSON.stringify(taydaş.localDescription), ice: JSON.stringify(ice)});
@@ -146,7 +146,7 @@ function izlemci_mesaj_işle(e) {
         }
       });
       taydaş.addEventListener('connectionstatechange', () => {
-        // console.log(`conn state: ${taydaş.connectionState}`);
+        console.log(`conn state: ${taydaş.connectionState}`);
         if (taydaş.connectionState == 'connected') {
           console.log('taydaşlar bağlı.');
           bağlı = true; bağlanıyor = false;

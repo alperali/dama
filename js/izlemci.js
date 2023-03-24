@@ -3,7 +3,7 @@
  * All Rights Reserved. This is not free software.
  *---------------------------------------------------------------------------*/
 const info_hash = 'dama47f0a059bdaf4651';
-const izlemci = 'wss://tracker.openwebtorrent.com';
+const izlemci = 'wss://tracker.files.fm:7073/announce'; // 'ws://localhost:8000'; //
 let skt, peer_id, trackerid, taydaşlar_bağlı=false;
 
 self.addEventListener('message', e => {
@@ -20,7 +20,7 @@ self.addEventListener('message', e => {
       }
       peer_id = e.data.id;
       skt.addEventListener('open', () => {
-        // console.log('soket açıldı.');
+        console.log('soket açıldı.');
         postMessage({msg: 'soket-açıldı'});
       });
       skt.addEventListener('close', () => console.log('soket kapandı.'));
@@ -28,7 +28,7 @@ self.addEventListener('message', e => {
         if (taydaşlar_bağlı)
           return;    // taydaşlar bağlandıktan sonra izlemci soketinin hata verip kapanması sorun değil.
         postMessage({msg: 'soket-hatası'});
-        // console.log('soket hatası.');
+        console.log('soket hatası.');
       });     
       skt.addEventListener('message', e => izlemci_yanıtını_işle(JSON.parse(e.data)));
       break;
@@ -60,6 +60,7 @@ function teklif_yap(sd, ice) {
               offers: [ {offer_id: crypto.randomUUID().replace(/-/g,''), offer: {sd, ice}} ] };
   if (trackerid) m.trackerid = trackerid;
   skt.send(JSON.stringify(m));
+  console.log('teklif gitti.');
 }
 
 function izlemci_yanıtını_işle(yn) {
@@ -79,15 +80,15 @@ function izlemci_yanıtını_işle(yn) {
   //   setInterval()
 
   if (yn.offer) {
-    // console.log('teklif geldi');
+    console.log('teklif geldi');
     postMessage({msg: 'teklif-geldi', yn});
   }
   else if (yn.answer) {
-    // console.log('yanıt geldi');
+    console.log('yanıt geldi');
     postMessage({msg: 'yanıt-geldi', yn});
   }
   else {
-    // console.log('izlemci yanıt: '+ JSON.stringify(yn));
+    console.log('izlemci yanıt: '+ JSON.stringify(yn));
     if (+yn.incomplete < 2)
       postMessage({msg: 'oda-boş'});
   }
