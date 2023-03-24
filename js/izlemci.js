@@ -20,7 +20,7 @@ self.addEventListener('message', e => {
       }
       peer_id = e.data.id;
       skt.addEventListener('open', () => {
-        console.log('soket açıldı.');
+        // console.log('soket açıldı.');
         postMessage({msg: 'soket-açıldı'});
       });
       skt.addEventListener('close', () => console.log('soket kapandı.'));
@@ -28,7 +28,7 @@ self.addEventListener('message', e => {
         if (taydaşlar_bağlı)
           return;    // taydaşlar bağlandıktan sonra izlemci soketinin hata verip kapanması sorun değil.
         postMessage({msg: 'soket-hatası'});
-        console.log('soket hatası.');
+        // console.log('soket hatası.');
       });     
       skt.addEventListener('message', e => izlemci_yanıtını_işle(JSON.parse(e.data)));
       break;
@@ -79,15 +79,15 @@ function izlemci_yanıtını_işle(yn) {
   //   setInterval()
 
   if (yn.offer) {
-    console.log('teklif geldi');
+    // console.log('teklif geldi');
     postMessage({msg: 'teklif-geldi', yn});
   }
   else if (yn.answer) {
-    console.log('yanıt geldi');
+    // console.log('yanıt geldi');
     postMessage({msg: 'yanıt-geldi', yn});
   }
   else {
-    console.log('izlemci yanıt: '+ JSON.stringify(yn));
+    // console.log('izlemci yanıt: '+ JSON.stringify(yn));
     if (+yn.incomplete < 2)
       postMessage({msg: 'oda-boş'});
   }

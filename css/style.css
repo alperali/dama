@@ -103,6 +103,9 @@ button {
 .bağlı:active {
   background-color: #ffff99;
 }
+.oyuncu-bağlı {
+  background-color: white;
+}
 
 .mesaj-kutu {
   display: flex;

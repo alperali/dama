@@ -88,6 +88,7 @@ onload = () => {
       Dama.kişi.kop();
       bağlı = bağlanıyor = false;
       e.currentTarget.classList.remove('bağlı');
+      document.querySelector('#oyuncu svg').classList.remove('oyuncu-bağlı');
       e.currentTarget.children[0].children[0].attributes[0].value = './img/icons.svg#cloud-slash';
       document.querySelector('#anons').style.opacity="0";
     }
@@ -133,7 +134,7 @@ onload = () => {
     }
     bağlı = true; bağlanıyor = false;
     document.querySelector('#çevrim').classList.add('bağlı');
-    // oyuncu butonu rengini de degistir burada
+    document.querySelector('#oyuncu svg').classList.add('oyuncu-bağlı');
   });
   bağ_durum.addEventListener('başladı', () => {
     document.querySelector('#anons').style.opacity="0";
