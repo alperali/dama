@@ -3,7 +3,7 @@
  * All Rights Reserved. This is not free software.
  *---------------------------------------------------------------------------*/
 const info_hash = 'dama47f0a059bdaf4651';
-const izlemci = 'ws://localhost:8000';
+const izlemci = 'wss://tracker.openwebtorrent.com';
 let skt, peer_id, trackerid, taydaşlar_bağlı=false;
 
 self.addEventListener('message', e => {
