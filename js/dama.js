@@ -14,9 +14,10 @@ const C = {
           };
 
 const makiwrk = new Worker('./js/makina.js');
-let th, marker, alt_marker, glgth, sayaçlar, evnt, bağ_durum;
+const izlemci = new Worker('./js/izlemci.js');
+let th, marker, alt_marker, glgth, sayaçlar, evnt, bağ_durum, taydaş, kanal, ice=[];
 let from, yön, seçim_sabit=false, taş_seçili=false, al=false, alan=[], seçili_alım=[],
-      beyazlar, siyahlar, bağlanıyor=false, bağlı=false;
+      beyazlar, siyahlar, bağlanıyor=false, bağlı=false, teklif_yapıldı=false, ben_başlarım=false;
 
 // yön değişkeni atılım yönüne ek olarak sırayı da belirtir:
 // yön == Yön.Beyaz ise sıra beyazda, Yön.Siyah ise sıra siyahta.
@@ -24,44 +25,17 @@ let from, yön, seçim_sabit=false, taş_seçili=false, al=false, alan=[], seçi
 export let makina;
 export const kişi = {
   kimlik: localStorage.getItem('kim') ?? kimlik_üret(),
-  wrk: new Worker('./js/taydas.js'),
   bağlan: function() {
     bağlanıyor = true;
-    this.wrk.postMessage({msg: 'bağlan', id: this.kimlik});
+    izlemci.postMessage({msg: 'bağlan', id: this.kimlik});
   },
   kop: function() {
-    bağlı = bağlanıyor = false;
-    this.wrk.postMessage({msg: 'kop'});
-  },
-  mesaj_işle: function(e) {
-    switch (e.data.msg) {
-      case 'izlemci-bağlanma-hatası':
-        bağ_durum.dispatchEvent(new CustomEvent('izlemci-bağlanma-hatası', {detail: e.data.neden}));
-        bağlanıyor = false;
-        break;
-      case 'soket-hatası':
-        bağ_durum.dispatchEvent(new CustomEvent('soket-hatası'));
-        bağlanıyor = false;
-        break;
-      case 'bağlandı':
-        bağ_durum.dispatchEvent(new CustomEvent('bağlandı', {detail: e.data.ben_başlarım}));
-        bağlı = true;
-        // if (e.data.ben_başlarım)  bağlanıyor = false;
-        bağlanıyor = false;
-        break;
-      case 'seç-byz':
-        yön = kişi.yön = makina.yön = Yön.Siyah;
-        makiwrk.postMessage({msg: 'seç-syh'});
-        break;
-      case 'seç-syh':
-        yön = kişi.yön = makina.yön = Yön.Beyaz;        
-        makiwrk.postMessage({msg: 'seç-byz'});
-        break;
-      case 'devindir':
-        alan_seç({data: {x: e.data.x, y: e.data.y}});
-        devinim(e.data.to, C[yön].dama_satırı);
-        break;
-    }
+    if (bağlı)  kanal.send(JSON.stringify({msg: 'terk'}));
+    izlemci.postMessage({msg: 'kop'});
+    bağlı = bağlanıyor = teklif_yapıldı = ben_başlarım = false;
+    taydaş?.close();
+    ice.length = 0;
+    taydaş = null;
   }
 };
 
@@ -92,8 +66,8 @@ function başlat(pth, byz_sayaç, syh_sayaç, bağdur, pevt) {
   th.querySelector('#kareler').addEventListener('click', kare_seç);
   th.querySelector('#siyahlar').addEventListener('click', siyah_seç);
   th.querySelector('#beyazlar').addEventListener('click', beyaz_seç);
-  makiwrk.addEventListener('message', mesaj_işle);
-  kişi.wrk.addEventListener('message', kişi.mesaj_işle);
+  makiwrk.addEventListener('message', makina_mesaj_işle);
+  izlemci.addEventListener('message', izlemci_mesaj_işle);
   
   [yön, sayaçlar[Yön.Beyaz].say, sayaçlar[Yön.Siyah].say, beyazlar, siyahlar, makina] = oyun_yükle(th, glgth);
   makiwrk.postMessage({msg: "oyun-yükle", glgth, beyazlar, siyahlar, makina});
@@ -116,6 +90,7 @@ function başlat(pth, byz_sayaç, syh_sayaç, bağdur, pevt) {
   // yön == 'N/A' ise ikisi de hidden kalsın
 
   return function yeni_oyun() {
+    if (bağlı || bağlanıyor)  return;
     localStorage.removeItem('damalper');
     marker_unset();
     switch (alan.length) {
@@ -147,7 +122,101 @@ function kimlik_üret() {
   return id;
 }
 
-function mesaj_işle(e) {
+function izlemci_mesaj_işle(e) {
+  let yn;
+  switch (e.data.msg) {
+    case 'izlemci-bağlanma-hatası':
+      bağ_durum.dispatchEvent(new CustomEvent('izlemci-bağlanma-hatası', {detail: e.data.neden}));
+      bağlanıyor = false;
+      break;
+    case 'soket-hatası':
+      bağ_durum.dispatchEvent(new CustomEvent('soket-hatası'));
+      teklif_yapıldı = bağlanıyor = false;
+      break;
+    case 'soket-açıldı':
+      taydaş = new RTCPeerConnection({'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]});
+      taydaş.addEventListener('signalingstatechange', () => console.log(`signal state: ${taydaş.signalingState}`));
+      taydaş.addEventListener('icecandidate', c => {
+        if (c.candidate !== null) ice.push(c.candidate);
+      });
+      taydaş.addEventListener('icegatheringstatechange', () => {
+        console.log(`ice state: ${taydaş.iceGatheringState}`);
+        if (taydaş.iceGatheringState == 'complete' && !teklif_yapıldı) {
+          // worker'a RTCSessionDescription ve RTCIceCandidate gönderilemiyor, o nedenle JSON.stringify yapıldı.
+          izlemci.postMessage({msg: 'teklif-yap', sd: JSON.stringify(taydaş.localDescription), ice: JSON.stringify(ice)});
+          teklif_yapıldı = true;
+        }
+      });
+      taydaş.addEventListener('connectionstatechange', () => {
+        console.log(`conn state: ${taydaş.connectionState}`);
+        if (taydaş.connectionState == 'connected') {
+          console.log('taydaşlar bağlı.');
+          bağlı = true; bağlanıyor = false;
+          izlemci.postMessage({msg: 'bağlandı'});
+          bağ_durum.dispatchEvent(new CustomEvent('bağlandı', {detail: ben_başlarım}));
+        }
+      });
+
+      kanal = taydaş.createDataChannel('dama', {negotiated: true, id: 335});
+      (async () => await taydaş.createOffer().then(o => taydaş.setLocalDescription(o)))();
+
+      kanal.addEventListener('message', k => {
+        const r = JSON.parse(k.data);
+        switch(r.msg) {
+          case 'seç-byz':
+            yön = kişi.yön = makina.yön = Yön.Siyah;
+            makiwrk.postMessage({msg: 'seç-syh'});
+            bağ_durum.dispatchEvent(new CustomEvent('başladı'));
+            break;
+          case 'seç-syh':
+            yön = kişi.yön = makina.yön = Yön.Beyaz;
+            makiwrk.postMessage({msg: 'seç-byz'});
+            bağ_durum.dispatchEvent(new CustomEvent('başladı'));
+            break;
+          case 'devindir':
+            alan_seç(th.querySelector(`circle[data-x="${r.x}"][data-y="${r.y}"]`));
+            setTimeout(devinim, al && from.dataset.taş == Taş.Dama ? 750 : 500, r.to, C[yön].dama_satırı);
+            // devinim(r.to, C[yön].dama_satırı);
+            break;
+          case 'terk':
+            bağlı = false;
+            bağ_durum.dispatchEvent(new CustomEvent('karşı-terk'));
+            break;
+          default:
+            console.log('kanal: bilinmeyen mesaj geldi.')
+        }
+      });
+      break;
+    case 'teklif-geldi':
+      yn = e.data.yn;
+      taydaş.setRemoteDescription(new RTCSessionDescription(yn.offer.sd)).then(async () => {
+        for (const i of yn.offer.ice)
+          await taydaş.addIceCandidate(i);
+        taydaş.createAnswer().then(a => taydaş.setLocalDescription(a)).then(() => {
+          izlemci.postMessage({msg: 'yanıt-ver', to_peer_id: yn.peer_id, offer_id: yn.offer_id,
+                               answer: JSON.stringify({ sd: taydaş.localDescription, ice})});
+        });
+      });
+      if (teklif_yapıldı)
+        // teklif yapmışım, sonra bana teklif gelmiş, demek ki daha erken sisteme giren benim, o halde ben başlarım.
+        ben_başlarım = true;
+      break;
+    case 'yanıt-geldi':
+      yn = e.data.yn;
+      taydaş.setRemoteDescription(new RTCSessionDescription(yn.answer.sd)).then(async () => {
+        for (const i of yn.answer.ice)
+          await taydaş.addIceCandidate(i);
+      });
+      break;
+    case 'oda-boş':
+      bağ_durum.dispatchEvent(new CustomEvent('oda-boş'));
+      break;
+    default:
+      console.log('izlemci_mesaj_işle: bilinmeyen mesaj geldi.');
+  }
+}
+
+function makina_mesaj_işle(e) {
   switch (e.data.msg) {
     case 'devindir':
       from = th.querySelector(`circle[data-x="${e.data.dn.k.x}"][data-y="${e.data.dn.k.y}"]`);
@@ -163,7 +232,7 @@ function mesaj_işle(e) {
       setTimeout(devinim, al && from.dataset.taş == Taş.Dama ? 750 : 500, e.data.dn.to, C[yön].dama_satırı);
       break;
     default:
-      console.log('ana modül: bilinmeyen mesaj geldi.');
+      console.log('makina_mesaj_işle: bilinmeyen mesaj geldi.');
   }
 }
 
@@ -193,10 +262,14 @@ function siyah_seç(e) {
     return;
   }
   if (yön == 'N/A') {
+    if (bağlı && !ben_başlarım)  return;
     yön = Yön.Siyah;
     kişi.yön = makina.yön = Yön.Beyaz;
     makiwrk.postMessage({msg: 'seç-byz'});
-    if (bağlı) kişi.wrk.postMessage({msg: 'seç-byz'});
+    if (bağlı) {
+      kanal.send(JSON.stringify({msg: 'seç-byz'}));
+      bağ_durum.dispatchEvent(new CustomEvent('başladı'));
+    }
   }
   alan_seç(e.target);
 }
@@ -210,10 +283,14 @@ function beyaz_seç(e) {
     return;
   }
   if (yön == 'N/A') {
+    if (bağlı && !ben_başlarım)  return;
     yön = Yön.Beyaz;
     kişi.yön = makina.yön = Yön.Siyah;
     makiwrk.postMessage({msg: 'seç-syh'});
-    if (bağlı) kişi.wrk.postMessage({msg: 'seç-syh'});
+    if (bağlı) {
+      kanal.send(JSON.stringify({msg: 'seç-syh'}));
+      bağ_durum.dispatchEvent(new CustomEvent('başladı'));
+    }
   }
   alan_seç(e.target);
 }
@@ -524,7 +601,7 @@ function taş_devindir(from, to) {
     }
     from.children[0].beginElement();
     makiwrk.postMessage({msg: 'devindir', x, y, to, yön});
-    if (bağlı && yön == Karşı[kişi.yön])  kişi.wrk.postMessage({msg: 'devindir', x, y, to, yön});
+    if (bağlı && yön == Karşı[kişi.yön])  kanal.send(JSON.stringify({msg: 'devindir', x, y, to, yön}));
   }
 
 } /* taş_devindir */

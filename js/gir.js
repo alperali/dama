@@ -33,7 +33,7 @@ onload = () => {
   const th = document.querySelector('object').contentDocument;
   document.querySelector('#yeni').addEventListener('click', Dama.başlat(th, beyaz_sayaç, siyah_sayaç, bağ_durum, 'taş-aldı'));
   document.querySelector('#yeni').addEventListener('click', () => {
-    if (bağlanıyor) return;
+    if (bağlı || bağlanıyor) return;
     document.querySelector('#beyazskor svg text').setAttribute('x', '6');
     document.querySelector('#siyahskor svg text').setAttribute('x', '6');
     beyaz_onlu = siyah_onlu = false;
@@ -92,6 +92,8 @@ onload = () => {
       document.querySelector('#anons').style.opacity="0";
     }
     else {
+      document.querySelector('#yeni').click();
+      if (Dama.makina.aktif)  document.querySelector('#oyuncu').click();
       e.currentTarget.children[0].children[0].attributes[0].value = './img/icons.svg#cloud';
       document.querySelector('#mesaj1').textContent = "Bağlanıyor...";
       document.querySelector('#anons').style.visibility="visible";
@@ -115,22 +117,36 @@ onload = () => {
   });
   bağ_durum.addEventListener('soket-hatası', () => {
     document.querySelector('#mesaj1').textContent = 'İzlemci soket hatası.';
+    document.querySelector('#mesaj2').textContent = '';
     setTimeout(() => document.querySelector('#anons').style.opacity="0", 1500);
     bağlanıyor = false;
     document.querySelector('#çevrim').children[0].children[0].attributes[0].value = './img/icons.svg#cloud-slash';
   });
   bağ_durum.addEventListener('bağlandı', e => {
-    document.querySelector('#yeni').click();
-    if (Dama.makina.aktif)  document.querySelector('#oyuncu').click();
-    if (e.detail)  // ben_başlarım
+    if (e.detail) { // ben_başlarım
       document.querySelector('#mesaj1').textContent = 'Oyuna başlayın.';
-    else
-      document.querySelector('#mesaj1').textContent = 'Karşısı başlar.';
-
-    document.querySelector('#mesaj2').textContent = 'Bağlandı.';
+      document.querySelector('#mesaj2').textContent = 'Bağlandı.';
+    }
+    else {
+      document.querySelector('#mesaj1').textContent = 'Bağlandı, bekleyin.';
+      document.querySelector('#mesaj2').textContent = 'Karşısı başlar.';
+    }
     bağlı = true; bağlanıyor = false;
     document.querySelector('#çevrim').classList.add('bağlı');
     // oyuncu butonu rengini de degistir burada
+  });
+  bağ_durum.addEventListener('başladı', () => {
+    document.querySelector('#anons').style.opacity="0";
+  });
+  bağ_durum.addEventListener('karşı-terk', () => {
+    document.querySelector('#mesaj1').textContent = 'Karşısı terk etti.';
+    document.querySelector('#mesaj2').textContent = '';
+    document.querySelector('#anons').style.visibility="visible";
+    document.querySelector('#anons').style.opacity="1";
+    setTimeout(() => document.querySelector('#çevrim').click(), 2000);
+  });
+  bağ_durum.addEventListener('oda-boş', () => {
+    if (bağlanıyor)  document.querySelector('#mesaj2').textContent = 'Oda boş.';
   });
 
 };
