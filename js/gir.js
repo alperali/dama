@@ -97,6 +97,7 @@ onload = () => {
       if (Dama.makina.aktif)  document.querySelector('#oyuncu').click();
       e.currentTarget.children[0].children[0].attributes[0].value = './img/icons.svg#cloud';
       document.querySelector('#mesaj1').textContent = "Bağlanıyor...";
+      document.querySelector('#mesaj2').textContent = '';
       document.querySelector('#anons').style.visibility="visible";
       document.querySelector('#anons').style.opacity="1";
       bağlanıyor = true;
