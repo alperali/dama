@@ -24,7 +24,7 @@ let from, yön, seçim_sabit=false, taş_seçili=false, al=false, alan=[], seçi
 
 export let makina;
 export const kişi = {
-  kimlik: localStorage.getItem('kim') ?? kimlik_üret(),
+  kimlik: kimlik_üret(),
   bağlan: function() {
     bağlanıyor = true;
     izlemci.postMessage({msg: 'bağlan', id: this.kimlik});
@@ -117,9 +117,7 @@ function başlat(pth, byz_sayaç, syh_sayaç, bağdur, pevt) {
 }
 
 function kimlik_üret() {
-  const id = String.fromCharCode(...crypto.randomUUID().replace(/-/g,'').match(/.{2}/g).map(e => parseInt(e,16)))+'dama';
-  localStorage.setItem('kim', id);
-  return id;
+  return String.fromCharCode(...crypto.randomUUID().replace(/-/g,'').match(/.{2}/g).map(e => parseInt(e,16)))+'dama';
 }
 
 function izlemci_mesaj_işle(e) {
