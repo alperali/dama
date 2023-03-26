@@ -5,7 +5,7 @@ WebRTC kullanarak çevrim içi eşleşme sağlanmıştır.
 Sinyalleme için kamuya açık webtorrent izlemcisi, ICE için kamuya açık STUN sunucusu kullanılmıştır (TURN yoktur).
 Aynı yerel ağ üzerinde bulunan taydaşlar eşleşerek karşılıklı oynayabilmiş, fakat geniş alan ağlarda eşleşme sağlanamamıştır.
 Farklı webtorrent izlemcilerinden alınan yanıtların tam benzeşmediği gözlenmiştir. Webtorrent izlemci protokolünün de halen 
-örgün belgelemesi olmadığından bu dal deneysel bir çalışma olarak görülmelidir. Şartların gelişmesi durumunda tekrar ele alınabilir.
+örgün belgelemesi olmadığından bu dal deneysel bir çalışma olarak görülmelidir. Koşulların ilerlemesi durumunda tekrar ele alınabilir.
 
 ---
 
