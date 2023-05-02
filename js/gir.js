@@ -9,7 +9,7 @@ onload = () => {
   const siyah_sayaç = new EventTarget();
   const bağ_durum = new EventTarget();
   let beyaz_onlu=false, siyah_onlu=false;
-  let bağlı = false, bağlanıyor = false;
+  let bağlı = false, bağlanıyor = false, oyun_sonu = false;
   beyaz_sayaç.addEventListener('taş-aldı', e => {
     if (!beyaz_onlu && +e.detail > 9) {
       document.querySelector('#beyazskor svg text').setAttribute('x', '1.75');
@@ -17,7 +17,13 @@ onload = () => {
     }
     document.querySelector('#beyazskor svg text').textContent = e.detail;
     if (+e.detail == 16) {
-      document.querySelector('#yeni').classList.add('oyun-sonu');
+      document.querySelector('#yeni svg').classList.add('oyun-sonu');
+      oyun_sonu = true;
+      // document.querySelector('#mesaj1').textContent = "Beyaz kazanır.";
+      // document.querySelector('#mesaj2').textContent = '';
+      ileti('beyaz-kazanır');
+      document.querySelector('#anons').style.visibility="visible";
+      document.querySelector('#anons').style.opacity="1";
     }
   });
   siyah_sayaç.addEventListener('taş-aldı', e => {
@@ -27,19 +33,31 @@ onload = () => {
     }
     document.querySelector('#siyahskor svg text').textContent = e.detail;
     if (+e.detail == 16) {
-      document.querySelector('#yeni').classList.add('oyun-sonu');
+      document.querySelector('#yeni svg').classList.add('oyun-sonu');
+      oyun_sonu = true;
+      // document.querySelector('#mesaj1').textContent = "Siyah kazanır.";
+      // document.querySelector('#mesaj2').textContent = '';
+      ileti('siyah-kazanır');
+      document.querySelector('#anons').style.visibility="visible";
+      document.querySelector('#anons').style.opacity="1";
     }
   });
   const th = document.querySelector('object').contentDocument;
   document.querySelector('#yeni').addEventListener('click', Dama.başlat(th, beyaz_sayaç, siyah_sayaç, bağ_durum, 'taş-aldı'));
   document.querySelector('#yeni').addEventListener('click', () => {
-    if (bağlı || bağlanıyor) return;
+    if ((bağlı || bağlanıyor) && !oyun_sonu) return;
     document.querySelector('#beyazskor svg text').setAttribute('x', '6');
     document.querySelector('#siyahskor svg text').setAttribute('x', '6');
     beyaz_onlu = siyah_onlu = false;
-    document.querySelector('#yeni').classList.remove('oyun-sonu');
+    if (oyun_sonu) {
+      document.querySelector('#yeni svg').classList.remove('oyun-sonu');
+      document.querySelector('#anons').style.opacity="0";
+      oyun_sonu = false;
+    }
   });
 
+  document.body.addEventListener('contextmenu', e => e.preventDefault());
+  th.addEventListener('contextmenu', e => e.preventDefault());
   if (!Dama.makina.aktif)
     document.querySelector('#oyuncu').children[0].children[0].attributes[0].value = './img/icons.svg#person';
 
@@ -96,8 +114,9 @@ onload = () => {
       document.querySelector('#yeni').click();
       if (Dama.makina.aktif)  document.querySelector('#oyuncu').click();
       e.currentTarget.children[0].children[0].attributes[0].value = './img/icons.svg#cloud';
-      document.querySelector('#mesaj1').textContent = "Bağlanıyor...";
-      document.querySelector('#mesaj2').textContent = '';
+      // document.querySelector('#mesaj1').textContent = "Bağlanıyor...";
+      // document.querySelector('#mesaj2').textContent = '';
+      ileti('bağlanıyor');
       document.querySelector('#anons').style.visibility="visible";
       document.querySelector('#anons').style.opacity="1";
       bağlanıyor = true;
@@ -110,28 +129,32 @@ onload = () => {
       e.currentTarget.style.visibility = 'hidden';
   }, true);
 
-  bağ_durum.addEventListener('izlemci-bağlanma-hatası', e => {
-    document.querySelector('#mesaj1').textContent = "İzlemci bağlanamadı.";
-    document.querySelector('#mesaj2').textContent = e.detail;
+  bağ_durum.addEventListener('sinyalci-bağlanma-hatası', e => {
+    // document.querySelector('#mesaj1').textContent = "Sinyalci bağlanamadı.";
+    // document.querySelector('#mesaj2').textContent = e.detail;
+    ileti('sinyalci-bağlanma-hatası', e.detail);
     setTimeout(() => document.querySelector('#anons').style.opacity="0", 1500);
     bağlanıyor = false;
     document.querySelector('#çevrim').children[0].children[0].attributes[0].value = './img/icons.svg#cloud-slash';
   });
   bağ_durum.addEventListener('soket-hatası', () => {
-    document.querySelector('#mesaj1').textContent = 'İzlemci soket hatası.';
-    document.querySelector('#mesaj2').textContent = '';
+    // document.querySelector('#mesaj1').textContent = 'Soket hatası.';
+    // document.querySelector('#mesaj2').textContent = '';
+    ileti('soket-hatası');
     setTimeout(() => document.querySelector('#anons').style.opacity="0", 1500);
     bağlanıyor = false;
     document.querySelector('#çevrim').children[0].children[0].attributes[0].value = './img/icons.svg#cloud-slash';
   });
   bağ_durum.addEventListener('bağlandı', e => {
-    if (e.detail) { // ben_başlarım
-      document.querySelector('#mesaj1').textContent = 'Oyuna başlayın.';
-      document.querySelector('#mesaj2').textContent = 'Bağlandı.';
+    if (e.detail) { // teklif_yaptı
+      // document.querySelector('#mesaj1').textContent = 'Oyuna başlayın.';
+      // document.querySelector('#mesaj2').textContent = 'Bağlandı.';
+      ileti('bağlandı-teklifçi');
     }
     else {
-      document.querySelector('#mesaj1').textContent = 'Bağlandı, bekleyin.';
-      document.querySelector('#mesaj2').textContent = 'Karşısı başlar.';
+      // document.querySelector('#mesaj1').textContent = 'Bağlandı, bekleyin.';
+      // document.querySelector('#mesaj2').textContent = 'Karşısı başlar.';
+      ileti('bağlandı-yanıtçı');
     }
     bağlı = true; bağlanıyor = false;
     document.querySelector('#çevrim').classList.add('bağlı');
@@ -141,14 +164,79 @@ onload = () => {
     document.querySelector('#anons').style.opacity="0";
   });
   bağ_durum.addEventListener('karşı-terk', () => {
-    document.querySelector('#mesaj1').textContent = 'Karşısı terk etti.';
-    document.querySelector('#mesaj2').textContent = '';
+    // document.querySelector('#mesaj1').textContent = 'Karşısı terk etti.';
+    // document.querySelector('#mesaj2').textContent = '';
+    ileti('karşı-terk');
     document.querySelector('#anons').style.visibility="visible";
     document.querySelector('#anons').style.opacity="1";
-    setTimeout(() => document.querySelector('#çevrim').click(), 2000);
+    setTimeout(() => {
+      document.querySelector('#çevrim').click();
+      // giden oyuncu yerine makina geçsin
+      document.querySelector('#oyuncu').click();
+    }, 2000);
   });
   bağ_durum.addEventListener('oda-boş', () => {
-    if (bağlanıyor)  document.querySelector('#mesaj2').textContent = 'Oda boş.';
+    if (bağlanıyor)  ileti('oda-boş'); // document.querySelector('#mesaj2').textContent = 'Oda boş.';
   });
 
+  const ileti = (() => {
+    let cari, dil1, dil2;
+    const lng = navigator.language.slice(0,2).toLowerCase();
+    dil1 = localStorage.getItem('dil') ?? (localStorage.setItem('dil', lng), lng);
+    dil2 = (dil1 == 'en' ? 'tr' : 'en');
+    document.querySelector('#anons').addEventListener('click', () => {
+      [dil1, dil2] = [dil2, dil1];
+      localStorage.setItem('dil', dil1);
+      ileti(cari);
+    });
+    const m = {
+      'beyaz-kazanır': {
+        'tr': ['Beyaz kazanır.', ''],
+        'en': ['White wins.', '']
+      },
+      'siyah-kazanır': {
+        'tr': ['Siyah kazanır.', ''],
+        'en': ['Black wins.', '']
+      },
+      'bağlanıyor': {
+        'tr': ['Bağlanıyor...', ''],
+        'en': ['Connecting...', '']
+      },
+      'sinyalci-bağlanma-hatası': {
+        'tr': ['Sinyalci bağlanamadı.', ''],
+        'en': ['Create socket failed.', '']
+      },
+      'soket-hatası': {
+        'tr': ['Soket hatası.', ''],
+        'en': ['Socket error.', '']
+      },
+      'bağlandı-teklifçi': {
+        'tr': ['Oyuna başlayın.', 'Bağlandı.'],
+        'en': ['You start.', 'Connected.']
+      },
+      'bağlandı-yanıtçı': {
+        'tr': ['Bağlandı, bekleyin.', 'Karşısı başlar.'],
+        'en': ['Connected, wait.', 'Opponent starts.']
+      },
+      'karşı-terk': {
+        'tr': ['Karşısı terk etti.', ''],
+        'en': ['Opponent left.', '']
+      },
+      'oda-boş': {
+        'tr': ['Bağlanıyor...', 'Oda boş.'],
+        'en': ['Connecting...', 'Room empty.']
+      }
+    };
+    return function (msg, p2, p1) {
+      cari = msg;
+      if (p1 != undefined)
+        document.querySelector('#mesaj1').textContent = p1;
+      else
+        document.querySelector('#mesaj1').textContent = m[msg][dil1][0];
+      if (p2 != undefined)
+        document.querySelector('#mesaj2').textContent = p2;
+      else
+        document.querySelector('#mesaj2').textContent = m[msg][dil1][1];
+    };
+  })();
 };

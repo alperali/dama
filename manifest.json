@@ -6,6 +6,7 @@
   "description": "Klasik Türk dama oyunu",
   "categories": ["games"],
   "orientation": "any",
+  "iarc_rating_id": "4594523c-d769-4d99-837c-eb6b9f4bfbf5",
   "icons": [
     {
       "src": "./img/ikon-apple.png",
@@ -45,8 +46,9 @@
       "label": "Yatay görünüm, telefon"
     }
   ],
-  "start_url": "https://alperali.github.io/dama/index.html",
+  "start_url": "https://dama.web.tr/ms.html",
   "background_color": "#FFFACD",
   "theme_color": "#F5DEB3",
+  "display_override": ["fullscreen", "window-controls-overlay"],
   "display": "standalone"
 }
