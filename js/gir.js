@@ -19,8 +19,6 @@ onload = () => {
     if (+e.detail == 16) {
       document.querySelector('#yeni svg').classList.add('oyun-sonu');
       oyun_sonu = true;
-      // document.querySelector('#mesaj1').textContent = "Beyaz kazanır.";
-      // document.querySelector('#mesaj2').textContent = '';
       ileti('beyaz-kazanır');
       document.querySelector('#anons').style.visibility="visible";
       document.querySelector('#anons').style.opacity="1";
@@ -35,8 +33,6 @@ onload = () => {
     if (+e.detail == 16) {
       document.querySelector('#yeni svg').classList.add('oyun-sonu');
       oyun_sonu = true;
-      // document.querySelector('#mesaj1').textContent = "Siyah kazanır.";
-      // document.querySelector('#mesaj2').textContent = '';
       ileti('siyah-kazanır');
       document.querySelector('#anons').style.visibility="visible";
       document.querySelector('#anons').style.opacity="1";
@@ -114,8 +110,6 @@ onload = () => {
       document.querySelector('#yeni').click();
       if (Dama.makina.aktif)  document.querySelector('#oyuncu').click();
       e.currentTarget.children[0].children[0].attributes[0].value = './img/icons.svg#cloud';
-      // document.querySelector('#mesaj1').textContent = "Bağlanıyor...";
-      // document.querySelector('#mesaj2').textContent = '';
       ileti('bağlanıyor');
       document.querySelector('#anons').style.visibility="visible";
       document.querySelector('#anons').style.opacity="1";
@@ -130,16 +124,12 @@ onload = () => {
   }, true);
 
   bağ_durum.addEventListener('sinyalci-bağlanma-hatası', e => {
-    // document.querySelector('#mesaj1').textContent = "Sinyalci bağlanamadı.";
-    // document.querySelector('#mesaj2').textContent = e.detail;
     ileti('sinyalci-bağlanma-hatası', e.detail);
     setTimeout(() => document.querySelector('#anons').style.opacity="0", 1500);
     bağlanıyor = false;
     document.querySelector('#çevrim').children[0].children[0].attributes[0].value = './img/icons.svg#cloud-slash';
   });
   bağ_durum.addEventListener('soket-hatası', () => {
-    // document.querySelector('#mesaj1').textContent = 'Soket hatası.';
-    // document.querySelector('#mesaj2').textContent = '';
     ileti('soket-hatası');
     setTimeout(() => document.querySelector('#anons').style.opacity="0", 1500);
     bağlanıyor = false;
@@ -147,13 +137,9 @@ onload = () => {
   });
   bağ_durum.addEventListener('bağlandı', e => {
     if (e.detail) { // teklif_yaptı
-      // document.querySelector('#mesaj1').textContent = 'Oyuna başlayın.';
-      // document.querySelector('#mesaj2').textContent = 'Bağlandı.';
       ileti('bağlandı-teklifçi');
     }
     else {
-      // document.querySelector('#mesaj1').textContent = 'Bağlandı, bekleyin.';
-      // document.querySelector('#mesaj2').textContent = 'Karşısı başlar.';
       ileti('bağlandı-yanıtçı');
     }
     bağlı = true; bağlanıyor = false;
@@ -164,8 +150,6 @@ onload = () => {
     document.querySelector('#anons').style.opacity="0";
   });
   bağ_durum.addEventListener('karşı-terk', () => {
-    // document.querySelector('#mesaj1').textContent = 'Karşısı terk etti.';
-    // document.querySelector('#mesaj2').textContent = '';
     ileti('karşı-terk');
     document.querySelector('#anons').style.visibility="visible";
     document.querySelector('#anons').style.opacity="1";
@@ -176,12 +160,12 @@ onload = () => {
     }, 2000);
   });
   bağ_durum.addEventListener('oda-boş', () => {
-    if (bağlanıyor)  ileti('oda-boş'); // document.querySelector('#mesaj2').textContent = 'Oda boş.';
+    if (bağlanıyor)  ileti('oda-boş');
   });
 
   const ileti = (() => {
     let cari, dil1, dil2;
-    const lng = navigator.language.slice(0,2).toLowerCase();
+    const lng = navigator.language.slice(0,2).toLowerCase() != 'tr' ? 'en' : 'tr';
     dil1 = localStorage.getItem('dil') ?? (localStorage.setItem('dil', lng), lng);
     dil2 = (dil1 == 'en' ? 'tr' : 'en');
     document.querySelector('#anons').addEventListener('click', () => {

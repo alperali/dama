@@ -131,7 +131,7 @@ function teklif_yanıt_gönder() {
 function bağlan() {
   bağlanıyor = true;
   try {
-    skt = new WebSocket('wss://dama.web.tr/snyl');
+    skt = new WebSocket('wss://dama.azurewebsites.net/snyl');
   }
   catch(h) {
     göster(h);
@@ -412,11 +412,6 @@ function devinim(to, dama_satırı) {
       makiwrk.postMessage({msg: 'oyna', al: true, dama_yön});
       return;
     }
-    // else if (bağlı && kişi.yön == yön && al) {
-      // kişi taş almış ve daha alırım demiş (al'ı true yapmış), buradan tekrar ona devredelim.
-      // kişi.wrk.postMessage({msg: 'oyna', al: true, dama_yön});
-      // return;
-    // }
     else {
       // daha alır mı?
       [al, seçili_alım] = from.dataset.taş == Taş.Dama ? alım_olası_dama(+from.dataset.x, +from.dataset.y, dama_yön)
@@ -433,7 +428,6 @@ function devinim(to, dama_satırı) {
     from.dataset.taş = Taş.Dama;
     dama_çiz(from, C[yön].taş_renk);
     makiwrk.postMessage({msg: 'dama-oldu', x: +from.dataset.x, y: +from.dataset.y, yön});
-    // if (bağlı)  kişi.wrk.postMessage({msg: 'dama-oldu', x: +from.dataset.x, y: +from.dataset.y, yön});
   }
 
   seçim_sabit = false;
@@ -444,9 +438,6 @@ function devinim(to, dama_satırı) {
   oyun_kaydet(th, yön, sayaçlar[Yön.Beyaz].say, sayaçlar[Yön.Siyah].say, makina);
   if (makina.aktif && (makina.yön == yön))
     makiwrk.postMessage({msg: 'oyna'});
-  // else if (bağlı && (kişi.yön == yön))
-    // kişi.wrk.postMessage({msg: 'oyna'});
-    // return;
   else
     alım_denetimi();
 }
@@ -566,7 +557,6 @@ function taş_devindir(from, to) {
         glgth[seçili_alım[i].alınan_y][seçili_alım[i].alınan_x] = Taş.yok;
         th.querySelector(`circle[data-x="${seçili_alım[i].alınan_x}"][data-y="${seçili_alım[i].alınan_y}"]`).remove();
         makiwrk.postMessage({msg: 'taş-al', x: seçili_alım[i].alınan_x, y: seçili_alım[i].alınan_y, yön});
-        // if (bağlı && yön == Karşı[kişi.yön])  kişi.wrk.postMessage({msg: 'taş-al', x: seçili_alım[i].alınan_x, y: seçili_alım[i].alınan_y, yön});
         devin();
         return [true,true,seçili_alım[i].dama_yön];
       }
