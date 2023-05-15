@@ -3,22 +3,21 @@ Türk dama oyunudur.
 
 ![Demo animasyonu](./demo.webp)
 
-### Microsoft Store üzerinden yüklenebilir (sadece Türkiye, Kıbrıs)
+### Microsoft Store üzerinden yüklenebilir
 > https://www.microsoft.com/store/productId/9NZ067RSDNRV
 ---
 
-- Gerçek kişi veya bilgisayara karşı oynayabilirsiniz (çevrim içi eşleşme henüz yoktur, tablet/surface üzerinde karşılıklı iki kişi oynayabilir).
-  Oyun sırasında gerçek kişi - makina arası geçiş yapılabilir, oyun kaldığı yerden devam eder.
+- Çevrim içi, çevrim dışı (bilgisayara karşı veya karşılıklı iki kişi) oynayabilirsiniz. Çevrim içi eşleşme rastgele ve anonimdir.
 
-- *Denetim işlevleri:* Tahta çevirme, büyültme/küçültme, sıfırlama(yeni oyun), oyuncu seçimi, çubuk taşıma.
+- *Denetim işlevleri:* Çevrim içi/dışı, tahta çevirme, tahta büyültme/küçültme, sıfırlama (yeni oyun), oyuncu seçimi, çubuk taşıma.
 
-- *Görsel işlevler:* Sayaçlar, alım kılavuzları (zorunlu taş alımında yanlış kareye tıklanırsa kılavuzlar belirir), sıra göstergesi (yatay yeşil çubuk).
+- *Görsel işlevler:* Sayaçlar, alım kılavuzları (zorunlu taş alımında yanlış kareye tıklanırsa kılavuzlar belirir), sıra göstergesi (yatay yeşil çubuk), mesaj kutusu.
 
 - Oyundan çıkıp sonra geri döndüğünüzde oyun kaldığı yerden devam eder (`localStorage`da tahtanın son hali kayıt edilmektedir).
 
 **Bulduğunuz hataları alper.goplay@gmail.com adresine bildirin, veya Issues altında bir kayıt açın.**
 
-## Özellikleri
+## Teknik Özellikler
 - **PWA (_Progessive Web App_) :**  
   Hem çevrimiçi hem de çevrimdışı çalışabilir.
   Chrome, Edge, Safari, PWA destekli tarayıcı kullanan her platformda çalışır, kurulabilir.
@@ -26,10 +25,6 @@ Türk dama oyunudur.
   (_Trusted Web Activity(TWA)_ bazlı örnek bir APK _Releases_ altına eklenmiştir).
 - **_Responsive_ tasarım:**  
   Telefon, tablet, dizüstü, masaüstü, smartTV, vb her ekran boyutuna uygundur.
-- **Temel dama kurallarını uygular:**  
-  Taş almak zorunludur. Birden fazla taş alma yolu varsa en fazla taş alınan yolu seçmek zorunludur,
-  eşit sayıda taş alma durumunda seçim oyuncuya bırakılır.
-  Dama, son taş aldığı yönün tam tersi yönde taş almaya devam edemez. Yapılan hamle geri alınmaz.
 - **Temel web teknolojilerine dayanır:**  
   Html, CSS, Javascript, SVG kullanılarak geliştirilmiştir.
   Herhangi bir oyun motoru veya _framework_ kullanmaz, %100 yerlidir.
