@@ -1,8 +1,6 @@
 # Dama
 Türk dama oyunudur.
 
-![Demo animasyonu](./demo.webp)
-
 ### Microsoft Store üzerinden yüklenebilir
 > https://www.microsoft.com/store/productId/9NZ067RSDNRV
 ---
@@ -21,10 +19,8 @@ Türk dama oyunudur.
 - **PWA (_Progessive Web App_) :**  
   Hem çevrimiçi hem de çevrimdışı çalışabilir.
   Chrome, Edge, Safari, PWA destekli tarayıcı kullanan her platformda çalışır, kurulabilir.
-  PWABuilder, Bubblewrap gibi araçlar ile mobil marketlere uygun paketlenip yüklenebilir
-  (_Trusted Web Activity(TWA)_ bazlı örnek bir APK _Releases_ altına eklenmiştir).
 - **_Responsive_ tasarım:**  
   Telefon, tablet, dizüstü, masaüstü, smartTV, vb her ekran boyutuna uygundur.
 - **Temel web teknolojilerine dayanır:**  
-  Html, CSS, Javascript, SVG kullanılarak geliştirilmiştir.
+  Html, CSS, Javascript, SVG, WebRTC kullanılarak geliştirilmiştir.
   Herhangi bir oyun motoru veya _framework_ kullanmaz, %100 yerlidir.
