@@ -7,6 +7,7 @@
   "categories": ["games"],
   "orientation": "any",
   "iarc_rating_id": "4594523c-d769-4d99-837c-eb6b9f4bfbf5",
+  "shortcuts": [],
   "icons": [
     {
       "src": "./img/ikon-apple.png",
@@ -46,7 +47,7 @@
       "label": "Yatay görünüm, telefon"
     }
   ],
-  "start_url": "https://dama.azurewebsites.net/ms.html",
+  "start_url": "https://dama.web.tr/ms.html",
   "id": "/ms.html",
   "background_color": "#FFFACD",
   "theme_color": "#F5DEB3",

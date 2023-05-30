@@ -39,11 +39,6 @@ div object {
   width: auto;
 }
 
-.reklam {
-  width: calc(5 * var(--buton-en));
-  height: auto;
-}
-
 div button svg {
   width: var(--buton-en);
   height: var(--buton-en);
@@ -162,18 +157,6 @@ button {
   div object {
     width: min(100vmin, calc(100vh - calc(2 * var(--buton-en))));
     height: auto;
-  }
-  .reklam {
-    height: calc(4 * var(--buton-en));
-    width: auto;
-  }
-  .skor-btn-beyaz {
-    padding-right: 0.75vmin;
-    margin-left: 0;
-  }
-  .skor-btn-siyah {
-    padding-left: 0.75vmin;
-    margin-right: 0;
   }
   #çevrim {
     margin-top: 0.75vmin;

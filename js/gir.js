@@ -69,8 +69,8 @@ onload = () => {
     const levha = ['#beyazskor', '#siyahskor'];
     let alttaki=0, üstteki=1;
     return function() {
-      frm.appendChild(frm.replaceChild(document.querySelector(`${levha[alttaki]}`),
-                                       document.querySelector(`${levha[üstteki]}`))
+      frm.appendChild(frm.replaceChild(document.querySelector(levha[alttaki]),
+                                       document.querySelector(levha[üstteki]))
                      );
       [üstteki,alttaki] = [alttaki,üstteki];
     };

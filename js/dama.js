@@ -131,7 +131,7 @@ function teklif_yanıt_gönder() {
 function bağlan() {
   bağlanıyor = true;
   try {
-    skt = new WebSocket('wss://dama.azurewebsites.net/snyl');
+    skt = new WebSocket('wss://dama.web.tr/snyl');
   }
   catch(h) {
     göster(h);
