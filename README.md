@@ -1,10 +1,10 @@
 # Dama
 Türk dama oyunudur.
-
+<!--
 |  |  |
 | --- | --- |
 | [![Google Play'den alın](get-play-tr.png)](https://play.google.com/store/apps/details?id=tr.web.dama.twa) | [![Microsoft'tan alın](get-ms-tr.png)](https://apps.microsoft.com/store/detail/9NZ067RSDNRV) |
-
+-->
 - Çevrim içi, çevrim dışı (bilgisayara karşı veya karşılıklı iki kişi) oynayabilirsiniz. Çevrim içi eşleşme rastgele ve anonimdir.
 
 - *Denetim işlevleri:* Çevrim içi/dışı, tahta çevirme, tahta büyültme/küçültme, sıfırlama (yeni oyun), oyuncu seçimi, çubuk taşıma.
