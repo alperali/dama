@@ -1,5 +1,9 @@
 # Dama
 Türk dama oyunudur.
+
+## [>> Demo için tıklayın](https://dama.web.tr/demo/ms.html)
+> Demo için güncel bir Chrome, Edge, Safari, Firefox vs sürümü kullanın.
+
 <!--
 |  |  |
 | --- | --- |

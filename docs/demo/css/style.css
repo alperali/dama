@@ -1,0 +1,178 @@
+/*---------------------------------------------------------------------------
+ * Telif Hakkı/Copyright A. Alper Atıcı. Her Hakkı Saklıdır.
+ * All Rights Reserved. This is not free software.
+ *---------------------------------------------------------------------------*/
+:root {
+  --buton-en: 6vmin;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1;
+  background-color: #616247;
+}
+
+main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.solüst {
+  flex-direction: row;
+}
+.sağalt {
+  flex-direction: row-reverse;
+}
+
+div object {
+  height: min(100vmin, calc(100vw - calc(2 * var(--buton-en))));
+  width: auto;
+}
+
+div button svg {
+  width: var(--buton-en);
+  height: var(--buton-en);
+}
+
+button {
+  margin: 1.75vmin 0.75vmin;
+  display: block;
+  padding-left: 0.5vmin;
+  padding-right: 0.5vmin;
+}
+
+.skor-svg {
+  width: calc(1.75vmin + var(--buton-en));
+  height: calc(1.25vmin + var(--buton-en));
+}
+.skor-btn-siyah, .skor-btn-beyaz {
+  padding: 0;
+  border: 0;
+}
+
+#çevrim {
+  margin-top: 5vmin;
+}
+
+#yeni {
+  margin-bottom: 5vmin;
+}
+
+.ikon {
+  display: block;
+  text-transform: none;
+}
+
+.yatay {
+  display: block;
+}
+.düşey {
+  display: none;
+}
+
+.oyun-sonu {
+  animation-name: ani1;
+  animation-duration: 1.33s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+@keyframes ani1 {
+  from {
+    background-color: goldenrod;
+  }
+  to {
+    background-color: #ffff99;
+  }
+}
+.bağlı {
+  background-color: #ffff99;
+}
+.bağlı:hover {
+  background-color: #ffec80;
+}
+.bağlı:active {
+  background-color: #ffff99;
+}
+.oyuncu-bağlı {
+  background-color: white;
+}
+
+.mesaj-kutu {
+  display: flex;
+  align-items: center;
+  padding-left: 2vmin;
+  visibility: hidden;
+  position: absolute;
+  top: 14vmin;
+  left: 7.5vmin;
+  right: 7.5vmin;
+  height: 20vmin;
+  border-width: 1;
+  background-color: lightcyan;
+  font-size: 8vmin;
+  font-weight: bold;
+  border: 0.66vmin solid darkolivegreen;
+  border-radius: 2vmin;
+  opacity: 0;
+  transition: opacity 1s;
+}
+#mesaj2 {
+  font-size: 6vmin;
+  font-weight: normal;
+}
+
+@media screen and (orientation: portrait) {
+  main {
+    height: 100vh;
+    align-content: center;
+  }
+  .solüst {
+    flex-direction: column;
+  }
+  .sağalt {
+    flex-direction: column-reverse;
+  }
+
+  div button svg {
+    width: calc(var(--buton-en) + 0.85vh);
+    height: calc(var(--buton-en) + 0.85vh);
+  }
+
+  button {
+    margin: 1vmin 0.5vmin;
+    display: inline;
+    padding-top: 0.5vmin;
+    padding-bottom: 0.5vmin;
+  }
+  div object {
+    width: min(100vmin, calc(100vh - calc(2 * var(--buton-en))));
+    height: auto;
+  }
+  #çevrim {
+    margin-top: 0.75vmin;
+  }
+  #yeni {
+    margin-bottom: 0.75vmin;
+  }
+  .yatay {
+    display: none;
+  }
+  .düşey {
+    display: block;
+  }
+}
+
+.çerçeve {
+  border: 2px solid dimgray;
+  background-color: #EAE6DA;
+}
