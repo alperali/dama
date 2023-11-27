@@ -4,6 +4,10 @@ Türk dama oyunudur.
 ## [>> Demo için tıklayın](https://dama.web.tr/demo/ms.html)
 > Demo için güncel bir Chrome, Edge, Safari, Firefox vs sürümü kullanın.
 
+[Lighthouse raporunu göster](https://pagespeed.web.dev/analysis/https-dama-web-tr-demo-ms-html/7rvhm6nms1?form_factor=mobile)
+
+---
+
 <!--
 |  |  |
 | --- | --- |
