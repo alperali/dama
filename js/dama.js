@@ -14,7 +14,7 @@ const C = {
           };
 
 const makiwrk = new Worker('./js/makina.js');
-let th, marker, alt_marker, glgth, sayaçlar, evnt, bağ_durum, skt, taydaş, kanal;
+let th, marker, alt_marker, glgth, sayaçlar, bağ_durum, skt, taydaş, kanal;
 let from, yön, seçim_sabit=false, taş_seçili=false, al=false, alan=[], seçili_alım=[],
       beyazlar, siyahlar, bağlanıyor=false, bağlı=false, teklif_yanıt_gitti=false, teklif_yaptı=false;
 
@@ -46,14 +46,13 @@ function oyuncu_değiştir() {
 }
 
 export
-function başlat(pth, byz_sayaç, syh_sayaç, bağdur, pevt) {
+function başlat(pth, byz_sayaç, syh_sayaç, bağdur) {
   th = pth;
-  evnt = pevt;
   bağ_durum = bağdur;
   marker = th.querySelector('#marker');
   alt_marker = [th.querySelector('#alan1'), th.querySelector('#alan2'), th.querySelector('#alan3')];
-  sayaçlar = {[Yön.Beyaz]: {sayaç: byz_sayaç, say: 0},
-              [Yön.Siyah]: {sayaç: syh_sayaç, say: 0}};
+  sayaçlar = {[Yön.Beyaz]: byz_sayaç,
+              [Yön.Siyah]: syh_sayaç};
 
   glgth = tahta_çiz(th);
   th.querySelector('#kareler').addEventListener('click', kare_seç);
@@ -61,15 +60,8 @@ function başlat(pth, byz_sayaç, syh_sayaç, bağdur, pevt) {
   th.querySelector('#beyazlar').addEventListener('click', beyaz_seç);
   makiwrk.addEventListener('message', makina_mesaj_işle);
   
-  [yön, sayaçlar[Yön.Beyaz].say, sayaçlar[Yön.Siyah].say, beyazlar, siyahlar, makina] = oyun_yükle(th, glgth);
+  [yön, sayaçlar[Yön.Beyaz].sayaç, sayaçlar[Yön.Siyah].sayaç, beyazlar, siyahlar, makina] = oyun_yükle(th, glgth);
   makiwrk.postMessage({msg: "oyun-yükle", glgth, beyazlar, siyahlar, makina});
-
-  if (sayaçlar[Yön.Beyaz].say)
-    sayaçlar[Yön.Beyaz].sayaç.dispatchEvent(new CustomEvent(evnt, {detail: sayaçlar[Yön.Beyaz].say}));
-  if (sayaçlar[Yön.Siyah].say)
-    sayaçlar[Yön.Siyah].sayaç.dispatchEvent(new CustomEvent(evnt, {detail: sayaçlar[Yön.Siyah].say}));
-
-  // sayaç 0 ise tabelası boş kalsın
 
   if (yön != 'N/A') {
     th.querySelector(`line${C[yön].sıra_göster}`).setAttribute('visibility', 'visible');
@@ -98,10 +90,10 @@ function başlat(pth, byz_sayaç, syh_sayaç, bağdur, pevt) {
     for (let y=8; y>0; --y)
       for (let x=1; x<9; ++x)
         glgth[y][x] = Taş.yok;
-    sayaçlar[Yön.Beyaz].sayaç.dispatchEvent(new CustomEvent(evnt, {detail: ""}));
-    sayaçlar[Yön.Siyah].sayaç.dispatchEvent(new CustomEvent(evnt, {detail: ""}));
+    sayaçlar[Yön.Beyaz].sıfırla();
+    sayaçlar[Yön.Siyah].sıfırla();
     const durum_mak = makina.aktif;
-    [yön, sayaçlar[Yön.Beyaz].say, sayaçlar[Yön.Siyah].say, beyazlar, siyahlar, makina] = oyun_yükle(th, glgth);
+    [yön, sayaçlar[Yön.Beyaz].sayaç, sayaçlar[Yön.Siyah].sayaç, beyazlar, siyahlar, makina] = oyun_yükle(th, glgth);
     makina.aktif = durum_mak;
     makiwrk.postMessage({msg: "oyun-yükle", glgth, beyazlar, siyahlar, makina});
   };
@@ -405,8 +397,7 @@ function devinim(to, dama_satırı) {
     default: alan.length = 0;
   }
   if (taş_aldı) {
-    ++sayaçlar[yön].say;
-    sayaçlar[yön].sayaç.dispatchEvent(new CustomEvent(evnt, {detail: sayaçlar[yön].say}));
+    sayaçlar[yön].taş_aldı();
     if (makina.aktif && makina.yön == yön && al) {
     // makina taş almış ve daha alırım demiş (al'ı true yapmış), buradan tekrar ona devredelim.
       makiwrk.postMessage({msg: 'oyna', al: true, dama_yön});
@@ -435,7 +426,7 @@ function devinim(to, dama_satırı) {
   th.querySelector(`line${C[yön].sıra_göster}`).setAttribute('visibility', 'hidden');
   th.querySelector(`line${C[Karşı[yön]].sıra_göster}`).setAttribute('visibility', 'visible');
   yön = Karşı[yön];
-  oyun_kaydet(th, yön, sayaçlar[Yön.Beyaz].say, sayaçlar[Yön.Siyah].say, makina);
+  oyun_kaydet(th, yön, sayaçlar[Yön.Beyaz].sayaç, sayaçlar[Yön.Siyah].sayaç, makina);
   if (makina.aktif && (makina.yön == yön))
     makiwrk.postMessage({msg: 'oyna'});
   else
