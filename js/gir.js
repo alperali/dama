@@ -89,6 +89,7 @@ const ileti = (() => {
 class Sayaç {
   #renk;  // 'beyaz' veya 'siyah', string olacak
   #syç = 0;
+  #onlu = false;
   constructor(r) {
     this.#renk = r;
   }
@@ -104,7 +105,10 @@ class Sayaç {
     this.#işle();
   }
   #işle() {
-    if (this.#syç == 10)  document.querySelector(`#${this.#renk}skor svg text`).setAttribute('x', '1.75');
+    if (!this.#onlu && this.#syç > 9) {
+      document.querySelector(`#${this.#renk}skor svg text`).setAttribute('x', '1.75');
+      this.#onlu = true;
+    }
     document.querySelector(`#${this.#renk}skor svg text`).textContent = this.#syç || ""; // sayaç 0 ise tabelası boş kalsın
     if (this.#syç == 16) {
       document.querySelector('#yeni svg').classList.add('oyun-sonu');
@@ -114,6 +118,7 @@ class Sayaç {
   }
   sıfırla() {
     this.sayaç = 0;
+    this.#onlu = false;
     document.querySelector(`#${this.#renk}skor svg text`).setAttribute('x', '6');
   }
 }
