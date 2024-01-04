@@ -4,16 +4,14 @@
  *---------------------------------------------------------------------------*/
 export { tahta_çevir, çerçeve_gör } from './gorsel.js';
 import { oyun_yükle, tahta_çiz, oyun_kaydet, dama_çiz } from './gorsel.js';
+import { Taş, Yön, Karşı } from './defs.js';
 
-const Taş = { yok: 9, Syh: 13, Byz: 17, Yoz: 0, Dama: 1 };
-const Yön = {B: 0, K: 1, D: 2, G: 3, yok: 4, Beyaz: 1, Siyah: -1 };
-const Karşı = {[Yön.Beyaz]: Yön.Siyah, [Yön.Siyah]: Yön.Beyaz};
 const C = {
            [Yön.Beyaz]: {sıra_göster: '#beyaz', dama_satırı: '8', taş_grup: '#beyazlar', taş_renk: Taş.Byz, yağı: Taş.Syh},
            [Yön.Siyah]: {sıra_göster: '#siyah', dama_satırı: '1', taş_grup: '#siyahlar', taş_renk: Taş.Syh, yağı: Taş.Byz}
           };
 
-const makiwrk = new Worker('./js/makina.js');
+const makiwrk = new Worker('./js/makina.js', { type: 'module' });
 let th, marker, alt_marker, glgth, sayaçlar, bağ_durum, skt, taydaş, kanal;
 let from, yön, seçim_sabit=false, taş_seçili=false, al=false, alan=[], seçili_alım=[],
       beyazlar, siyahlar, bağlanıyor=false, bağlı=false, teklif_yanıt_gitti=false, teklif_yaptı=false;
