@@ -2,9 +2,7 @@
  * Telif Hakkı/Copyright A. Alper Atıcı. Her Hakkı Saklıdır.
  * All Rights Reserved. This is not free software.
  *---------------------------------------------------------------------------*/
-const Taş = { yok: 9, Syh: 13, Byz: 17, Yoz: 0, Dama: 1 };
-const Yön = {B: 0, K: 1, D: 2, G: 3, yok: 4, Beyaz: 1, Siyah: -1 };
-const Karşı = {[Yön.Beyaz]: Yön.Siyah, [Yön.Siyah]: Yön.Beyaz};
+import { Taş, Yön, Karşı } from './defs.js';
 const dama_değeri = 3;  // bir damanın tahminen kaç yoz taş değerinde olduğu
 const C = {
   [Yön.Beyaz]: {taş_renk: Taş.Byz, yağı: Taş.Syh, dama_satırı: 8},
